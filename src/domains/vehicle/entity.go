@@ -1,5 +1,7 @@
 package vehicle
 
+import "ddgodeliv/src/domains/company"
+
 type IVehicleModel interface {
 	GetId() int
 	SetId(id int) IVehicleModel
@@ -25,4 +27,8 @@ type IVehicle interface {
 	SetLicenseId(licenseId string) IVehicle
 
 	GetModel() IVehicleModel
+	SetModel(model IVehicleModel) IVehicle
+
+	GetCompany() company.ICompany
+	SetCompany(company company.ICompany) IVehicle
 }
