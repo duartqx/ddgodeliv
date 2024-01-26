@@ -58,10 +58,18 @@ type IFreightRepository interface {
 
 	FindByCompanyId(id int) (*[]freight.IFreight, error)
 	ExistsByCompanyId(id int) bool
+
+	Create(freight freight.IFreight) error
+	Update(freight freight.IFreight) error
+	Delete(freight freight.IFreight) error
 }
 
 type IVehicleModelRepository interface {
 	FindById(id int) (vehicle.IVehicleModel, error)
+
+	Create(model vehicle.IVehicleModel) error
+	Update(model vehicle.IVehicleModel) error
+	Delete(model vehicle.IVehicleModel) error
 }
 
 type IVehicleRepository interface {
@@ -69,4 +77,8 @@ type IVehicleRepository interface {
 
 	FindByCompanyId(id int) (*[]vehicle.IVehicle, error)
 	ExistsByCompanyId(id int) bool
+
+	Create(vehicle vehicle.IVehicle) error
+	Update(vehicle vehicle.IVehicle) error
+	Delete(vehicle vehicle.IVehicle) error
 }
