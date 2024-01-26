@@ -3,82 +3,82 @@ package infrastructure
 import (
 	"time"
 
-	"ddgodeliv/src/domains/company"
-	"ddgodeliv/src/domains/driver"
-	"ddgodeliv/src/domains/freight"
-	"ddgodeliv/src/domains/user"
-	"ddgodeliv/src/domains/vehicle"
+	c "ddgodeliv/src/domains/company"
+	d "ddgodeliv/src/domains/driver"
+	f "ddgodeliv/src/domains/freight"
+	u "ddgodeliv/src/domains/user"
+	v "ddgodeliv/src/domains/vehicle"
 )
 
 type IUserRepository interface {
-	FindById(id int) (user.IUser, error)
+	FindById(id int) (u.IUser, error)
 
-	FindByEmail(email string) (user.IUser, error)
-	ExistsByEmail(email string) bool
+	FindByEmail(email string) (u.IUser, error)
+	ExistsByEmail(email string) *bool
 
-	Create(user user.IUser) error
-	Update(user user.IUser) error
-	Delete(user user.IUser) error
+	Create(user u.IUser) error
+	Update(user u.IUser) error
+	Delete(user u.IUser) error
 }
 
 type ICompanyRepository interface {
-	FindById(id int) (company.ICompany, error)
+	FindById(id int) (c.ICompany, error)
 
-	Create(company company.ICompany) error
-	Update(company company.ICompany) error
-	Delete(company company.ICompany) error
+	Create(company c.ICompany) error
+	Update(company c.ICompany) error
+	Delete(company c.ICompany) error
 }
 
 type IDriverRepository interface {
-	FindById(id int) (driver.IDriver, error)
+	FindById(id int) (d.IDriver, error)
 
-	FindByUserId(id int) (driver.IDriver, error)
-	ExistsByUserId(id int) bool
+	FindByUserId(id int) (d.IDriver, error)
+	ExistsByUserId(id int) *bool
 
-	FindByCompanyId(id int) (*[]driver.IDriver, error)
-	ExistsByCompanyId(id int) bool
+	FindByCompanyId(id int) (*[]d.IDriver, error)
+	ExistsByCompanyId(id int) *bool
 
-	Create(driver driver.IDriver) error
-	Update(driver driver.IDriver) error
-	Delete(driver driver.IDriver) error
+	Create(driver d.IDriver) error
+	Update(driver d.IDriver) error
+	Delete(driver d.IDriver) error
 }
 
 type IFreightRepository interface {
-	FindById(id int) (freight.IFreight, error)
+	FindById(id int) (f.IFreight, error)
 
-	FindByDriverId(id int) (*[]freight.IFreight, error)
-	ExistsByDriverId(id int) bool
+	FindByDriverId(id int) (*[]f.IFreight, error)
+	ExistsByDriverId(id int) *bool
 
-	FindByDeadlineDateRange(start, end time.Time) (*[]freight.IFreight, error)
-	FindByDeadlineDate(deadline time.Time) (*[]freight.IFreight, error)
-	ExistsByDeadlineDate(deadline time.Time) bool
+	FindByDeadlineDateRange(start, end time.Time) (*[]f.IFreight, error)
+	FindByDeadlineDate(deadline time.Time) (*[]f.IFreight, error)
+	ExistsByDeadlineDate(deadline time.Time) *bool
 
-	FindBySenderId(id int) (*[]freight.IFreight, error)
-	ExistsBySenderId(id int) bool
+	FindBySenderId(id int) (*[]f.IFreight, error)
+	ExistsBySenderId(id int) *bool
 
-	FindByCompanyId(id int) (*[]freight.IFreight, error)
-	ExistsByCompanyId(id int) bool
+	FindByCompanyId(id int) (*[]f.IFreight, error)
+	ExistsByCompanyId(id int) *bool
 
-	Create(freight freight.IFreight) error
-	Update(freight freight.IFreight) error
-	Delete(freight freight.IFreight) error
+	Create(freight f.IFreight) error
+	Update(freight f.IFreight) error
+	Delete(freight f.IFreight) error
 }
 
 type IVehicleModelRepository interface {
-	FindById(id int) (vehicle.IVehicleModel, error)
+	FindById(id int) (v.IVehicleModel, error)
 
-	Create(model vehicle.IVehicleModel) error
-	Update(model vehicle.IVehicleModel) error
-	Delete(model vehicle.IVehicleModel) error
+	Create(model v.IVehicleModel) error
+	Update(model v.IVehicleModel) error
+	Delete(model v.IVehicleModel) error
 }
 
 type IVehicleRepository interface {
-	FindById(id int) (vehicle.IVehicle, error)
+	FindById(id int) (v.IVehicle, error)
 
-	FindByCompanyId(id int) (*[]vehicle.IVehicle, error)
-	ExistsByCompanyId(id int) bool
+	FindByCompanyId(id int) (*[]v.IVehicle, error)
+	ExistsByCompanyId(id int) *bool
 
-	Create(vehicle vehicle.IVehicle) error
-	Update(vehicle vehicle.IVehicle) error
-	Delete(vehicle vehicle.IVehicle) error
+	Create(vehicle v.IVehicle) error
+	Update(vehicle v.IVehicle) error
+	Delete(vehicle v.IVehicle) error
 }
