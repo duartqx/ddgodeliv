@@ -1,36 +1,24 @@
 package postgresql
 
 import (
-	c "ddgodeliv/src/domains/company"
 	"fmt"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+
+	c "ddgodeliv/src/domains/company"
 )
 
 type CompanyRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewCompanyRepository(db *sqlx.DB) (*CompanyRepository, error) {
-	if _, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS Companies (
-			id SERIAL PRIMARY KEY,
-			name VARCHAR(255) NOT NULL UNIQUE,
-		);
-	`); err != nil {
-		return nil, err
-	}
-
-	return &CompanyRepository{db: db}, nil
-}
-
-func (cr CompanyRepository) getModel() *c.Company {
-	return &c.Company{}
+func GetNewCompanyRepository(db *sqlx.DB) *CompanyRepository {
+	return &CompanyRepository{db: db}
 }
 
 func (cr CompanyRepository) FindById(id int) (c.ICompany, error) {
-	company := cr.getModel()
+	company := c.GetNewCompany()
 
 	if err := cr.db.Get(company, "SELECT * FROM companies WHERE id = $1", id); err != nil {
 		return nil, err
