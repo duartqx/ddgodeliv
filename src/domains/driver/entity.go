@@ -32,6 +32,13 @@ type Driver struct {
 	Company company.ICompany `json:"company"`
 }
 
+func GetNewDriver() *Driver {
+	return &Driver{
+		User:    user.GetNewUser(),
+		Company: company.GetNewCompany(),
+	}
+}
+
 func (d Driver) GetId() int {
 	return d.Id
 }

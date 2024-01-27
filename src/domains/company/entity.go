@@ -13,6 +13,10 @@ type Company struct {
 	Name string `db:"name" json:"name"`
 }
 
+func GetNewCompany() *Company {
+	return &Company{}
+}
+
 func (c Company) GetId() int {
 	return c.Id
 }

@@ -21,6 +21,10 @@ type User struct {
 	Name     string `db:"name" json:"name" validate:"required,min=3,max=50"`
 }
 
+func GetNewUser() *User {
+	return &User{}
+}
+
 func (u User) GetId() int {
 	return u.Id
 }
