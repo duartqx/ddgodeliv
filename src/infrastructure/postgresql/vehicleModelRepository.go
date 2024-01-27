@@ -65,8 +65,8 @@ func (vmr VehicleModelRepository) Update(model v.IVehicleModel) error {
 
 	_, err := vmr.db.Exec(
 		`
-			UPDATE vehiclemodels SET
-			manufacturer = $1, year = $2, max_load = $3
+			UPDATE vehiclemodels
+			SET manufacturer = $1, year = $2, max_load = $3
 			WHERE id = $2
 		`,
 		model.GetManufacturer(),
