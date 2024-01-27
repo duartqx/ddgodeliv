@@ -13,28 +13,13 @@ type UserRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewUserRepository(db *sqlx.DB) (*UserRepository, error) {
-	if _, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS Users (
-			id SERIAL PRIMARY KEY,
-			email VARCHAR(255) NOT NULL UNIQUE,
-			password VARCHAR(255) NOT NULL,
-			name VARCHAR(255) NOT NULL
-		);
-	`); err != nil {
-		return nil, err
-	}
-
-	return &UserRepository{db: db}, nil
-}
-
-func (ur UserRepository) getUserModel() *u.User {
-	return &u.User{}
+func GetNewUserRepository(db *sqlx.DB) *UserRepository {
+	return &UserRepository{db: db}
 }
 
 func (ur UserRepository) FindByID(id int) (u.IUser, error) {
 
-	user := ur.getUserModel()
+	user := u.GetNewUser()
 
 	if err := ur.db.Get(user, "SELECT * FROM users WHERE id = $1", id); err != nil {
 		return nil, err
@@ -45,7 +30,7 @@ func (ur UserRepository) FindByID(id int) (u.IUser, error) {
 
 func (ur UserRepository) FindByEmail(email string) (u.IUser, error) {
 
-	user := ur.getUserModel()
+	user := u.GetNewUser()
 
 	if err := ur.db.Get(user, "SELECT * FROM users WHERE email = $1", email); err != nil {
 		return nil, err
@@ -95,16 +80,14 @@ func (ur UserRepository) Update(user u.IUser) error {
 		return fmt.Errorf("Invalid user id")
 	}
 
-	if _, err := ur.db.Exec(
+	_, err := ur.db.Exec(
 		"UPDATE users SET email = $1, name = $2 WHERE id = $3",
 		strings.ToLower(user.GetEmail()),
 		user.GetName(),
 		user.GetId(),
-	); err != nil {
-		return err
-	}
+	)
 
-	return nil
+	return err
 }
 
 func (ur UserRepository) Delete(user u.IUser) error {
@@ -113,9 +96,7 @@ func (ur UserRepository) Delete(user u.IUser) error {
 		return fmt.Errorf("Invalid User")
 	}
 
-	if _, err := ur.db.Exec("DELETE FROM users WHERE id = $1", user.GetId()); err != nil {
-		return err
-	}
+	_, err := ur.db.Exec("DELETE FROM users WHERE id = $1", user.GetId())
 
-	return nil
+	return err
 }
