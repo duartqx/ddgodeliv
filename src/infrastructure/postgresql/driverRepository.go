@@ -117,6 +117,10 @@ func (dr DriverRepository) Update(driver d.IDriver) error {
 		return err
 	}
 
+	if driver.GetId() == 0 {
+		return fmt.Errorf("Invalid Driver Id")
+	}
+
 	_, err := dr.db.Exec(
 		"UPDATE drivers SET license_id = $1 WHERE id = $2",
 		strings.ToLower(driver.GetLicenseId()),
