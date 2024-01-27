@@ -1,7 +1,7 @@
 package repository
 
 import (
-	v "ddgodeliv/src/domains/vehicle"
+	v "ddgodeliv/domains/vehicle"
 )
 
 type IVehicleModelRepository interface {

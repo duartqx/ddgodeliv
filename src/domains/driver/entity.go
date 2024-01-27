@@ -1,8 +1,8 @@
 package driver
 
 import (
-	"ddgodeliv/src/domains/company"
-	"ddgodeliv/src/domains/user"
+	"ddgodeliv/domains/company"
+	"ddgodeliv/domains/user"
 )
 
 type IDriver interface {

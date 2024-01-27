@@ -1,7 +1,7 @@
 package repository
 
 import (
-	c "ddgodeliv/src/domains/company"
+	c "ddgodeliv/domains/company"
 )
 
 type ICompanyRepository interface {

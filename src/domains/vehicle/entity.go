@@ -1,6 +1,6 @@
 package vehicle
 
-import "ddgodeliv/src/domains/company"
+import "ddgodeliv/domains/company"
 
 type IVehicleModel interface {
 	GetId() int

@@ -1,7 +1,7 @@
 package repository
 
 import (
-	d "ddgodeliv/src/domains/driver"
+	d "ddgodeliv/domains/driver"
 )
 
 type IDriverRepository interface {

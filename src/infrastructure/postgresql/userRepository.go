@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	u "ddgodeliv/src/domains/user"
+	u "ddgodeliv/domains/user"
 )
 
 type UserRepository struct {

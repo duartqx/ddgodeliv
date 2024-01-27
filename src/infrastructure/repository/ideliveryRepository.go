@@ -3,7 +3,7 @@ package repository
 import (
 	"time"
 
-	de "ddgodeliv/src/domains/delivery"
+	de "ddgodeliv/domains/delivery"
 )
 
 type IDeliveryRepository interface {

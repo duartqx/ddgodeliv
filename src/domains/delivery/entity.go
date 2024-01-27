@@ -1,9 +1,10 @@
 package delivery
 
 import (
-	"ddgodeliv/src/domains/driver"
-	"ddgodeliv/src/domains/user"
 	"time"
+
+	"ddgodeliv/domains/driver"
+	"ddgodeliv/domains/user"
 )
 
 type IDelivery interface {

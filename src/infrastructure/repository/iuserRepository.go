@@ -1,7 +1,7 @@
 package repository
 
 import (
-	u "ddgodeliv/src/domains/user"
+	u "ddgodeliv/domains/user"
 )
 
 type IUserRepository interface {

@@ -1,6 +1,6 @@
 package vehicle
 
-import "ddgodeliv/src/domains/company"
+import "ddgodeliv/domains/company"
 
 type Vehicle struct {
 	Id        int    `db:"id" json:"id"`

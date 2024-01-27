@@ -5,7 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	v "ddgodeliv/src/domains/vehicle"
+	v "ddgodeliv/domains/vehicle"
 )
 
 type VehicleModelRepository struct {

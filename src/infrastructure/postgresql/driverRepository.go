@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	d "ddgodeliv/src/domains/driver"
+	d "ddgodeliv/domains/driver"
 )
 
 type DriverRepository struct {

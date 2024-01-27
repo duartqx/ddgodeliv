@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	c "ddgodeliv/src/domains/company"
+	c "ddgodeliv/domains/company"
 )
 
 type CompanyRepository struct {
