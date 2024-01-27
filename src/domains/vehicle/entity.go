@@ -23,6 +23,9 @@ type IVehicle interface {
 	GetModelId() int
 	SetModelId(modelId int) IVehicle
 
+	GetCompanyId() int
+	SetCompanyId(companyId int) IVehicle
+
 	GetLicenseId() string
 	SetLicenseId(licenseId string) IVehicle
 

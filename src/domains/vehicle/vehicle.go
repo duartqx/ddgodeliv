@@ -12,6 +12,13 @@ type Vehicle struct {
 	Company company.ICompany `json:"company"`
 }
 
+func GetNewVehicle() *Vehicle {
+	return &Vehicle{
+		Model:   &VehicleModel{},
+		Company: &company.Company{},
+	}
+}
+
 func (v Vehicle) GetId() int {
 	return v.Id
 }
@@ -27,6 +34,15 @@ func (v Vehicle) GetModelId() int {
 
 func (v *Vehicle) SetModelId(modelId int) IVehicle {
 	v.ModelId = modelId
+	return v
+}
+
+func (v Vehicle) GetCompanyId() int {
+	return v.CompanyId
+}
+
+func (v *Vehicle) SetCompanyId(companyId int) IVehicle {
+	v.CompanyId = companyId
 	return v
 }
 
