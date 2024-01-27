@@ -7,6 +7,10 @@ type VehicleModel struct {
 	MaxLoad      int    `db:"max_load" json:"max_load"`
 }
 
+func GetNewVehicleModel() *VehicleModel {
+	return &VehicleModel{}
+}
+
 func (m VehicleModel) GetId() int {
 	return m.Id
 
