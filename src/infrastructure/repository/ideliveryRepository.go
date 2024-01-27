@@ -12,6 +12,9 @@ type IDeliveryRepository interface {
 	FindByDriverId(id int) (*[]de.IDelivery, error)
 	ExistsByDriverId(id int) *bool
 
+	FindByCompletionByDriverId(id int, completed bool) (*[]de.IDelivery, error)
+	ExistsByCompletionByDriverId(id int, completed bool) *bool
+
 	FindByDeadlineDateRange(start, end time.Time) (*[]de.IDelivery, error)
 	FindByDeadlineDate(deadline time.Time) (*[]de.IDelivery, error)
 	ExistsByDeadlineDate(deadline time.Time) *bool
@@ -22,7 +25,7 @@ type IDeliveryRepository interface {
 	FindByCompanyId(id int) (*[]de.IDelivery, error)
 	ExistsByCompanyId(id int) *bool
 
-	Create(freight de.IDelivery) error
-	Update(freight de.IDelivery) error
-	Delete(freight de.IDelivery) error
+	Create(delivery de.IDelivery) error
+	Update(delivery de.IDelivery) error
+	Delete(delivery de.IDelivery) error
 }

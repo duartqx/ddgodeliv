@@ -17,6 +17,9 @@ type IDelivery interface {
 	GetDeadline() time.Time
 	SetDeadline(deadline time.Time) IDelivery
 
+	GetCompleted() bool
+	SetCompleted() IDelivery
+
 	GetDriverId() int
 	SetDriverId(driverId int) IDelivery
 
@@ -29,13 +32,21 @@ type IDelivery interface {
 
 type Delivery struct {
 	Id          int       `db:"id" json:"id"`
-	Destination string    `db:"destination" json:"destination"`
-	Deadline    time.Time `db:"deadline" json:"deadline"`
 	DriverId    int       `db:"driver_id" json:"driver_id"`
 	SenderId    int       `db:"sender_id" json:"sender_id"`
+	Destination string    `db:"destination" json:"destination"`
+	Deadline    time.Time `db:"deadline" json:"deadline"`
+	Completed   bool      `db:"completed" json:"completed"`
 
 	Driver driver.IDriver `json:"driver"`
 	Sender user.IUser     `json:"sender"`
+}
+
+func GetNewDelivery() *Delivery {
+	return &Delivery{
+		Driver: driver.GetNewDriver(),
+		Sender: user.GetNewUser(),
+	}
 }
 
 func (d Delivery) GetId() int {
@@ -62,6 +73,15 @@ func (d Delivery) GetDeadline() time.Time {
 
 func (d *Delivery) SetDeadline(deadline time.Time) IDelivery {
 	d.Deadline = deadline
+	return d
+}
+
+func (d Delivery) GetCompleted() bool {
+	return d.Completed
+}
+
+func (d *Delivery) SetCompleted() IDelivery {
+	d.Completed = !d.Completed
 	return d
 }
 
