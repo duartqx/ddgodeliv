@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS Deliveries (
     id SERIAL PRIMARY KEY,
     driver_id int,
     sender_id int,
+    origin TEXT NOT NULL,
     destination TEXT NOT NULL,
     deadline TIMESTAMP,
     status SMALLINT DEFAULT 0,

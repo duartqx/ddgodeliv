@@ -32,17 +32,23 @@ func (ro *router) SetSecret(secret []byte) *router {
 	return ro
 }
 
-func userRoutes(userService *s.UserService, jwtController *c.JwtController) *chi.Mux {
+func (ro router) userRoutes(userService *s.UserService, jwtController *c.JwtController) *chi.Mux {
 
 	userController := c.GetNewUserController(userService)
 
 	userSubrouter := chi.NewRouter()
+
+	// POST: Create User
 	userSubrouter.
 		With(jwtController.UnauthenticatedMiddleware).
 		Method(http.MethodPost, "/", userController)
+
+	// GET: Self (Good for checking if the user is authenticated)
 	userSubrouter.
 		With(jwtController.AuthenticatedMiddleware).
 		Method(http.MethodGet, "/", userController)
+
+	// PATCH: Password Update
 	userSubrouter.
 		With(jwtController.AuthenticatedMiddleware).
 		Method(http.MethodPatch, "/password", userController)
@@ -65,16 +71,18 @@ func (ro router) Build() *chi.Mux {
 	router.Use(rm.RecoveryMiddleware, lm.LoggerMiddleware)
 
 	// Auth Routes
+	// POST: User Login
 	router.
 		With(jwtController.UnauthenticatedMiddleware).
 		Method(http.MethodPost, "/login", jwtController)
 
+	// DELETE: User Logout
 	router.
 		With(jwtController.AuthenticatedMiddleware).
 		Method(http.MethodDelete, "/logout", jwtController)
 
 	// User Routes
-	router.Mount("/user", userRoutes(userService, jwtController))
+	router.Mount("/user", ro.userRoutes(userService, jwtController))
 
 	return router
 }

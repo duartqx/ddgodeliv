@@ -20,7 +20,8 @@ func GetNewDeliveryRepository(db *sqlx.DB) *DeliveryRepository {
 func (dr DeliveryRepository) FindById(id int) (de.IDelivery, error) {
 	delivery := de.GetNewDelivery()
 
-	if err := dr.db.Get(delivery, "SELECT * FROM deliveries WHERE id = $1", id); err != nil {
+	err := dr.db.Get(delivery, "SELECT * FROM deliveries WHERE id = $1", id)
+	if err != nil {
 		return nil, err
 	}
 
@@ -233,22 +234,24 @@ func (dr DeliveryRepository) getDriverIdToQuery(id int) string {
 }
 
 func (dr DeliveryRepository) Create(delivery de.IDelivery) error {
-	if delivery.GetSenderId() == 0 || delivery.GetDestination() == "" {
-		return fmt.Errorf("Invalid Delivery: Missing Sender or Destination")
+	if delivery.GetSenderId() == 0 || delivery.GetOrigin() == "" || delivery.GetDestination() == "" {
+		return fmt.Errorf("Invalid Delivery: Missing Sender, Origin or Destination")
 	}
 
 	var id int
 
 	if err := dr.db.QueryRow(
 		`
-			INSERT INTO deliveries (driver_id, sender_id, destination, deadline)
-			VALUES ($1, $2, $3, $4)
+			INSERT INTO deliveries (driver_id, sender_id, origin, destination, deadline, status)
+			VALUES ($1, $2, $3, $4, $5, $6)
 			RETURNING id
 		`,
 		dr.getDriverIdToQuery(delivery.GetDriverId()),
 		delivery.GetSenderId(),
+		delivery.GetOrigin(),
 		delivery.GetDestination(),
 		delivery.GetDeadline(),
+		delivery.GetStatus(),
 	).Scan(&id); err != nil {
 		return err
 	}
@@ -260,7 +263,7 @@ func (dr DeliveryRepository) Create(delivery de.IDelivery) error {
 
 func (dr DeliveryRepository) Update(delivery de.IDelivery) error {
 
-	if delivery.GetSenderId() == 0 || delivery.GetDestination() == "" {
+	if delivery.GetSenderId() == 0 || delivery.GetOrigin() == "" || delivery.GetDestination() == "" {
 		return fmt.Errorf("Invalid Delivery: Missing Sender or Destination")
 	}
 
@@ -270,16 +273,19 @@ func (dr DeliveryRepository) Update(delivery de.IDelivery) error {
 			SET
 				driver_id = $1,
 				sender_id = $2,
-				destination = $3,
-				deadline = $4,
-				status = $5
-			WHERE id = $6
+				origin = $3,
+				destination = $4,
+				deadline = $5,
+				status = $6
+			WHERE id = $7
 		`,
 		dr.getDriverIdToQuery(delivery.GetDriverId()),
 		delivery.GetSenderId(),
+		delivery.GetOrigin(),
 		delivery.GetDestination(),
-		delivery.GetStatus(),
 		delivery.GetDeadline(),
+		delivery.GetStatus(),
+		delivery.GetId(),
 	)
 	return err
 }

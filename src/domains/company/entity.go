@@ -1,13 +1,5 @@
 package company
 
-type ICompany interface {
-	GetId() int
-	SetId(id int) ICompany
-
-	GetName() string
-	SetName(name string) ICompany
-}
-
 type Company struct {
 	Id   int    `db:"id" json:"id"`
 	Name string `db:"name" json:"name"`

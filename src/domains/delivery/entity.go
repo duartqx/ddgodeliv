@@ -1,73 +1,17 @@
 package delivery
 
 import (
-	"reflect"
 	"time"
 
 	"ddgodeliv/domains/driver"
 	"ddgodeliv/domains/user"
 )
 
-type IDelivery interface {
-	GetId() int
-	SetId(id int) IDelivery
-
-	GetDestination() string
-	SetDestination(destination string) IDelivery
-
-	GetDeadline() time.Time
-	SetDeadline(deadline time.Time) IDelivery
-
-	GetStatus() uint8
-	GetStatusDisplay() string
-	SetStatus(status uint8) IDelivery
-
-	GetDriverId() int
-	SetDriverId(driverId int) IDelivery
-
-	GetSenderId() int
-	SetSenderId(senderId int) IDelivery
-
-	GetDriver() driver.IDriver
-	GetSender() user.IUser
-}
-
-type statusChoices struct {
-	Pending   uint8
-	InTransit uint8
-	Late      uint8
-	Completed uint8
-}
-
-// Reflects upon the fields of statusChoices and builds an slice containing all
-// status labels
-func (sc statusChoices) getStatusChoicesLabels() *[]string {
-
-	rfl := reflect.TypeOf(statusChoices{})
-
-	statusLabels := make([]string, rfl.NumField())
-	for i := 0; i < rfl.NumField(); i++ {
-		statusLabels[i] = rfl.Field(i).Name
-	}
-
-	return &statusLabels
-}
-
-func (sc statusChoices) GetDisplay(s uint8) string {
-	return (*sc.getStatusChoicesLabels())[s]
-}
-
-var StatusChoices *statusChoices = &statusChoices{
-	Pending:   0,
-	InTransit: 1,
-	Late:      2,
-	Completed: 3,
-}
-
 type Delivery struct {
 	Id          int       `db:"id" json:"id"`
 	DriverId    int       `db:"driver_id" json:"driver_id"`
 	SenderId    int       `db:"sender_id" json:"sender_id"`
+	Origin      string    `db:"origin" json:"origin"`
 	Destination string    `db:"destination" json:"destination"`
 	Deadline    time.Time `db:"deadline" json:"deadline"`
 	Status      uint8     `db:"status" json:"status"`
@@ -89,6 +33,15 @@ func (d Delivery) GetId() int {
 
 func (d *Delivery) SetId(id int) IDelivery {
 	d.Id = id
+	return d
+}
+
+func (d Delivery) GetOrigin() string {
+	return d.Origin
+}
+
+func (d *Delivery) SetOrigin(origin string) IDelivery {
+	d.Origin = origin
 	return d
 }
 
