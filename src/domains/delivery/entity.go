@@ -17,8 +17,8 @@ type IDelivery interface {
 	GetDeadline() time.Time
 	SetDeadline(deadline time.Time) IDelivery
 
-	GetCompleted() bool
-	SetCompleted() IDelivery
+	GetStatus() uint8
+	SetStatus(status uint8) IDelivery
 
 	GetDriverId() int
 	SetDriverId(driverId int) IDelivery
@@ -30,13 +30,32 @@ type IDelivery interface {
 	GetSender() user.IUser
 }
 
+type status struct {
+	Value uint8
+	Label string
+}
+
+type deliveryStatus struct {
+	Pending   *status
+	InTransit *status
+	Late      *status
+	Completed *status
+}
+
+var DeliveryStatusChoices *deliveryStatus = &deliveryStatus{
+	Pending:   &status{Value: 0, Label: "Pending"},
+	InTransit: &status{Value: 1, Label: "InTransit"},
+	Late:      &status{Value: 2, Label: "Late"},
+	Completed: &status{Value: 3, Label: "Completed"},
+}
+
 type Delivery struct {
 	Id          int       `db:"id" json:"id"`
 	DriverId    int       `db:"driver_id" json:"driver_id"`
 	SenderId    int       `db:"sender_id" json:"sender_id"`
 	Destination string    `db:"destination" json:"destination"`
 	Deadline    time.Time `db:"deadline" json:"deadline"`
-	Completed   bool      `db:"completed" json:"completed"`
+	Status      uint8     `db:"status" json:"status"`
 
 	Driver driver.IDriver `json:"driver"`
 	Sender user.IUser     `json:"sender"`
@@ -76,12 +95,12 @@ func (d *Delivery) SetDeadline(deadline time.Time) IDelivery {
 	return d
 }
 
-func (d Delivery) GetCompleted() bool {
-	return d.Completed
+func (d Delivery) GetStatus() uint8 {
+	return d.Status
 }
 
-func (d *Delivery) SetCompleted() IDelivery {
-	d.Completed = !d.Completed
+func (d *Delivery) SetStatus(status uint8) IDelivery {
+	d.Status = status
 	return d
 }
 

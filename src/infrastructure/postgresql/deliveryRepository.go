@@ -59,12 +59,12 @@ func (dr DeliveryRepository) ExistsByDriverId(id int) (exists *bool) {
 	return exists
 }
 
-func (dr DeliveryRepository) FindByCompletionByDriverId(id int, completed bool) (*[]de.IDelivery, error) {
+func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]de.IDelivery, error) {
 	deliveries := []de.IDelivery{}
 
 	rows, err := dr.db.Query(
-		"SELECT * FROM deliveries WHERE driver_id = $1 AND completed = $2",
-		id, completed,
+		"SELECT * FROM deliveries WHERE driver_id = $1 AND status = $2",
+		id, status,
 	)
 	if err != nil {
 		return nil, err
@@ -85,10 +85,10 @@ func (dr DeliveryRepository) FindByCompletionByDriverId(id int, completed bool) 
 	return &deliveries, nil
 }
 
-func (dr DeliveryRepository) ExistsByCompletionByDriverId(id int, completed bool) (exists *bool) {
+func (dr DeliveryRepository) ExistsByCompletionByDriverId(id int, status uint8) (exists *bool) {
 	dr.db.QueryRow(
-		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE driver_id = $1 AND completed = $2)",
-		id, completed,
+		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE driver_id = $1 AND status = $2)",
+		id, status,
 	).Scan(&exists)
 
 	return exists

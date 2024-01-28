@@ -12,8 +12,8 @@ type IDeliveryRepository interface {
 	FindByDriverId(id int) (*[]de.IDelivery, error)
 	ExistsByDriverId(id int) *bool
 
-	FindByCompletionByDriverId(id int, completed bool) (*[]de.IDelivery, error)
-	ExistsByCompletionByDriverId(id int, completed bool) *bool
+	FindByStatusByDriverId(id int, status uint8) (*[]de.IDelivery, error)
+	ExistsByStatusByDriverId(id int, status uint8) *bool
 
 	FindByDeadlineDateRange(start, end time.Time) (*[]de.IDelivery, error)
 	FindByDeadlineDate(deadline time.Time) (*[]de.IDelivery, error)

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS Deliveries (
     sender_id int,
     destination TEXT NOT NULL,
     deadline TIMESTAMP,
-    completed BOOLEAN DEFAULT FALSE,
+    status SMALLINT DEFAULT 0,
     FOREIGN KEY (driver_id) REFERENCES Drivers (id) ON DELETE SET NULL,
     FOREIGN KEY (sender_id) REFERENCES Users (id) ON DELETE SET NULL
 );
