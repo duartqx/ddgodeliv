@@ -1,0 +1,25 @@
+@HOST = localhost:8080
+@JWT = {{ LoginAPI.response.body.token }}
+
+POST http://{{ HOST }}/user
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "password",
+    "name": "Teste User"
+}
+
+###
+# @name LoginAPI
+POST http://{{ HOST }}/login
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "password"
+}
+
+###
+GET http://{{ HOST }}/user
+Authorization: Bearer {{ JWT }}
