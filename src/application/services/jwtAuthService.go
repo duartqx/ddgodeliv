@@ -83,17 +83,13 @@ func (jas JwtAuthService) ValidateAuth(authorization string, cookie *http.Cookie
 		return nil, fmt.Errorf("Missing Token")
 	}
 
-	var claims *customClaims = jas.claims()
+	claims := jas.claims()
 
 	parsedToken, err := jwt.ParseWithClaims(unparsedToken, claims, jas.keyFunc)
 	if err != nil || !parsedToken.Valid {
 		jas.sessionRepository.Delete(unparsedToken)
 
 		return nil, fmt.Errorf("Expired session")
-	}
-
-	if _, err := jas.sessionRepository.Get(unparsedToken); err != nil {
-		return nil, fmt.Errorf("Missing session")
 	}
 
 	return &claims.ClaimsUser, nil
