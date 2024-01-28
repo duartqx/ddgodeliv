@@ -2,6 +2,7 @@ package validation
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -16,9 +17,17 @@ type Validator struct {
 }
 
 func NewValidator() *Validator {
-	return &Validator{
-		Validate: validator.New(),
-	}
+	v := validator.New()
+
+	v.RegisterValidation("future", func(fl validator.FieldLevel) bool {
+		t, ok := fl.Field().Interface().(time.Time)
+		if !ok {
+			return false
+		}
+		return t.After(time.Now())
+	})
+
+	return &Validator{Validate: v}
 }
 
 func (v Validator) Decode(errs error) *map[string]interface{} {

@@ -10,11 +10,11 @@ import (
 type Delivery struct {
 	Id          int       `db:"id" json:"id"`
 	DriverId    int       `db:"driver_id" json:"driver_id"`
-	SenderId    int       `db:"sender_id" json:"sender_id"`
-	Origin      string    `db:"origin" json:"origin"`
-	Destination string    `db:"destination" json:"destination"`
-	Deadline    time.Time `db:"deadline" json:"deadline"`
-	Status      uint8     `db:"status" json:"status"`
+	SenderId    int       `db:"sender_id" json:"sender_id" validate:"required"`
+	Origin      string    `db:"origin" json:"origin" validate:"required"`
+	Destination string    `db:"destination" json:"destination" validate:"required"`
+	Deadline    time.Time `db:"deadline" json:"deadline" validate:"future"`
+	Status      uint8     `db:"status" json:"status" validate:"required,gte=0,lte=4"`
 
 	Driver driver.IDriver `json:"driver"`
 	Sender user.IUser     `json:"sender"`
