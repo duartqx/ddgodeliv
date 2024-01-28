@@ -25,7 +25,7 @@ type CleanUser struct {
 type User struct {
 	Id       int    `db:"id" json:"id"`
 	Email    string `db:"email" json:"email" validate:"email,required"`
-	Password string `db:"password" json:"password"`
+	Password string `db:"password" json:"password" validate:"required,min=8,max=200"`
 	Name     string `db:"name" json:"name" validate:"required,min=3,max=50"`
 }
 

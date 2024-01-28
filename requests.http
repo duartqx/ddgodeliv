@@ -1,6 +1,8 @@
 @HOST = localhost:8080
 @JWT = {{ LoginAPI.response.body.token }}
 
+###
+# If user with same email exists, responds with 400 Bad Request
 POST http://{{ HOST }}/user
 Content-Type: application/json
 
@@ -8,6 +10,17 @@ Content-Type: application/json
     "email": "test@test.com",
     "password": "password",
     "name": "Teste User"
+}
+
+###
+# 400 Bad Request with Errors
+POST http://{{ HOST }}/user
+Content-Type: application/json
+
+{
+    "email": "",
+    "password": "",
+    "name": ""
 }
 
 ###

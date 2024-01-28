@@ -32,13 +32,32 @@ func (ro *router) SetSecret(secret []byte) *router {
 	return ro
 }
 
+func userRoutes(userService *s.UserService, jwtController *c.JwtController) *chi.Mux {
+
+	userController := c.GetNewUserController(userService)
+
+	userSubrouter := chi.NewRouter()
+	userSubrouter.
+		With(jwtController.UnauthenticatedMiddleware).
+		Method(http.MethodPost, "/", userController)
+	userSubrouter.
+		With(jwtController.AuthenticatedMiddleware).
+		Method(http.MethodGet, "/", userController)
+	userSubrouter.
+		With(jwtController.AuthenticatedMiddleware).
+		Method(http.MethodPatch, "/password", userController)
+
+	return userSubrouter
+}
+
 func (ro router) Build() *chi.Mux {
 
 	userRepository := r.GetNewUserRepository(ro.db)
 	userService := s.GetNewUserService(userRepository)
-	userController := c.GetNewUserController(userService)
 
-	jwtAuthService := s.GetNewJwtAuthService(userRepository, ro.secret, r.GetNewSessionRepository())
+	jwtAuthService := s.GetNewJwtAuthService(
+		userRepository, ro.secret, r.GetNewSessionRepository(),
+	)
 	jwtController := c.NewJwtController(jwtAuthService)
 
 	router := chi.NewRouter()
@@ -55,15 +74,7 @@ func (ro router) Build() *chi.Mux {
 		Method(http.MethodDelete, "/logout", jwtController)
 
 	// User Routes
-	userSubrouter := chi.NewRouter()
-	userSubrouter.
-		With(jwtController.UnauthenticatedMiddleware).
-		Method(http.MethodPost, "/", userController)
-	userSubrouter.
-		With(jwtController.AuthenticatedMiddleware).
-		Method(http.MethodGet, "/", userController)
-
-	router.Mount("/user", userSubrouter)
+	router.Mount("/user", userRoutes(userService, jwtController))
 
 	return router
 }

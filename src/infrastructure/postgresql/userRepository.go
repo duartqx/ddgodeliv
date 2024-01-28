@@ -39,7 +39,7 @@ func (ur UserRepository) FindByEmail(email string) (u.IUser, error) {
 	return user, nil
 }
 
-func (ur UserRepository) ExistsByEmail(email string) (exists *bool) {
+func (ur UserRepository) ExistsByEmail(email string) (exists bool) {
 	ur.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM users WHERE email = $1)",
 		email,

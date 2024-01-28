@@ -39,7 +39,8 @@ func (jc JwtController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if body, err := json.Marshal(response.Body); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
 	} else {
 		if response.Cookie != nil {
 			http.SetCookie(w, response.Cookie)

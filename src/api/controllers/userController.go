@@ -28,6 +28,8 @@ func (uc UserController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		response = uc.create(r)
 	case http.MethodGet:
 		response = uc.get(r)
+	case http.MethodPatch:
+		response = uc.updatePassword(r)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -55,8 +57,17 @@ func (uc UserController) create(r *http.Request) *h.Response {
 	}
 
 	if err := uc.userService.Create(user); err != nil {
+
+		creationErr := err.Error()
+		var errs interface{}
+
+		err = json.Unmarshal([]byte(creationErr), &errs)
+		if err != nil {
+			errs = creationErr
+		}
+
 		return &h.Response{
-			Body:   err.Error(),
+			Body:   map[string]interface{}{"error": errs},
 			Status: http.StatusBadRequest,
 		}
 	}
@@ -77,3 +88,31 @@ func (uc UserController) get(r *http.Request) *h.Response {
 		Status: http.StatusOK,
 	}
 }
+
+func (uc UserController) updatePassword(r *http.Request) *h.Response {
+
+	user, ok := r.Context().Value("user").(*s.ClaimsUser)
+	if !ok {
+		return &h.Response{Status: http.StatusUnauthorized}
+	}
+
+	userToUpdate := u.GetNewUser().SetId(user.Id)
+
+	password := struct {
+		Password string `json:"password"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&password); err != nil {
+		return &h.Response{Status: http.StatusBadRequest}
+	}
+
+	userToUpdate.SetPassword(password.Password)
+
+	if err := uc.userService.UpdatePassword(userToUpdate); err != nil {
+		return &h.Response{Status: http.StatusBadRequest}
+	}
+
+	return &h.Response{Status: http.StatusOK}
+}
+
+// updateName or updateEmail must also update the jwt
