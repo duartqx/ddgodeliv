@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"reflect"
 	"time"
 
 	"ddgodeliv/domains/driver"
@@ -18,6 +19,7 @@ type IDelivery interface {
 	SetDeadline(deadline time.Time) IDelivery
 
 	GetStatus() uint8
+	GetStatusDisplay() string
 	SetStatus(status uint8) IDelivery
 
 	GetDriverId() int
@@ -30,23 +32,36 @@ type IDelivery interface {
 	GetSender() user.IUser
 }
 
-type status struct {
-	Value uint8
-	Label string
+type statusChoices struct {
+	Pending   uint8
+	InTransit uint8
+	Late      uint8
+	Completed uint8
 }
 
-type deliveryStatus struct {
-	Pending   *status
-	InTransit *status
-	Late      *status
-	Completed *status
+// Reflects upon the fields of statusChoices and builds an slice containing all
+// status labels
+func (sc statusChoices) getStatusChoicesLabels() *[]string {
+
+	rfl := reflect.TypeOf(statusChoices{})
+
+	statusLabels := make([]string, rfl.NumField())
+	for i := 0; i < rfl.NumField(); i++ {
+		statusLabels[i] = rfl.Field(i).Name
+	}
+
+	return &statusLabels
 }
 
-var DeliveryStatusChoices *deliveryStatus = &deliveryStatus{
-	Pending:   &status{Value: 0, Label: "Pending"},
-	InTransit: &status{Value: 1, Label: "InTransit"},
-	Late:      &status{Value: 2, Label: "Late"},
-	Completed: &status{Value: 3, Label: "Completed"},
+func (sc statusChoices) GetDisplay(s uint8) string {
+	return (*sc.getStatusChoicesLabels())[s]
+}
+
+var StatusChoices *statusChoices = &statusChoices{
+	Pending:   0,
+	InTransit: 1,
+	Late:      2,
+	Completed: 3,
 }
 
 type Delivery struct {
@@ -97,6 +112,10 @@ func (d *Delivery) SetDeadline(deadline time.Time) IDelivery {
 
 func (d Delivery) GetStatus() uint8 {
 	return d.Status
+}
+
+func (d Delivery) GetStatusDisplay() string {
+	return StatusChoices.GetDisplay(d.GetStatus())
 }
 
 func (d *Delivery) SetStatus(status uint8) IDelivery {

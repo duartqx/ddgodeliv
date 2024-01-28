@@ -85,7 +85,7 @@ func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]de
 	return &deliveries, nil
 }
 
-func (dr DeliveryRepository) ExistsByCompletionByDriverId(id int, status uint8) (exists *bool) {
+func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exists *bool) {
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE driver_id = $1 AND status = $2)",
 		id, status,
@@ -267,12 +267,18 @@ func (dr DeliveryRepository) Update(delivery de.IDelivery) error {
 	_, err := dr.db.Exec(
 		`
 			UPDATE deliveries
-			SET driver_id = $1, sender_id = $2, destination = $3, deadline = $4
-			WHERE id = $5
+			SET
+				driver_id = $1,
+				sender_id = $2,
+				destination = $3,
+				deadline = $4,
+				status = $5
+			WHERE id = $6
 		`,
 		dr.getDriverIdToQuery(delivery.GetDriverId()),
 		delivery.GetSenderId(),
 		delivery.GetDestination(),
+		delivery.GetStatus(),
 		delivery.GetDeadline(),
 	)
 	return err
