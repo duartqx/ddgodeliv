@@ -26,6 +26,8 @@ func (uc UserController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		response = uc.create(r)
+	case http.MethodGet:
+		response = uc.get(r)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -53,17 +55,25 @@ func (uc UserController) create(r *http.Request) *h.Response {
 	}
 
 	if err := uc.userService.Create(user); err != nil {
-		var body interface{}
-		json.Unmarshal([]byte(err.Error()), &body)
-
 		return &h.Response{
-			Body:   body,
+			Body:   err.Error(),
 			Status: http.StatusBadRequest,
 		}
 	}
 
 	return &h.Response{
-		Body:   user,
+		Body:   user.Clean(),
 		Status: http.StatusCreated,
+	}
+}
+
+func (uc UserController) get(r *http.Request) *h.Response {
+	user, ok := r.Context().Value("user").(*s.ClaimsUser)
+	if !ok {
+		return &h.Response{Status: http.StatusUnauthorized}
+	}
+	return &h.Response{
+		Body:   user,
+		Status: http.StatusOK,
 	}
 }

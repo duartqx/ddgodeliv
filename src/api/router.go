@@ -59,6 +59,9 @@ func (ro router) Build() *chi.Mux {
 	userSubrouter.
 		With(jwtController.UnauthenticatedMiddleware).
 		Method(http.MethodPost, "/", userController)
+	userSubrouter.
+		With(jwtController.AuthenticatedMiddleware).
+		Method(http.MethodGet, "/", userController)
 
 	router.Mount("/user", userSubrouter)
 
