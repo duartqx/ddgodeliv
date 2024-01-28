@@ -1,6 +1,6 @@
 version: "3.1"
 services:
-  ddgodeliv-postgres:
+  postgres:
     image: postgres:16.1-alpine3.18
     env_file:
       - .env
@@ -8,7 +8,7 @@ services:
       - ./src/infraestructure/postgres/migrations:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
-  ddgodeliv-backend:
+  backend:
     build: .
     network_mode: host
     depends_on:
