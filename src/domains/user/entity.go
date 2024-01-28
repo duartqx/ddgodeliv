@@ -1,6 +1,8 @@
 package user
 
 type IUser interface {
+	Clean() interface{}
+
 	GetId() int
 	SetId(id int) IUser
 
@@ -14,6 +16,12 @@ type IUser interface {
 	SetEmail(email string) IUser
 }
 
+type CleanUser struct {
+	Id    int    `json:"id"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
 type User struct {
 	Id       int    `db:"id" json:"id"`
 	Email    string `db:"email" json:"email" validate:"email,required"`
@@ -23,6 +31,14 @@ type User struct {
 
 func GetNewUser() *User {
 	return &User{}
+}
+
+func (u User) Clean() interface{} {
+	return &CleanUser{
+		Id:    u.GetId(),
+		Email: u.GetEmail(),
+		Name:  u.GetName(),
+	}
 }
 
 func (u User) GetId() int {
