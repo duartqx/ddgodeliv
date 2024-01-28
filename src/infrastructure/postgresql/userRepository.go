@@ -17,7 +17,7 @@ func GetNewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur UserRepository) FindByID(id int) (u.IUser, error) {
+func (ur UserRepository) FindById(id int) (u.IUser, error) {
 
 	user := u.GetNewUser()
 

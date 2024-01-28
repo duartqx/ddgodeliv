@@ -1,3 +1,7 @@
+github.com/duartqx/ddgomiddlewares v0.0.0-20240128001456-db96f1d1ea44 h1:rIna+xZxCqZ7CkEFNSvAUCIRa3uHSMGi9u0gHZ8kY3Q=
+github.com/duartqx/ddgomiddlewares v0.0.0-20240128001456-db96f1d1ea44/go.mod h1:09JCf6pUSUvD7mrJi3qSsaLvEznL9beWh3CR8M/hXEE=
+github.com/go-chi/chi/v5 v5.0.11 h1:BnpYbFZ3T3S1WMpD79r7R5ThWX40TaFB7L31Y8xqSwA=
+github.com/go-chi/chi/v5 v5.0.11/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/golang-jwt/jwt/v5 v5.2.0 h1:d/ix8ftRUorsN+5eMIlF4T6J8CAt9rch3My2winC1Jw=
