@@ -6,7 +6,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	c "ddgodeliv/domains/company"
+	c "ddgodeliv/domains/entities/company"
+	m "ddgodeliv/domains/models"
 )
 
 type CompanyRepository struct {
@@ -17,7 +18,7 @@ func GetNewCompanyRepository(db *sqlx.DB) *CompanyRepository {
 	return &CompanyRepository{db: db}
 }
 
-func (cr CompanyRepository) FindById(id int) (c.ICompany, error) {
+func (cr CompanyRepository) FindById(id int) (m.ICompany, error) {
 	company := c.GetNewCompany()
 
 	if err := cr.db.Get(company, "SELECT * FROM companies WHERE id = $1", id); err != nil {
@@ -36,7 +37,7 @@ func (cr CompanyRepository) ExistsByName(name string) (exists bool) {
 	return exists
 }
 
-func (cr CompanyRepository) Create(company c.ICompany, licenseId string) error {
+func (cr CompanyRepository) Create(company m.ICompany, licenseId string) error {
 	var id int
 
 	// Creates Company and Driver for User with id = ownerId
@@ -63,7 +64,7 @@ func (cr CompanyRepository) Create(company c.ICompany, licenseId string) error {
 	return nil
 }
 
-func (cr CompanyRepository) Delete(company c.ICompany) error {
+func (cr CompanyRepository) Delete(company m.ICompany) error {
 	if company.GetId() == 0 {
 		return fmt.Errorf("Invalid Company Id")
 	}

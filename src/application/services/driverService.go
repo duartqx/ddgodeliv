@@ -1,10 +1,11 @@
 package services
 
 import (
-	v "ddgodeliv/application/validation"
-	d "ddgodeliv/domains/driver"
-	r "ddgodeliv/infrastructure/repository"
 	"fmt"
+
+	v "ddgodeliv/application/validation"
+	m "ddgodeliv/domains/models"
+	r "ddgodeliv/infrastructure/repository/interfaces"
 )
 
 type DriverService struct {
@@ -30,12 +31,12 @@ func GetNewDriverService(
 
 // Asks the new user to activate it's account and warns the company owner
 // of the new driver creation
-func (cs DriverService) sendDriverCreationEmails(driver d.IDriver) error {
+func (cs DriverService) sendDriverCreationEmails(driver m.IDriver) error {
 	return nil
 }
 
 // Warns the user and the company owner of the driver deletion
-func (cs DriverService) sendDriverDeletionEmails(driver d.IDriver) error {
+func (cs DriverService) sendDriverDeletionEmails(driver m.IDriver) error {
 	return nil
 }
 
@@ -47,7 +48,7 @@ func (cs DriverService) Validate(s interface{}) error {
 	return nil
 }
 
-func (ds DriverService) CreateDriver(driver d.IDriver) error {
+func (ds DriverService) CreateDriver(driver m.IDriver) error {
 	if err := ds.Struct(driver); err != nil {
 		return err
 	}
@@ -75,7 +76,7 @@ func (ds DriverService) CreateDriver(driver d.IDriver) error {
 	return nil
 }
 
-func (ds DriverService) DeleteDriver(driver d.IDriver) error {
+func (ds DriverService) DeleteDriver(driver m.IDriver) error {
 	if driver.GetId() == 0 || driver.GetUserId() == 0 || driver.GetCompanyId() == 0 {
 		return fmt.Errorf("Invalid Driver")
 	}
@@ -96,7 +97,7 @@ func (ds DriverService) DeleteDriver(driver d.IDriver) error {
 	return nil
 }
 
-func (ds DriverService) UpdateDriverLicense(driver d.IDriver) error {
+func (ds DriverService) UpdateDriverLicense(driver m.IDriver) error {
 	if err := ds.Validator.Var(driver.GetLicenseId(), "required,min=3,max=250"); err != nil {
 		return fmt.Errorf("Invalid Driver License")
 	}

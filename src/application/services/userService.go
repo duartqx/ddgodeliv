@@ -6,8 +6,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	v "ddgodeliv/application/validation"
-	u "ddgodeliv/domains/user"
-	r "ddgodeliv/infrastructure/repository"
+	m "ddgodeliv/domains/models"
+	r "ddgodeliv/infrastructure/repository/interfaces"
 )
 
 type UserService struct {
@@ -22,14 +22,14 @@ func GetNewUserService(userRepository r.IUserRepository, validator *v.Validator)
 	}
 }
 
-func (us UserService) Validate(user u.IUser) error {
+func (us UserService) Validate(user m.IUser) error {
 	if errs := us.Struct(user); errs != nil {
 		return fmt.Errorf(string(*us.JSON(errs)))
 	}
 	return nil
 }
 
-func (us UserService) Create(user u.IUser) error {
+func (us UserService) Create(user m.IUser) error {
 
 	if err := us.Validate(user); err != nil {
 		return err
@@ -55,7 +55,7 @@ func (us UserService) Create(user u.IUser) error {
 	return nil
 }
 
-func (us UserService) UpdatePassword(user u.IUser) error {
+func (us UserService) UpdatePassword(user m.IUser) error {
 	if err := us.Validator.Var(user.GetPassword(), "required,min=8,max=200"); err != nil {
 		return fmt.Errorf("Invalid Password")
 	}
@@ -74,6 +74,6 @@ func (us UserService) UpdatePassword(user u.IUser) error {
 	return nil
 }
 
-func (us UserService) FindById(id int) (u.IUser, error) {
+func (us UserService) FindById(id int) (m.IUser, error) {
 	return us.userRepository.FindById(id)
 }

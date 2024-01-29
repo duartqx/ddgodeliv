@@ -6,7 +6,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	u "ddgodeliv/domains/user"
+	u "ddgodeliv/domains/entities/user"
+	m "ddgodeliv/domains/models"
 )
 
 type UserRepository struct {
@@ -17,7 +18,7 @@ func GetNewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur UserRepository) FindById(id int) (u.IUser, error) {
+func (ur UserRepository) FindById(id int) (m.IUser, error) {
 
 	user := u.GetNewUser()
 
@@ -28,7 +29,7 @@ func (ur UserRepository) FindById(id int) (u.IUser, error) {
 	return user, nil
 }
 
-func (ur UserRepository) FindByEmail(email string) (u.IUser, error) {
+func (ur UserRepository) FindByEmail(email string) (m.IUser, error) {
 
 	user := u.GetNewUser()
 
@@ -48,7 +49,7 @@ func (ur UserRepository) ExistsByEmail(email string) (exists bool) {
 	return exists
 }
 
-func (ur UserRepository) Create(user u.IUser) error {
+func (ur UserRepository) Create(user m.IUser) error {
 
 	if user.GetEmail() == "" || user.GetName() == "" || user.GetPassword() == "" {
 		return fmt.Errorf("Invalid User")
@@ -74,7 +75,7 @@ func (ur UserRepository) Create(user u.IUser) error {
 	return nil
 }
 
-func (ur UserRepository) Update(user u.IUser) error {
+func (ur UserRepository) Update(user m.IUser) error {
 
 	if user.GetId() == 0 {
 		return fmt.Errorf("Invalid user id")
@@ -90,7 +91,7 @@ func (ur UserRepository) Update(user u.IUser) error {
 	return err
 }
 
-func (ur UserRepository) Delete(user u.IUser) error {
+func (ur UserRepository) Delete(user m.IUser) error {
 
 	if user.GetId() == 0 {
 		return fmt.Errorf("Invalid User")

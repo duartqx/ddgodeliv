@@ -1,9 +1,4 @@
-package driver
-
-import (
-	"ddgodeliv/domains/company"
-	"ddgodeliv/domains/user"
-)
+package models
 
 type IDriver interface {
 	GetId() int
@@ -18,6 +13,6 @@ type IDriver interface {
 	GetCompanyId() int
 	SetCompanyId(companyId int) IDriver
 
-	GetUser() user.IUser
-	GetCompany() company.ICompany
+	GetUser() IUser
+	GetCompany() ICompany
 }

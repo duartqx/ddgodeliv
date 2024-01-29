@@ -9,7 +9,7 @@ import (
 	c "ddgodeliv/api/controllers"
 	s "ddgodeliv/application/services"
 	"ddgodeliv/application/validation"
-	r "ddgodeliv/infrastructure/postgresql"
+	r "ddgodeliv/infrastructure/repository/postgresql"
 
 	lm "github.com/duartqx/ddgomiddlewares/logger"
 	rm "github.com/duartqx/ddgomiddlewares/recovery"

@@ -1,4 +1,4 @@
-package user
+package models
 
 type IUser interface {
 	Clean() interface{}

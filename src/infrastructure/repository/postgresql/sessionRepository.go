@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	r "ddgodeliv/infrastructure/repository"
+	r "ddgodeliv/infrastructure/repository/interfaces"
 )
 
 type Session struct {

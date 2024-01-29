@@ -5,7 +5,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	v "ddgodeliv/domains/vehicle"
+	v "ddgodeliv/domains/entities/vehicle"
+	m "ddgodeliv/domains/models"
 )
 
 type VehicleModelRepository struct {
@@ -16,14 +17,14 @@ func GetNewVehicleModelRepository(db *sqlx.DB) *VehicleModelRepository {
 	return &VehicleModelRepository{db: db}
 }
 
-func (vrm VehicleModelRepository) simpleValidate(model v.IVehicleModel) error {
+func (vrm VehicleModelRepository) simpleValidate(model m.IVehicleModel) error {
 	if model.GetManufacturer() == "" || model.GetYear() == 0 || model.GetMaxLoad() == 0 {
 		return fmt.Errorf("Invalid Vehicle Model")
 	}
 	return nil
 }
 
-func (vmr VehicleModelRepository) FindById(id int) (v.IVehicleModel, error) {
+func (vmr VehicleModelRepository) FindById(id int) (m.IVehicleModel, error) {
 
 	vehicleModel := v.GetNewVehicleModel()
 
@@ -34,7 +35,7 @@ func (vmr VehicleModelRepository) FindById(id int) (v.IVehicleModel, error) {
 	return vehicleModel, nil
 }
 
-func (vmr VehicleModelRepository) Create(model v.IVehicleModel) error {
+func (vmr VehicleModelRepository) Create(model m.IVehicleModel) error {
 	if err := vmr.simpleValidate(model); err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func (vmr VehicleModelRepository) Create(model v.IVehicleModel) error {
 	return nil
 }
 
-func (vmr VehicleModelRepository) Update(model v.IVehicleModel) error {
+func (vmr VehicleModelRepository) Update(model m.IVehicleModel) error {
 	if err := vmr.simpleValidate(model); err != nil {
 		return err
 	}
@@ -77,7 +78,7 @@ func (vmr VehicleModelRepository) Update(model v.IVehicleModel) error {
 	return err
 }
 
-func (vmr VehicleModelRepository) Delete(model v.IVehicleModel) error {
+func (vmr VehicleModelRepository) Delete(model m.IVehicleModel) error {
 	if model.GetId() == 0 {
 		return fmt.Errorf("Invalid Vehicle Model Id")
 	}

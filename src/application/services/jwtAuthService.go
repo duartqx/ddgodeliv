@@ -9,8 +9,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 
-	u "ddgodeliv/domains/user"
-	r "ddgodeliv/infrastructure/repository"
+	m "ddgodeliv/domains/models"
+	r "ddgodeliv/infrastructure/repository/interfaces"
 )
 
 type ClaimsUser struct {
@@ -95,7 +95,7 @@ func (jas JwtAuthService) ValidateAuth(authorization string, cookie *http.Cookie
 	return &claims.ClaimsUser, nil
 }
 
-func (jas JwtAuthService) Login(user u.IUser) (token string, expiresAt time.Time, err error) {
+func (jas JwtAuthService) Login(user m.IUser) (token string, expiresAt time.Time, err error) {
 
 	if user.GetEmail() == "" || user.GetPassword() == "" {
 		return token, expiresAt, fmt.Errorf("Invalid Email or Password")

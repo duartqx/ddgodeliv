@@ -1,5 +1,7 @@
 package user
 
+import m "ddgodeliv/domains/models"
+
 type CleanUser struct {
 	Id    int    `json:"id"`
 	Email string `json:"email"`
@@ -29,7 +31,7 @@ func (u User) GetId() int {
 	return u.Id
 }
 
-func (u *User) SetId(id int) IUser {
+func (u *User) SetId(id int) m.IUser {
 	u.Id = id
 	return u
 }
@@ -38,7 +40,7 @@ func (u User) GetName() string {
 	return u.Name
 }
 
-func (u *User) SetName(name string) IUser {
+func (u *User) SetName(name string) m.IUser {
 	u.Name = name
 	return u
 }
@@ -47,7 +49,7 @@ func (u User) GetPassword() string {
 	return u.Password
 }
 
-func (u *User) SetPassword(password string) IUser {
+func (u *User) SetPassword(password string) m.IUser {
 	u.Password = password
 	return u
 }
@@ -56,7 +58,7 @@ func (u User) GetEmail() string {
 	return u.Email
 }
 
-func (u *User) SetEmail(email string) IUser {
+func (u *User) SetEmail(email string) m.IUser {
 	u.Email = email
 	return u
 }

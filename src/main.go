@@ -47,6 +47,8 @@ func main() {
 		}
 	}()
 
+	log.Println("Listening and Serving at:", addr)
+
 	c := make(chan os.Signal, 1)
 	// Graceful shutdowns when quit via SIGINT (Ctrl+C)
 	signal.Notify(c, os.Interrupt)
