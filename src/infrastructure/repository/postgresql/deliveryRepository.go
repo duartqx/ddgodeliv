@@ -6,8 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	de "ddgodeliv/domains/entities/delivery"
-	m "ddgodeliv/domains/models"
+	d "ddgodeliv/domains/delivery"
 )
 
 type DeliveryRepository struct {
@@ -18,8 +17,8 @@ func GetNewDeliveryRepository(db *sqlx.DB) *DeliveryRepository {
 	return &DeliveryRepository{db: db}
 }
 
-func (dr DeliveryRepository) FindById(id int) (m.IDelivery, error) {
-	delivery := de.GetNewDelivery()
+func (dr DeliveryRepository) FindById(id int) (d.IDelivery, error) {
+	delivery := d.GetNewDelivery()
 
 	err := dr.db.Get(delivery, "SELECT * FROM deliveries WHERE id = $1", id)
 	if err != nil {
@@ -29,8 +28,8 @@ func (dr DeliveryRepository) FindById(id int) (m.IDelivery, error) {
 	return delivery, nil
 }
 
-func (dr DeliveryRepository) FindByDriverId(id int) (*[]m.IDelivery, error) {
-	deliveries := []m.IDelivery{}
+func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
+	deliveries := []d.IDelivery{}
 
 	rows, err := dr.db.Query("SELECT * FROM deliveries WHERE driver_id = $1", id)
 	if err != nil {
@@ -38,13 +37,13 @@ func (dr DeliveryRepository) FindByDriverId(id int) (*[]m.IDelivery, error) {
 	}
 
 	for rows.Next() {
-		delivery := de.GetNewDelivery()
+		delivery := d.GetNewDelivery()
 
 		if err := rows.Scan(delivery); err != nil {
 			return nil, err
 		}
 
-		var castedDelivery m.IDelivery = delivery
+		var castedDelivery d.IDelivery = delivery
 
 		deliveries = append(deliveries, castedDelivery)
 	}
@@ -61,8 +60,8 @@ func (dr DeliveryRepository) ExistsByDriverId(id int) (exists *bool) {
 	return exists
 }
 
-func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]m.IDelivery, error) {
-	deliveries := []m.IDelivery{}
+func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]d.IDelivery, error) {
+	deliveries := []d.IDelivery{}
 
 	rows, err := dr.db.Query(
 		"SELECT * FROM deliveries WHERE driver_id = $1 AND status = $2",
@@ -73,13 +72,13 @@ func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]m.
 	}
 
 	for rows.Next() {
-		delivery := de.GetNewDelivery()
+		delivery := d.GetNewDelivery()
 
 		if err := rows.Scan(delivery); err != nil {
 			return nil, err
 		}
 
-		var castedDelivery m.IDelivery = delivery
+		var castedDelivery d.IDelivery = delivery
 
 		deliveries = append(deliveries, castedDelivery)
 	}
@@ -96,8 +95,8 @@ func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exi
 	return exists
 }
 
-func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]m.IDelivery, error) {
-	deliveries := []m.IDelivery{}
+func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]d.IDelivery, error) {
+	deliveries := []d.IDelivery{}
 
 	rows, err := dr.db.Query(
 		"SELECT * FROM deliveries WHERE deadline BETWEEN $1 AND $2", start, end,
@@ -107,13 +106,13 @@ func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]m
 	}
 
 	for rows.Next() {
-		delivery := de.GetNewDelivery()
+		delivery := d.GetNewDelivery()
 
 		if err := rows.Scan(delivery); err != nil {
 			return nil, err
 		}
 
-		var castedDelivery m.IDelivery = delivery
+		var castedDelivery d.IDelivery = delivery
 
 		deliveries = append(deliveries, castedDelivery)
 	}
@@ -121,9 +120,9 @@ func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]m
 	return &deliveries, nil
 }
 
-func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]m.IDelivery, error) {
+func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]d.IDelivery, error) {
 
-	deliveries := []m.IDelivery{}
+	deliveries := []d.IDelivery{}
 
 	rows, err := dr.db.Query(
 		"SELECT * FROM deliveries WHERE deadline::date = $1",
@@ -134,13 +133,13 @@ func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]m.IDeliv
 	}
 
 	for rows.Next() {
-		delivery := de.GetNewDelivery()
+		delivery := d.GetNewDelivery()
 
 		if err := rows.Scan(delivery); err != nil {
 			return nil, err
 		}
 
-		var castedDelivery m.IDelivery = delivery
+		var castedDelivery d.IDelivery = delivery
 
 		deliveries = append(deliveries, castedDelivery)
 	}
@@ -158,9 +157,9 @@ func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists *b
 	return exists
 }
 
-func (dr DeliveryRepository) FindBySenderId(id int) (*[]m.IDelivery, error) {
+func (dr DeliveryRepository) FindBySenderId(id int) (*[]d.IDelivery, error) {
 
-	deliveries := []m.IDelivery{}
+	deliveries := []d.IDelivery{}
 
 	rows, err := dr.db.Query("SELECT * FROM deliveries WHERE sender_id = $1", id)
 	if err != nil {
@@ -168,13 +167,13 @@ func (dr DeliveryRepository) FindBySenderId(id int) (*[]m.IDelivery, error) {
 	}
 
 	for rows.Next() {
-		delivery := de.GetNewDelivery()
+		delivery := d.GetNewDelivery()
 
 		if err := rows.Scan(delivery); err != nil {
 			return nil, err
 		}
 
-		var castedDelivery m.IDelivery = delivery
+		var castedDelivery d.IDelivery = delivery
 
 		deliveries = append(deliveries, castedDelivery)
 	}
@@ -191,9 +190,9 @@ func (dr DeliveryRepository) ExistsBySenderId(id int) (exists *bool) {
 	return exists
 }
 
-func (dr DeliveryRepository) FindByCompanyId(id int) (*[]m.IDelivery, error) {
+func (dr DeliveryRepository) FindByCompanyId(id int) (*[]d.IDelivery, error) {
 
-	deliveries := []m.IDelivery{}
+	deliveries := []d.IDelivery{}
 
 	rows, err := dr.db.Query("SELECT * FROM deliveries WHERE company_id = $1", id)
 	if err != nil {
@@ -201,13 +200,13 @@ func (dr DeliveryRepository) FindByCompanyId(id int) (*[]m.IDelivery, error) {
 	}
 
 	for rows.Next() {
-		delivery := de.GetNewDelivery()
+		delivery := d.GetNewDelivery()
 
 		if err := rows.Scan(delivery); err != nil {
 			return nil, err
 		}
 
-		var castedDelivery m.IDelivery = delivery
+		var castedDelivery d.IDelivery = delivery
 
 		deliveries = append(deliveries, castedDelivery)
 	}
@@ -234,7 +233,7 @@ func (dr DeliveryRepository) getDriverIdToQuery(id int) string {
 	return deliveryDriverId
 }
 
-func (dr DeliveryRepository) Create(delivery m.IDelivery) error {
+func (dr DeliveryRepository) Create(delivery d.IDelivery) error {
 	if delivery.GetSenderId() == 0 || delivery.GetOrigin() == "" || delivery.GetDestination() == "" {
 		return fmt.Errorf("Invalid Delivery: Missing Sender, Origin or Destination")
 	}
@@ -262,7 +261,7 @@ func (dr DeliveryRepository) Create(delivery m.IDelivery) error {
 	return nil
 }
 
-func (dr DeliveryRepository) Update(delivery m.IDelivery) error {
+func (dr DeliveryRepository) Update(delivery d.IDelivery) error {
 
 	if delivery.GetSenderId() == 0 || delivery.GetOrigin() == "" || delivery.GetDestination() == "" {
 		return fmt.Errorf("Invalid Delivery: Missing Sender or Destination")
@@ -291,7 +290,7 @@ func (dr DeliveryRepository) Update(delivery m.IDelivery) error {
 	return err
 }
 
-func (dr DeliveryRepository) Delete(delivery m.IDelivery) error {
+func (dr DeliveryRepository) Delete(delivery d.IDelivery) error {
 	if delivery.GetId() == 0 {
 		return fmt.Errorf("Invalid Delivery Id")
 	}

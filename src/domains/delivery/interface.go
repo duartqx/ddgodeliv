@@ -1,6 +1,11 @@
-package models
+package delivery
 
-import "time"
+import (
+	"time"
+
+	d "ddgodeliv/domains/driver"
+	u "ddgodeliv/domains/user"
+)
 
 type IDelivery interface {
 	GetId() int
@@ -25,6 +30,6 @@ type IDelivery interface {
 	GetSenderId() int
 	SetSenderId(senderId int) IDelivery
 
-	GetDriver() IDriver
-	GetSender() IUser
+	GetDriver() d.IDriver
+	GetSender() u.IUser
 }

@@ -6,8 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	v "ddgodeliv/domains/entities/vehicle"
-	m "ddgodeliv/domains/models"
+	v "ddgodeliv/domains/vehicle"
 )
 
 type VehicleRepository struct {
@@ -18,14 +17,14 @@ func GetNewVehicleRepository(db *sqlx.DB) *VehicleModelRepository {
 	return &VehicleModelRepository{db: db}
 }
 
-func (vr VehicleRepository) simpleValidate(vehicle m.IVehicle) error {
+func (vr VehicleRepository) simpleValidate(vehicle v.IVehicle) error {
 	if vehicle.GetModelId() == 0 || vehicle.GetCompanyId() == 0 || vehicle.GetLicenseId() == "" {
 		return fmt.Errorf("Invalid vehicle: Missing Model, Company or License")
 	}
 	return nil
 }
 
-func (vr VehicleRepository) FindById(id int) (m.IVehicle, error) {
+func (vr VehicleRepository) FindById(id int) (v.IVehicle, error) {
 
 	vehicle := v.GetNewVehicle()
 
@@ -36,8 +35,8 @@ func (vr VehicleRepository) FindById(id int) (m.IVehicle, error) {
 	return vehicle, nil
 }
 
-func (vr VehicleRepository) FindByCompanyId(id int) (*[]m.IVehicle, error) {
-	vehicles := []m.IVehicle{}
+func (vr VehicleRepository) FindByCompanyId(id int) (*[]v.IVehicle, error) {
+	vehicles := []v.IVehicle{}
 
 	rows, err := vr.db.Query("SELECT * FROM vehicles WHERE company_id = $1", id)
 	if err != nil {
@@ -52,7 +51,7 @@ func (vr VehicleRepository) FindByCompanyId(id int) (*[]m.IVehicle, error) {
 			return nil, err
 		}
 
-		var castedVehicle m.IVehicle = vehicle
+		var castedVehicle v.IVehicle = vehicle
 
 		vehicles = append(vehicles, castedVehicle)
 	}
@@ -70,7 +69,7 @@ func (vr VehicleRepository) ExistsByCompanyId(id int) (exists *bool) {
 	return exists
 }
 
-func (vr VehicleRepository) Create(vehicle m.IVehicle) error {
+func (vr VehicleRepository) Create(vehicle v.IVehicle) error {
 	if err := vr.simpleValidate(vehicle); err != nil {
 		return err
 	}
@@ -95,7 +94,7 @@ func (vr VehicleRepository) Create(vehicle m.IVehicle) error {
 	return nil
 }
 
-func (vr VehicleRepository) Update(vehicle m.IVehicle) error {
+func (vr VehicleRepository) Update(vehicle v.IVehicle) error {
 	if err := vr.simpleValidate(vehicle); err != nil {
 		return err
 	}
@@ -116,7 +115,7 @@ func (vr VehicleRepository) Update(vehicle m.IVehicle) error {
 	return err
 }
 
-func (vr VehicleRepository) Delete(vehicle m.IVehicle) error {
+func (vr VehicleRepository) Delete(vehicle v.IVehicle) error {
 	if vehicle.GetId() == 0 {
 		return fmt.Errorf("Invalid Vehicle Id")
 	}

@@ -3,9 +3,8 @@ package delivery
 import (
 	"time"
 
-	d "ddgodeliv/domains/entities/driver"
-	u "ddgodeliv/domains/entities/user"
-	m "ddgodeliv/domains/models"
+	d "ddgodeliv/domains/driver"
+	u "ddgodeliv/domains/user"
 )
 
 type Delivery struct {
@@ -17,8 +16,8 @@ type Delivery struct {
 	Deadline    time.Time `db:"deadline" json:"deadline" validate:"future"`
 	Status      uint8     `db:"status" json:"status" validate:"required,gte=0,lte=4"`
 
-	Driver m.IDriver `json:"driver"`
-	Sender m.IUser   `json:"sender"`
+	Driver d.IDriver `json:"driver"`
+	Sender u.IUser   `json:"sender"`
 }
 
 func GetNewDelivery() *Delivery {
@@ -32,7 +31,7 @@ func (d Delivery) GetId() int {
 	return d.Id
 }
 
-func (d *Delivery) SetId(id int) m.IDelivery {
+func (d *Delivery) SetId(id int) IDelivery {
 	d.Id = id
 	return d
 }
@@ -41,7 +40,7 @@ func (d Delivery) GetOrigin() string {
 	return d.Origin
 }
 
-func (d *Delivery) SetOrigin(origin string) m.IDelivery {
+func (d *Delivery) SetOrigin(origin string) IDelivery {
 	d.Origin = origin
 	return d
 }
@@ -50,7 +49,7 @@ func (d Delivery) GetDestination() string {
 	return d.Destination
 }
 
-func (d *Delivery) SetDestination(destination string) m.IDelivery {
+func (d *Delivery) SetDestination(destination string) IDelivery {
 	d.Destination = destination
 	return d
 }
@@ -59,7 +58,7 @@ func (d Delivery) GetDeadline() time.Time {
 	return d.Deadline
 }
 
-func (d *Delivery) SetDeadline(deadline time.Time) m.IDelivery {
+func (d *Delivery) SetDeadline(deadline time.Time) IDelivery {
 	d.Deadline = deadline
 	return d
 }
@@ -72,7 +71,7 @@ func (d Delivery) GetStatusDisplay() string {
 	return StatusChoices.GetDisplay(d.GetStatus())
 }
 
-func (d *Delivery) SetStatus(status uint8) m.IDelivery {
+func (d *Delivery) SetStatus(status uint8) IDelivery {
 	d.Status = status
 	return d
 }
@@ -81,7 +80,7 @@ func (d Delivery) GetDriverId() int {
 	return d.DriverId
 }
 
-func (d *Delivery) SetDriverId(driverId int) m.IDelivery {
+func (d *Delivery) SetDriverId(driverId int) IDelivery {
 	d.DriverId = driverId
 	return d
 }
@@ -90,15 +89,15 @@ func (d Delivery) GetSenderId() int {
 	return d.SenderId
 }
 
-func (d *Delivery) SetSenderId(senderId int) m.IDelivery {
+func (d *Delivery) SetSenderId(senderId int) IDelivery {
 	d.SenderId = senderId
 	return d
 }
 
-func (d Delivery) GetDriver() m.IDriver {
+func (d Delivery) GetDriver() d.IDriver {
 	return d.Driver
 }
 
-func (d Delivery) GetSender() m.IUser {
+func (d Delivery) GetSender() u.IUser {
 	return d.Sender
 }

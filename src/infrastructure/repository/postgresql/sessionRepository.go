@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	r "ddgodeliv/infrastructure/repository/interfaces"
+	u "ddgodeliv/domains/user"
 )
 
 type Session struct {
@@ -26,7 +26,7 @@ func (s Session) GetToken() string {
 }
 
 type sessionStore struct {
-	sessions *map[string]r.ISession
+	sessions *map[string]u.ISession
 }
 
 type SessionRepository struct {
@@ -36,12 +36,12 @@ type SessionRepository struct {
 func GetNewSessionRepository() *SessionRepository {
 	return &SessionRepository{
 		store: &sessionStore{
-			sessions: &map[string]r.ISession{},
+			sessions: &map[string]u.ISession{},
 		},
 	}
 }
 
-func (sr SessionRepository) Get(token string) (r.ISession, error) {
+func (sr SessionRepository) Get(token string) (u.ISession, error) {
 	session, found := (*sr.store.sessions)[token]
 	if !found {
 		return nil, fmt.Errorf("Session Not Found!")

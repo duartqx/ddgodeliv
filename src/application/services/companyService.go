@@ -4,27 +4,26 @@ import (
 	"fmt"
 
 	v "ddgodeliv/application/validation"
-	m "ddgodeliv/domains/models"
-	r "ddgodeliv/infrastructure/repository/interfaces"
+	c "ddgodeliv/domains/company"
 )
 
 type CompanyService struct {
-	companyRepository r.ICompanyRepository
+	companyRepository c.ICompanyRepository
 	*v.Validator
 }
 
-func GetNewCompanyService(companyRepository r.ICompanyRepository, validator *v.Validator) *CompanyService {
+func GetNewCompanyService(companyRepository c.ICompanyRepository, validator *v.Validator) *CompanyService {
 	return &CompanyService{companyRepository: companyRepository, Validator: validator}
 }
 
-func (cs CompanyService) Validate(company m.ICompany) error {
+func (cs CompanyService) Validate(company c.ICompany) error {
 	if errs := cs.Struct(company); errs != nil {
 		return fmt.Errorf(string(*cs.JSON(errs)))
 	}
 	return nil
 }
 
-func (cs CompanyService) CreateCompany(company m.ICompany, licenseId string) error {
+func (cs CompanyService) CreateCompany(company c.ICompany, licenseId string) error {
 
 	if err := cs.Validate(company); err != nil {
 		return err
@@ -41,7 +40,7 @@ func (cs CompanyService) CreateCompany(company m.ICompany, licenseId string) err
 	return nil
 }
 
-func (cs CompanyService) DeleteCompany(userId int, company m.ICompany) error {
+func (cs CompanyService) DeleteCompany(userId int, company c.ICompany) error {
 
 	if company.GetId() == 0 {
 		return fmt.Errorf("Invalid Company Id")

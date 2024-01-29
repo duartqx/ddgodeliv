@@ -6,8 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	d "ddgodeliv/domains/entities/driver"
-	m "ddgodeliv/domains/models"
+	d "ddgodeliv/domains/driver"
 )
 
 type DriverRepository struct {
@@ -18,14 +17,14 @@ func GetNewDriverRepository(db *sqlx.DB) *DriverRepository {
 	return &DriverRepository{db: db}
 }
 
-func (dr DriverRepository) simpleValidation(driver m.IDriver) error {
+func (dr DriverRepository) simpleValidation(driver d.IDriver) error {
 	if driver.GetUserId() == 0 || driver.GetCompanyId() == 0 || driver.GetLicenseId() == "" {
 		return fmt.Errorf("Invalid Driver, missing user or license")
 	}
 	return nil
 }
 
-func (dr DriverRepository) FindById(id int) (m.IDriver, error) {
+func (dr DriverRepository) FindById(id int) (d.IDriver, error) {
 
 	driver := d.GetNewDriver()
 
@@ -36,7 +35,7 @@ func (dr DriverRepository) FindById(id int) (m.IDriver, error) {
 	return driver, nil
 }
 
-func (dr DriverRepository) FindByUserId(id int) (m.IDriver, error) {
+func (dr DriverRepository) FindByUserId(id int) (d.IDriver, error) {
 	driver := d.GetNewDriver()
 
 	if err := dr.db.Get(driver, "SELECT * FROM drivers WHERE user_id = $1", id); err != nil {
@@ -55,8 +54,8 @@ func (dr DriverRepository) ExistsByUserId(id int) (exists *bool) {
 	return exists
 }
 
-func (dr DriverRepository) FindByCompanyId(id int) (*[]m.IDriver, error) {
-	drivers := []m.IDriver{}
+func (dr DriverRepository) FindByCompanyId(id int) (*[]d.IDriver, error) {
+	drivers := []d.IDriver{}
 
 	rows, err := dr.db.Query("SELECT * FROM drivers WHERE company_id = $1", id)
 	if err != nil {
@@ -71,7 +70,7 @@ func (dr DriverRepository) FindByCompanyId(id int) (*[]m.IDriver, error) {
 			return nil, err
 		}
 
-		var castedDriver m.IDriver = driver
+		var castedDriver d.IDriver = driver
 
 		drivers = append(drivers, castedDriver)
 	}
@@ -88,7 +87,7 @@ func (dr DriverRepository) ExistsByCompanyId(id int) (exists *bool) {
 	return exists
 }
 
-func (dr DriverRepository) Create(driver m.IDriver) error {
+func (dr DriverRepository) Create(driver d.IDriver) error {
 	if err := dr.simpleValidation(driver); err != nil {
 		return err
 	}
@@ -113,7 +112,7 @@ func (dr DriverRepository) Create(driver m.IDriver) error {
 	return nil
 }
 
-func (dr DriverRepository) Update(driver m.IDriver) error {
+func (dr DriverRepository) Update(driver d.IDriver) error {
 	if err := dr.simpleValidation(driver); err != nil {
 		return err
 	}
@@ -130,7 +129,7 @@ func (dr DriverRepository) Update(driver m.IDriver) error {
 	return err
 }
 
-func (dr DriverRepository) Delete(driver m.IDriver) error {
+func (dr DriverRepository) Delete(driver d.IDriver) error {
 	if driver.GetId() == 0 {
 		return fmt.Errorf("Invalid Driver Id")
 	}

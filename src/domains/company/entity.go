@@ -1,7 +1,5 @@
 package company
 
-import m "ddgodeliv/domains/models"
-
 type Company struct {
 	Id      int    `db:"id" json:"id"`
 	OwnerId int    `db:"owner_id" json:"owner_id" validate:"required,gt=0"`
@@ -16,7 +14,7 @@ func (c Company) GetId() int {
 	return c.Id
 }
 
-func (c *Company) SetId(id int) m.ICompany {
+func (c *Company) SetId(id int) ICompany {
 	c.Id = id
 	return c
 }
@@ -25,7 +23,7 @@ func (c Company) GetName() string {
 	return c.Name
 }
 
-func (c *Company) SetName(name string) m.ICompany {
+func (c *Company) SetName(name string) ICompany {
 	c.Name = name
 	return c
 }

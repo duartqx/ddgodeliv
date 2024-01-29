@@ -1,18 +1,17 @@
 package services
 
 import (
-	m "ddgodeliv/domains/models"
-	r "ddgodeliv/infrastructure/repository/interfaces"
+	d "ddgodeliv/domains/delivery"
 )
 
 type DeliveryService struct {
-	deliveryRepository r.IDeliveryRepository
+	deliveryRepository d.IDeliveryRepository
 }
 
-func GetNewDeliveryService(deliveryRepository r.IDeliveryRepository) *DeliveryService {
+func GetNewDeliveryService(deliveryRepository d.IDeliveryRepository) *DeliveryService {
 	return &DeliveryService{deliveryRepository: deliveryRepository}
 }
 
-func (ds DeliveryService) Create(delivery m.IDelivery) error {
+func (ds DeliveryService) Create(delivery d.IDelivery) error {
 	return nil
 }

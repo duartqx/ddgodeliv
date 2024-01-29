@@ -6,7 +6,7 @@ import (
 
 	h "ddgodeliv/api/http"
 	s "ddgodeliv/application/services"
-	u "ddgodeliv/domains/entities/user"
+	u "ddgodeliv/domains/user"
 )
 
 type UserController struct {

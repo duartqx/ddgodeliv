@@ -1,4 +1,4 @@
-package models
+package company
 
 type ICompany interface {
 	GetId() int
