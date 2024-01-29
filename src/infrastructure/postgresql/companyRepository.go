@@ -27,16 +27,22 @@ func (cr CompanyRepository) FindById(id int) (c.ICompany, error) {
 	return company, nil
 }
 
-func (cr CompanyRepository) Create(company c.ICompany) error {
-	if company.GetName() == "" {
-		return fmt.Errorf("Invalid Company Name")
-	}
+func (cr CompanyRepository) ExistsByName(name string) (exists bool) {
+	cr.db.QueryRow(
+		"SELECT EXISTS (SELECT 1 FROM companies WHERE name = $1)",
+		name,
+	).Scan(&exists)
 
+	return exists
+}
+
+func (cr CompanyRepository) Create(ownerId int, company c.ICompany) error {
 	var id int
 
 	if err := cr.db.QueryRow(
-		"INSERT INTO companies (name) VALUES ($1) RETURNING id",
+		"INSERT INTO companies (name, owner_id) VALUES ($1, $2) RETURNING id",
 		strings.ToLower(company.GetName()),
+		ownerId,
 	).Scan(&id); err != nil {
 		return err
 	}

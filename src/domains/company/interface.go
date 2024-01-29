@@ -6,4 +6,6 @@ type ICompany interface {
 
 	GetName() string
 	SetName(name string) ICompany
+
+	GetOwnerId() int
 }

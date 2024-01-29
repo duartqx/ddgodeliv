@@ -1,8 +1,9 @@
 package company
 
 type Company struct {
-	Id   int    `db:"id" json:"id"`
-	Name string `db:"name" json:"name"`
+	Id      int    `db:"id" json:"id"`
+	OwnerId int    `db:"owner_id" json:"owner_id"`
+	Name    string `db:"name" json:"name" validate:"required,min=3"`
 }
 
 func GetNewCompany() *Company {
@@ -25,4 +26,8 @@ func (c Company) GetName() string {
 func (c *Company) SetName(name string) ICompany {
 	c.Name = name
 	return c
+}
+
+func (c Company) GetOwnerId() int {
+	return c.OwnerId
 }

@@ -16,10 +16,10 @@ type UserService struct {
 	*v.Validator
 }
 
-func GetNewUserService(userRepository r.IUserRepository) *UserService {
+func GetNewUserService(userRepository r.IUserRepository, validator *v.Validator) *UserService {
 	return &UserService{
 		userRepository: userRepository,
-		Validator:      v.NewValidator(),
+		Validator:      validator,
 	}
 }
 
