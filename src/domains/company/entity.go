@@ -2,7 +2,7 @@ package company
 
 type Company struct {
 	Id      int    `db:"id" json:"id"`
-	OwnerId int    `db:"owner_id" json:"owner_id"`
+	OwnerId int    `db:"owner_id" json:"owner_id" validate:"required,gt=0"`
 	Name    string `db:"name" json:"name" validate:"required,min=3"`
 }
 

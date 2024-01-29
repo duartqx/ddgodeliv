@@ -9,7 +9,7 @@ type Driver struct {
 	Id        int    `db:"id" json:"id"`
 	UserId    int    `db:"user_id" json:"user_id"`
 	CompanyId int    `db:"company_id" json:"company_id"`
-	LicenseId string `db:"license_id" json:"license_id"`
+	LicenseId string `db:"license_id" json:"license_id" validate:"required"`
 
 	User    user.IUser       `json:"user"`
 	Company company.ICompany `json:"company"`

@@ -9,6 +9,6 @@ type ICompanyRepository interface {
 
 	ExistsByName(name string) bool
 
-	Create(ownerId int, company c.ICompany) error
+	Create(company c.ICompany, licenseId string) error
 	Delete(company c.ICompany) error
 }

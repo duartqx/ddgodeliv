@@ -36,13 +36,24 @@ func (cr CompanyRepository) ExistsByName(name string) (exists bool) {
 	return exists
 }
 
-func (cr CompanyRepository) Create(ownerId int, company c.ICompany) error {
+func (cr CompanyRepository) Create(company c.ICompany, licenseId string) error {
 	var id int
 
+	// Creates Company and Driver for User with id = ownerId
 	if err := cr.db.QueryRow(
-		"INSERT INTO companies (name, owner_id) VALUES ($1, $2) RETURNING id",
+		`
+			WITH new_company AS (
+				INSERT INTO companies (name, owner_id)
+				VALUES ($1, $2)
+				RETURNING id
+			)
+			INSERT INTO drivers (user_id, company_id, license_id)
+			SELECT $2, $3, id FROM new_company
+			RETURNING company_id
+		`,
 		strings.ToLower(company.GetName()),
-		ownerId,
+		company.GetOwnerId(),
+		licenseId,
 	).Scan(&id); err != nil {
 		return err
 	}

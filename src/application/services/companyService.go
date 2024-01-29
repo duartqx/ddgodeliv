@@ -1,7 +1,6 @@
 package services
 
 import (
-	e "ddgodeliv/application/errors"
 	v "ddgodeliv/application/validation"
 	c "ddgodeliv/domains/company"
 	re "ddgodeliv/infrastructure/repository"
@@ -24,27 +23,31 @@ func (cs CompanyService) Validate(company c.ICompany) error {
 	return nil
 }
 
-func (cs CompanyService) CreateCompany(userId int, company c.ICompany) error {
+func (cs CompanyService) CreateCompany(company c.ICompany, licenseId string) error {
 
 	if err := cs.Validate(company); err != nil {
 		return err
 	}
 
 	if cs.companyRepository.ExistsByName(company.GetName()) {
-		return e.BadRequestError
+		return fmt.Errorf("Company with this name already exists!")
 	}
 
-	if err := cs.companyRepository.Create(userId, company); err != nil {
-		return e.InternalError
+	if err := cs.companyRepository.Create(company, licenseId); err != nil {
+		return fmt.Errorf("Internal: %v", err.Error())
 	}
 
 	return nil
 }
 
 func (cs CompanyService) DeleteCompany(userId int, company c.ICompany) error {
-	// Only the owner can Delete it's company
-	if userId != company.GetOwnerId() || company.GetId() == 0 {
-		return e.BadRequestError
+
+	if company.GetId() == 0 {
+		return fmt.Errorf("Invalid Company Id")
+	}
+
+	if userId != company.GetOwnerId() {
+		return fmt.Errorf("Only the owner can Delete a company!")
 	}
 
 	return cs.companyRepository.Delete(company)
