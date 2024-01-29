@@ -47,7 +47,7 @@ func (cr CompanyRepository) Create(company c.ICompany, licenseId string) error {
 				VALUES ($1, $2)
 				RETURNING id
 			)
-			INSERT INTO drivers (user_id, company_id, license_id)
+			INSERT INTO drivers (user_id, license_id, company_id)
 			SELECT $2, $3, id FROM new_company
 			RETURNING company_id
 		`,
