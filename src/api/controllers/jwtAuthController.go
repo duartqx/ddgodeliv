@@ -22,92 +22,58 @@ func NewJwtController(jwtService *s.JwtAuthService) *JwtController {
 	}
 }
 
-func (jc JwtController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
-	var response *h.Response
-
-	switch r.Method {
-	case http.MethodPost:
-		response = jc.Login(r)
-	case http.MethodDelete:
-		response = jc.Logout(r)
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	if body, err := json.Marshal(response.Body); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-	} else {
-		if response.Cookie != nil {
-			http.SetCookie(w, response.Cookie)
-		}
-		w.WriteHeader(response.Status)
-		w.Write(body)
-	}
-}
-
-func (jc JwtController) Login(r *http.Request) *h.Response {
+func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {
 
 	user := u.GetNewUser()
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		return &h.Response{
-			Status: http.StatusBadRequest,
-			Body:   "Bad Request",
-		}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	token, expiresAt, err := jc.jwtService.Login(user)
 
 	if err != nil {
-		return &h.Response{
-			Status: http.StatusUnauthorized,
-			Body:   "Unauthorized",
-		}
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
 	}
 
-	return &h.Response{
-		Status: http.StatusOK,
-		Body: h.LoginResponse{
-			Token:     token,
-			ExpiresAt: expiresAt,
-			Status:    "Valid",
-		},
-		Cookie: &http.Cookie{
-			Name:     jc.cookieName,
-			Value:    token,
-			Expires:  expiresAt,
-			Secure:   true,
-			HttpOnly: true,
-		},
+	http.SetCookie(w, &http.Cookie{
+		Name:     jc.cookieName,
+		Value:    token,
+		Expires:  expiresAt,
+		Secure:   true,
+		HttpOnly: true,
+	})
+
+	w.Header().Set("Content-Type", "application/json")
+
+	if err := json.NewEncoder(w).Encode(h.LoginResponse{
+		Token:     token,
+		ExpiresAt: expiresAt,
+		Status:    "Valid",
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
-func (jc JwtController) Logout(r *http.Request) *h.Response {
+func (jc JwtController) Logout(w http.ResponseWriter, r *http.Request) {
 
 	cookie, _ := r.Cookie(jc.cookieName)
 
 	err := jc.jwtService.Logout(r.Header.Get("Authorization"), cookie)
 
 	if err != nil {
-		return &h.Response{
-			Status: http.StatusUnauthorized,
-			Body:   err.Error(),
-		}
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	return &h.Response{
-		Status: http.StatusOK,
-		Body:   "Logged out",
-		Cookie: &http.Cookie{
-			Name:   jc.cookieName,
-			MaxAge: -1,
-		},
-	}
+	http.SetCookie(w, &http.Cookie{
+		Name:   jc.cookieName,
+		MaxAge: -1,
+	})
+
+	w.Write([]byte("Logged Out"))
 }
 
 func (jc JwtController) AuthenticatedMiddleware(next http.Handler) http.Handler {

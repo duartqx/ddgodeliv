@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	h "ddgodeliv/api/http"
 	s "ddgodeliv/application/services"
 	u "ddgodeliv/domains/user"
 )
@@ -19,42 +18,16 @@ func GetNewUserController(userService *s.UserService) *UserController {
 	}
 }
 
-func (uc UserController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
-	var response *h.Response
-
-	switch r.Method {
-	case http.MethodPost:
-		response = uc.create(r)
-	case http.MethodGet:
-		response = uc.get(r)
-	case http.MethodPatch:
-		response = uc.updatePassword(r)
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	if body, err := json.Marshal(response.Body); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(response.Status)
-		w.Write(body)
-	}
-}
-
-func (uc UserController) create(r *http.Request) *h.Response {
+func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 
 	user := u.GetNewUser()
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		return &h.Response{
-			Body:   map[string]string{"error": "Json Decode Error"},
-			Status: http.StatusBadRequest,
-		}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 
 	if err := uc.userService.Create(user); err != nil {
 
@@ -66,34 +39,33 @@ func (uc UserController) create(r *http.Request) *h.Response {
 			errs = creationErr
 		}
 
-		return &h.Response{
-			Body:   map[string]interface{}{"error": errs},
-			Status: http.StatusBadRequest,
-		}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"error": errs})
+		return
 	}
 
-	return &h.Response{
-		Body:   user.Clean(),
-		Status: http.StatusCreated,
-	}
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(user.Clean())
+	return
 }
 
-func (uc UserController) get(r *http.Request) *h.Response {
+func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("user").(*s.ClaimsUser)
 	if !ok {
-		return &h.Response{Status: http.StatusUnauthorized}
+		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+		return
 	}
-	return &h.Response{
-		Body:   user,
-		Status: http.StatusOK,
-	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
 
-func (uc UserController) updatePassword(r *http.Request) *h.Response {
+func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 
 	user, ok := r.Context().Value("user").(*s.ClaimsUser)
 	if !ok {
-		return &h.Response{Status: http.StatusUnauthorized}
+		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+		return
 	}
 
 	userToUpdate := u.GetNewUser().SetId(user.Id)
@@ -103,16 +75,19 @@ func (uc UserController) updatePassword(r *http.Request) *h.Response {
 	}{}
 
 	if err := json.NewDecoder(r.Body).Decode(&password); err != nil {
-		return &h.Response{Status: http.StatusBadRequest}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	userToUpdate.SetPassword(password.Password)
 
 	if err := uc.userService.UpdatePassword(userToUpdate); err != nil {
-		return &h.Response{Status: http.StatusBadRequest}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
-	return &h.Response{Status: http.StatusOK}
+	w.WriteHeader(http.StatusOK)
+	return
 }
 
 // updateName or updateEmail must also update the jwt

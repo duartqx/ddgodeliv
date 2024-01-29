@@ -1,8 +1,6 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 
@@ -43,17 +41,17 @@ func (ro router) userRoutes(userService *s.UserService, jwtController *c.JwtCont
 	// POST: Create User
 	userSubrouter.
 		With(jwtController.UnauthenticatedMiddleware).
-		Method(http.MethodPost, "/", userController)
+		Post("/", userController.Create)
 
 	// GET: Self (Good for checking if the user is authenticated)
 	userSubrouter.
 		With(jwtController.AuthenticatedMiddleware).
-		Method(http.MethodGet, "/", userController)
+		Get("/", userController.Get)
 
 	// PATCH: Password Update
 	userSubrouter.
 		With(jwtController.AuthenticatedMiddleware).
-		Method(http.MethodPatch, "/password", userController)
+		Patch("/password", userController.UpdatePassword)
 
 	return userSubrouter
 }
@@ -78,12 +76,12 @@ func (ro router) Build() *chi.Mux {
 	// POST: User Login
 	router.
 		With(jwtController.UnauthenticatedMiddleware).
-		Method(http.MethodPost, "/login", jwtController)
+		Post("/login", jwtController.Login)
 
 	// DELETE: User Logout
 	router.
 		With(jwtController.AuthenticatedMiddleware).
-		Method(http.MethodDelete, "/logout", jwtController)
+		Delete("/logout", jwtController.Logout)
 
 	// User Routes
 	router.Mount("/user", ro.userRoutes(userService, jwtController))
