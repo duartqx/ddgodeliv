@@ -8,7 +8,9 @@ import (
 
 	c "ddgodeliv/api/controllers"
 	s "ddgodeliv/application/services"
+	"ddgodeliv/application/validation"
 	r "ddgodeliv/infrastructure/postgresql"
+
 	lm "github.com/duartqx/ddgomiddlewares/logger"
 	rm "github.com/duartqx/ddgomiddlewares/recovery"
 )
@@ -58,8 +60,10 @@ func (ro router) userRoutes(userService *s.UserService, jwtController *c.JwtCont
 
 func (ro router) Build() *chi.Mux {
 
+	v := validation.NewValidator()
+
 	userRepository := r.GetNewUserRepository(ro.db)
-	userService := s.GetNewUserService(userRepository)
+	userService := s.GetNewUserService(userRepository, v)
 
 	jwtAuthService := s.GetNewJwtAuthService(
 		userRepository, ro.secret, r.GetNewSessionRepository(),
