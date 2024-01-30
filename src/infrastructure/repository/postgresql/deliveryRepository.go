@@ -234,10 +234,6 @@ func (dr DeliveryRepository) getDriverIdToQuery(id int) string {
 }
 
 func (dr DeliveryRepository) Create(delivery d.IDelivery) error {
-	if delivery.GetSenderId() == 0 || delivery.GetOrigin() == "" || delivery.GetDestination() == "" {
-		return fmt.Errorf("Invalid Delivery: Missing Sender, Origin or Destination")
-	}
-
 	var id int
 
 	if err := dr.db.QueryRow(
