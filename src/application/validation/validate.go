@@ -2,6 +2,7 @@ package validation
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -47,4 +48,11 @@ func (v Validator) Decode(errs error) *map[string]interface{} {
 func (v Validator) JSON(errs error) *[]byte {
 	res, _ := json.Marshal(v.Decode(errs))
 	return &res
+}
+
+func (v Validator) ValidateStruct(s interface{}) error {
+	if errs := v.Struct(s); errs != nil {
+		return fmt.Errorf(string(*v.JSON(errs)))
+	}
+	return nil
 }

@@ -39,20 +39,12 @@ func (cs DriverService) sendDriverDeletionEmails(driver d.IDriver) error {
 	return nil
 }
 
-// s: Driver | User
-func (cs DriverService) Validate(s interface{}) error {
-	if errs := cs.Struct(s); errs != nil {
-		return fmt.Errorf(string(*cs.JSON(errs)))
-	}
-	return nil
-}
-
 func (ds DriverService) CreateDriver(driver d.IDriver) error {
-	if err := ds.Validate(driver); err != nil {
+	if err := ds.ValidateStruct(driver); err != nil {
 		return err
 	}
 
-	if err := ds.Validate(driver.GetUser()); err != nil {
+	if err := ds.ValidateStruct(driver.GetUser()); err != nil {
 		return err
 	}
 

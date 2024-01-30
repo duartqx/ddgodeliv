@@ -2,9 +2,9 @@ package vehicle
 
 type VehicleModel struct {
 	Id           int    `db:"id" json:"id"`
-	Manufacturer string `db:"manufacturer" json:"manufacturer"`
-	Year         int    `db:"year" json:"year"`
-	MaxLoad      int    `db:"max_load" json:"max_load"`
+	Manufacturer string `db:"manufacturer" json:"manufacturer" validate:"required,min=3"`
+	Year         int    `db:"year" json:"year" validate:"gt=1900,lt=9999"`
+	MaxLoad      int    `db:"max_load" json:"max_load" validate:"required"`
 }
 
 func GetNewVehicleModel() *VehicleModel {

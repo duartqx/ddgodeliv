@@ -22,15 +22,8 @@ func GetNewVehicleService(
 	}
 }
 
-func (vs VehicleService) Validate(s interface{}) error {
-	if errs := vs.Struct(s); errs != nil {
-		return fmt.Errorf(string(*vs.JSON(errs)))
-	}
-	return nil
-}
-
 func (vs VehicleService) Create(vehicle ve.IVehicle) error {
-	if err := vs.Validate(vehicle); err != nil {
+	if err := vs.ValidateStruct(vehicle); err != nil {
 		return err
 	}
 

@@ -21,16 +21,9 @@ func GetNewUserService(userRepository u.IUserRepository, validator *v.Validator)
 	}
 }
 
-func (us UserService) Validate(user u.IUser) error {
-	if errs := us.Struct(user); errs != nil {
-		return fmt.Errorf(string(*us.JSON(errs)))
-	}
-	return nil
-}
-
 func (us UserService) Create(user u.IUser) error {
 
-	if err := us.Validate(user); err != nil {
+	if err := us.ValidateStruct(user); err != nil {
 		return err
 	}
 

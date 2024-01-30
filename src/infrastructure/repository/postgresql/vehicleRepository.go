@@ -141,7 +141,7 @@ func (vr VehicleRepository) Delete(vehicle v.IVehicle) error {
 	if count, err := res.RowsAffected(); err != nil {
 		return fmt.Errorf("Error trying to count affected rows: %v", err.Error())
 	} else if count < 1 {
-		return fmt.Errorf("No rows were affected!")
+		return fmt.Errorf("No rows affected")
 	}
 
 	return nil

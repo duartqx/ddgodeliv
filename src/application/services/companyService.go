@@ -16,16 +16,9 @@ func GetNewCompanyService(companyRepository c.ICompanyRepository, validator *v.V
 	return &CompanyService{companyRepository: companyRepository, Validator: validator}
 }
 
-func (cs CompanyService) Validate(company c.ICompany) error {
-	if errs := cs.Struct(company); errs != nil {
-		return fmt.Errorf(string(*cs.JSON(errs)))
-	}
-	return nil
-}
-
 func (cs CompanyService) CreateCompany(company c.ICompany, licenseId string) error {
 
-	if err := cs.Validate(company); err != nil {
+	if err := cs.ValidateStruct(company); err != nil {
 		return err
 	}
 
