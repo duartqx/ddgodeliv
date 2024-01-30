@@ -9,7 +9,7 @@ type IVehicleModelRepository interface {
 }
 
 type IVehicleRepository interface {
-	FindById(id int) (IVehicle, error)
+	FindById(vehicle IVehicle) error
 
 	FindByCompanyId(id int) (*[]IVehicle, error)
 	ExistsByCompanyId(id int) *bool

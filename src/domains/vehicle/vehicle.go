@@ -4,9 +4,9 @@ import c "ddgodeliv/domains/company"
 
 type Vehicle struct {
 	Id        int    `db:"id" json:"id"`
-	ModelId   int    `db:"model_id" json:"model_id"`
-	CompanyId int    `db:"company_id" json:"company_id"`
-	LicenseId string `db:"license_id" json:"license_id"`
+	ModelId   int    `db:"model_id" json:"model_id" validate:"required,gte=1"`
+	CompanyId int    `db:"company_id" json:"company_id" validate:"required,gte=1"`
+	LicenseId string `db:"license_id" json:"license_id" validate:"required"`
 
 	Model   IVehicleModel `json:"model"`
 	Company c.ICompany    `json:"company"`

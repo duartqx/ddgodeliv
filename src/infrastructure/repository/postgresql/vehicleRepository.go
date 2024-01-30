@@ -24,15 +24,15 @@ func (vr VehicleRepository) simpleValidate(vehicle v.IVehicle) error {
 	return nil
 }
 
-func (vr VehicleRepository) FindById(id int) (v.IVehicle, error) {
-
-	vehicle := v.GetNewVehicle()
-
-	if err := vr.db.Get(vehicle, "SELECT * FROM vehicles WHERE id = $1", id); err != nil {
-		return nil, err
+func (vr VehicleRepository) FindById(vehicle v.IVehicle) error {
+	if err := vr.db.Get(
+		vehicle,
+		"SELECT * FROM vehicles WHERE id = $1 AND company_id = $2",
+		vehicle.GetId(), vehicle.GetCompanyId(),
+	); err != nil {
+		return err
 	}
-
-	return vehicle, nil
+	return nil
 }
 
 func (vr VehicleRepository) FindByCompanyId(id int) (*[]v.IVehicle, error) {
@@ -102,16 +102,25 @@ func (vr VehicleRepository) Update(vehicle v.IVehicle) error {
 		return fmt.Errorf("Invalid Vehicle Id")
 	}
 
-	_, err := vr.db.Exec(
+	res, err := vr.db.Exec(
 		`
 			UPDATE vehicles
 			SET model_id = $1, company_id = $2, license_id = $3
-			WHERE id = $2
+			WHERE id = $2 AND company_id = $2
 		`,
 		vehicle.GetModelId(),
 		vehicle.GetCompanyId(),
 		strings.ToLower(vehicle.GetLicenseId()),
 	)
+	if err != nil {
+		return fmt.Errorf("Error trying to update vehicle: %v", err.Error())
+	}
+
+	if count, err := res.RowsAffected(); err != nil {
+		return fmt.Errorf("Error trying to count affected rows: %v", err.Error())
+	} else if count < 1 {
+		return fmt.Errorf("No rows were affected!")
+	}
 	return err
 }
 
@@ -120,7 +129,20 @@ func (vr VehicleRepository) Delete(vehicle v.IVehicle) error {
 		return fmt.Errorf("Invalid Vehicle Id")
 	}
 
-	_, err := vr.db.Exec("DELETE FROM vehicles WHERE id = $1", vehicle.GetId())
+	res, err := vr.db.Exec(
+		"DELETE FROM vehicles WHERE id = $1 AND company_id = $2",
+		vehicle.GetId(),
+		vehicle.GetCompanyId(),
+	)
+	if err != nil {
+		return fmt.Errorf("Error trying to exec Delete query: %v", err.Error())
+	}
 
-	return err
+	if count, err := res.RowsAffected(); err != nil {
+		return fmt.Errorf("Error trying to count affected rows: %v", err.Error())
+	} else if count < 1 {
+		return fmt.Errorf("No rows were affected!")
+	}
+
+	return nil
 }

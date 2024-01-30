@@ -48,15 +48,17 @@ func (cs DriverService) Validate(s interface{}) error {
 }
 
 func (ds DriverService) CreateDriver(driver d.IDriver) error {
-	if err := ds.Struct(driver); err != nil {
+	if err := ds.Validate(driver); err != nil {
 		return err
 	}
 
-	if err := ds.Struct(driver.GetUser()); err != nil {
+	if err := ds.Validate(driver.GetUser()); err != nil {
 		return err
 	}
 
-	driver.GetUser().SetPassword("TempPasswordToChangeWhenActivatingAccount")
+	driver.GetUser().SetPassword(
+		"TempPasswordToChangeWhenActivatingAccount" + driver.GetUser().GetEmail(),
+	)
 
 	if err := ds.userService.Create(driver.GetUser()); err != nil {
 		return fmt.Errorf("Internal Error creating the user: %v", err.Error())
