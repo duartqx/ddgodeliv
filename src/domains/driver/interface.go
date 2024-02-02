@@ -20,4 +20,6 @@ type IDriver interface {
 
 	GetUser() u.IUser
 	GetCompany() c.ICompany
+
+	HasInvalidId() bool
 }

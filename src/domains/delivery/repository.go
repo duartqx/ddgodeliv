@@ -3,7 +3,7 @@ package delivery
 import "time"
 
 type IDeliveryRepository interface {
-	FindById(id int) (IDelivery, error)
+	FindById(delivery IDelivery) error
 
 	FindByDriverId(id int) (*[]IDelivery, error)
 	ExistsByDriverId(id int) *bool

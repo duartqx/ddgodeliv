@@ -8,4 +8,6 @@ type ICompany interface {
 	SetName(name string) ICompany
 
 	GetOwnerId() int
+
+	HasInvalidId() bool
 }

@@ -32,4 +32,6 @@ type IDelivery interface {
 
 	GetDriver() d.IDriver
 	GetSender() u.IUser
+
+	HasInvalidId() bool
 }

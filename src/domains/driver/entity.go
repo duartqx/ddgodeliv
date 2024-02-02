@@ -65,3 +65,7 @@ func (d Driver) GetUser() u.IUser {
 func (d Driver) GetCompany() c.ICompany {
 	return d.Company
 }
+
+func (d Driver) HasInvalidId() bool {
+	return d.GetId() == 0
+}

@@ -31,3 +31,7 @@ func (c *Company) SetName(name string) ICompany {
 func (c Company) GetOwnerId() int {
 	return c.OwnerId
 }
+
+func (c Company) HasInvalidId() bool {
+	return c.GetId() == 0
+}
