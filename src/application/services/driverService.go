@@ -39,6 +39,8 @@ func (cs DriverService) sendDriverDeletionEmails(driver d.IDriver) error {
 	return nil
 }
 
+// A Company owner automatically has an driver created for its user, then all
+// other drivers of it's company are created by a manager
 func (ds DriverService) CreateDriver(driver d.IDriver) error {
 	if err := ds.ValidateStruct(driver); err != nil {
 		return err

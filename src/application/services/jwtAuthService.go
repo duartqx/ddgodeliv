@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 
+	d "ddgodeliv/domains/driver"
 	u "ddgodeliv/domains/user"
 )
 
@@ -16,6 +17,17 @@ type ClaimsUser struct {
 	Id    int    `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
+
+	Driver struct {
+		Id        int `json:"driver_id"`
+		CompanyId int `json:"company_id"`
+	} `json:"driver"`
+}
+
+func (u *ClaimsUser) SetDriver(driver d.IDriver) *ClaimsUser {
+	u.Driver.Id = driver.GetId()
+	u.Driver.CompanyId = driver.GetCompanyId()
+	return u
 }
 
 type customClaims struct {
@@ -25,13 +37,20 @@ type customClaims struct {
 
 type JwtAuthService struct {
 	userRepository    u.IUserRepository
+	driverRepository  d.IDriverRepository
 	sessionRepository u.ISessionRepository
 	secret            *[]byte
 }
 
-func GetNewJwtAuthService(userRepository u.IUserRepository, secret *[]byte, sessionRepository u.ISessionRepository) *JwtAuthService {
+func GetNewJwtAuthService(
+	userRepository u.IUserRepository,
+	driverRepository d.IDriverRepository,
+	sessionRepository u.ISessionRepository,
+	secret *[]byte,
+) *JwtAuthService {
 	return &JwtAuthService{
 		userRepository:    userRepository,
+		driverRepository:  driverRepository,
 		sessionRepository: sessionRepository,
 		secret:            secret,
 	}
@@ -46,6 +65,10 @@ func (jas JwtAuthService) keyFunc(t *jwt.Token) (interface{}, error) {
 }
 
 func (jas JwtAuthService) generateToken(user *ClaimsUser, expiresAt time.Time) (string, error) {
+
+	if driver, err := jas.driverRepository.FindByUserId(user.Id); err != nil {
+		user.SetDriver(driver)
+	}
 
 	claims := &customClaims{
 		ClaimsUser:       *user,

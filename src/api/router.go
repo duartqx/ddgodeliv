@@ -63,8 +63,10 @@ func (ro router) Build() *chi.Mux {
 	userRepository := r.GetNewUserRepository(ro.db)
 	userService := s.GetNewUserService(userRepository, v)
 
+	driverRepository := r.GetNewDriverRepository(ro.db)
+
 	jwtAuthService := s.GetNewJwtAuthService(
-		userRepository, ro.secret, r.GetNewSessionRepository(),
+		userRepository, driverRepository, r.GetNewSessionRepository(), ro.secret,
 	)
 	jwtController := c.NewJwtController(jwtAuthService)
 
