@@ -17,15 +17,13 @@ func GetNewDeliveryRepository(db *sqlx.DB) *DeliveryRepository {
 	return &DeliveryRepository{db: db}
 }
 
-func (dr DeliveryRepository) FindById(id int) (d.IDelivery, error) {
-	delivery := d.GetNewDelivery()
-
-	err := dr.db.Get(delivery, "SELECT * FROM deliveries WHERE id = $1", id)
-	if err != nil {
-		return nil, err
+func (dr DeliveryRepository) FindById(delivery d.IDelivery) error {
+	if err := dr.db.Get(
+		delivery, "SELECT * FROM deliveries WHERE id = $1", delivery.GetId(),
+	); err != nil {
+		return err
 	}
-
-	return delivery, nil
+	return nil
 }
 
 func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
@@ -258,11 +256,6 @@ func (dr DeliveryRepository) Create(delivery d.IDelivery) error {
 }
 
 func (dr DeliveryRepository) Update(delivery d.IDelivery) error {
-
-	if delivery.GetSenderId() == 0 || delivery.GetOrigin() == "" || delivery.GetDestination() == "" {
-		return fmt.Errorf("Invalid Delivery: Missing Sender or Destination")
-	}
-
 	_, err := dr.db.Exec(
 		`
 			UPDATE deliveries
@@ -287,10 +280,6 @@ func (dr DeliveryRepository) Update(delivery d.IDelivery) error {
 }
 
 func (dr DeliveryRepository) Delete(delivery d.IDelivery) error {
-	if delivery.GetId() == 0 {
-		return fmt.Errorf("Invalid Delivery Id")
-	}
-
 	_, err := dr.db.Exec("DELETE FROM deliveries WHERE id = $1", delivery.GetId())
 
 	return err
