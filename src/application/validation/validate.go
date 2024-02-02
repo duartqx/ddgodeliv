@@ -56,3 +56,10 @@ func (v Validator) ValidateStruct(s interface{}) error {
 	}
 	return nil
 }
+
+func (v Validator) ValidateVar(i interface{}, tag string) error {
+	if errs := v.Var(i, tag); errs != nil {
+		return fmt.Errorf(string(*v.JSON(errs)))
+	}
+	return nil
+}
