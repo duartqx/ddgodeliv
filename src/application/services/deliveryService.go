@@ -103,3 +103,11 @@ func (ds DeliveryService) Delete(user u.IUser, delivery de.IDelivery) error {
 
 	return nil
 }
+
+func (ds DeliveryService) FindPendingWithoutDriver() (*[]de.IDelivery, error) {
+	deliveries, err := ds.deliveryRepository.FindPendingWithNoDriver()
+	if err != nil {
+		return nil, fmt.Errorf("Internal Error trying to find pending deliveries: %v", err.Error())
+	}
+	return deliveries, nil
+}
