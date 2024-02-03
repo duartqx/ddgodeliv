@@ -9,26 +9,27 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 
+	a "ddgodeliv/domains/auth"
 	d "ddgodeliv/domains/driver"
 	u "ddgodeliv/domains/user"
 )
 
 type customClaims struct {
-	ClaimsUser
+	a.SessionUser
 	jwt.RegisteredClaims
 }
 
 type JwtAuthService struct {
 	userRepository    u.IUserRepository
 	driverRepository  d.IDriverRepository
-	sessionRepository u.ISessionRepository
+	sessionRepository a.ISessionRepository
 	secret            *[]byte
 }
 
 func GetNewJwtAuthService(
 	userRepository u.IUserRepository,
 	driverRepository d.IDriverRepository,
-	sessionRepository u.ISessionRepository,
+	sessionRepository a.ISessionRepository,
 	secret *[]byte,
 ) *JwtAuthService {
 	return &JwtAuthService{
@@ -41,7 +42,7 @@ func GetNewJwtAuthService(
 
 func (jas JwtAuthService) claims() *customClaims {
 	return &customClaims{
-		ClaimsUser: ClaimsUser{}, RegisteredClaims: jwt.RegisteredClaims{},
+		SessionUser: a.SessionUser{}, RegisteredClaims: jwt.RegisteredClaims{},
 	}
 }
 
@@ -50,15 +51,11 @@ func (jas JwtAuthService) keyFunc(t *jwt.Token) (interface{}, error) {
 }
 
 func (jas JwtAuthService) generateToken(
-	user *ClaimsUser, expiresAt time.Time,
+	user *a.SessionUser, expiresAt time.Time,
 ) (string, error) {
 
-	if driver, err := jas.driverRepository.FindByUserId(user.Id); err != nil {
-		user.SetDriver(driver)
-	}
-
 	claims := &customClaims{
-		ClaimsUser: *user,
+		SessionUser: *user,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
@@ -91,7 +88,7 @@ func (jas JwtAuthService) getUnparsedToken(
 
 func (jas JwtAuthService) ValidateAuth(
 	authorization string, cookie *http.Cookie,
-) (*ClaimsUser, error) {
+) (a.ISessionUser, error) {
 
 	unparsedToken := jas.getUnparsedToken(authorization, cookie)
 	if unparsedToken == "" {
@@ -102,12 +99,12 @@ func (jas JwtAuthService) ValidateAuth(
 
 	parsedToken, err := jwt.ParseWithClaims(unparsedToken, claims, jas.keyFunc)
 	if err != nil || !parsedToken.Valid {
-		jas.sessionRepository.Delete(unparsedToken)
+		jas.sessionRepository.Delete(&claims.SessionUser)
 
 		return nil, fmt.Errorf("Expired session")
 	}
 
-	return &claims.ClaimsUser, nil
+	return &claims.SessionUser, nil
 }
 
 func (jas JwtAuthService) Login(user u.IUser) (token string, expiresAt time.Time, err error) {
@@ -130,19 +127,22 @@ func (jas JwtAuthService) Login(user u.IUser) (token string, expiresAt time.Time
 	createdAt := time.Now()
 	expiresAt = createdAt.Add(time.Hour * 12)
 
-	token, err = jas.generateToken(
-		&ClaimsUser{
-			Id:    dbUser.GetId(),
-			Email: dbUser.GetEmail(),
-			Name:  dbUser.GetName(),
-		},
-		expiresAt,
-	)
+	claimsUser := a.SessionUser{
+		Id:    dbUser.GetId(),
+		Email: dbUser.GetEmail(),
+		Name:  dbUser.GetName(),
+	}
+
+	if driver, err := jas.driverRepository.FindByUserId(claimsUser.GetId()); err != nil {
+		claimsUser.SetDriver(driver)
+	}
+
+	token, err = jas.generateToken(&claimsUser, expiresAt)
 	if err != nil {
 		return "", expiresAt, fmt.Errorf("Could not generate token")
 	}
 
-	if err := jas.sessionRepository.Set(token, createdAt, dbUser.GetId()); err != nil {
+	if err := jas.sessionRepository.Set(&claimsUser, createdAt); err != nil {
 		return "", expiresAt, err
 	}
 
@@ -155,7 +155,10 @@ func (jas JwtAuthService) Logout(authorization string, cookie *http.Cookie) erro
 		return fmt.Errorf("Missing Token")
 	}
 
-	if err := jas.sessionRepository.Delete(unparsedToken); err != nil {
+	claims := jas.claims()
+
+	jwt.ParseWithClaims(unparsedToken, claims, jas.keyFunc)
+	if err := jas.sessionRepository.Delete(&claims.SessionUser); err != nil {
 		return fmt.Errorf("Invalid Token")
 	}
 
