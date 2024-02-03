@@ -36,7 +36,7 @@ func (ro *router) SetSecret(secret []byte) *router {
 func (ro router) userRoutes(
 	userService *s.UserService,
 	jwtController *c.JwtController,
-	claimsService *a.ClaimsService,
+	claimsService *a.SessionService,
 ) *chi.Mux {
 
 	userController := c.GetNewUserController(userService, claimsService)
@@ -66,15 +66,16 @@ func (ro router) Build() *chi.Mux {
 	v := validation.NewValidator()
 
 	// Repositories
-	userRepository := r.GetNewUserRepository(ro.db)
 	driverRepository := r.GetNewDriverRepository(ro.db)
+	sessionRepository := r.GetNewSessionRepository()
+	userRepository := r.GetNewUserRepository(ro.db)
 
 	// Services
-	userService := s.GetNewUserService(userRepository, v)
 	jwtAuthService := a.GetNewJwtAuthService(
-		userRepository, driverRepository, r.GetNewSessionRepository(), ro.secret,
+		userRepository, driverRepository, sessionRepository, ro.secret,
 	)
-	claimsService := a.GetNewClaimsService(driverRepository)
+	sessionService := a.GetNewSessionService(driverRepository, sessionRepository)
+	userService := s.GetNewUserService(userRepository, v)
 
 	// Controllers
 	jwtController := c.NewJwtController(jwtAuthService)
@@ -95,7 +96,7 @@ func (ro router) Build() *chi.Mux {
 		Delete("/logout", jwtController.Logout)
 
 	// User Routes
-	router.Mount("/user", ro.userRoutes(userService, jwtController, claimsService))
+	router.Mount("/user", ro.userRoutes(userService, jwtController, sessionService))
 
 	return router
 }
