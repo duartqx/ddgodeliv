@@ -53,3 +53,7 @@ func (cs CompanyService) FindById(company c.ICompany) error {
 	}
 	return nil
 }
+
+func (cs CompanyService) ValidateDriverLicense(license string) error {
+	return cs.ValidateVar(license, "required,min=3,max=250")
+}

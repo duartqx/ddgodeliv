@@ -47,9 +47,7 @@ func (cc CompanyController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := cc.companyService.ValidateVarJson(
-		tmpComp.LicenseId, "required,min=3,max=250",
-	); err != nil {
+	if err := cc.companyService.ValidateDriverLicense(tmpComp.LicenseId); err != nil {
 		http.Error(w, "Invalid Driver License", http.StatusBadRequest)
 		return
 	}
