@@ -4,17 +4,22 @@ import (
 	"encoding/json"
 	"net/http"
 
+	h "ddgodeliv/api/http"
+	as "ddgodeliv/application/auth"
 	s "ddgodeliv/application/services"
 	u "ddgodeliv/domains/user"
 )
 
 type UserController struct {
-	userService *s.UserService
+	userService   *s.UserService
+	claimsService *as.ClaimsService
 }
 
-func GetNewUserController(userService *s.UserService) *UserController {
+func GetNewUserController(
+	userService *s.UserService, claimsService *as.ClaimsService,
+) *UserController {
 	return &UserController{
-		userService: userService,
+		userService: userService, claimsService: claimsService,
 	}
 }
 
@@ -46,8 +51,10 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
-	user, ok := r.Context().Value("user").(*s.ClaimsUser)
-	if !ok {
+
+	user, err := uc.claimsService.GetClaimsUserFromContext(r.Context())
+	if err != nil {
+		http.SetCookie(w, h.GetInvalidCookie())
 		http.Error(w, "Not Authorized", http.StatusUnauthorized)
 		return
 	}
@@ -55,17 +62,18 @@ func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(
 		u.GetNewUser().
-			SetId(user.Id).
-			SetEmail(user.Name).
-			SetName(user.Name).
+			SetId(user.GetId()).
+			SetEmail(user.GetEmail()).
+			SetName(user.GetName()).
 			Clean(),
 	)
 }
 
 func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 
-	user, ok := r.Context().Value("user").(*s.ClaimsUser)
-	if !ok {
+	user, err := uc.claimsService.GetClaimsUserFromContext(r.Context())
+	if err != nil {
+		http.SetCookie(w, h.GetInvalidCookie())
 		http.Error(w, "Not Authorized", http.StatusUnauthorized)
 		return
 	}

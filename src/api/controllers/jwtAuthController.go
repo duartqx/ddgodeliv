@@ -6,19 +6,17 @@ import (
 	"net/http"
 
 	h "ddgodeliv/api/http"
-	s "ddgodeliv/application/services"
+	a "ddgodeliv/application/auth"
 	u "ddgodeliv/domains/user"
 )
 
 type JwtController struct {
-	jwtService *s.JwtAuthService
-	cookieName string
+	jwtService *a.JwtAuthService
 }
 
-func NewJwtController(jwtService *s.JwtAuthService) *JwtController {
+func NewJwtController(jwtService *a.JwtAuthService) *JwtController {
 	return &JwtController{
 		jwtService: jwtService,
-		cookieName: "JwtAuthToken",
 	}
 }
 
@@ -39,7 +37,7 @@ func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     jc.cookieName,
+		Name:     h.AuthCookieName,
 		Value:    token,
 		Expires:  expiresAt,
 		Secure:   true,
@@ -60,7 +58,7 @@ func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {
 
 func (jc JwtController) Logout(w http.ResponseWriter, r *http.Request) {
 
-	cookie, _ := r.Cookie(jc.cookieName)
+	cookie, _ := r.Cookie(h.AuthCookieName)
 
 	err := jc.jwtService.Logout(r.Header.Get("Authorization"), cookie)
 
@@ -68,22 +66,18 @@ func (jc JwtController) Logout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:   jc.cookieName,
-		MaxAge: -1,
-	})
-
-	w.Write([]byte("Logged Out"))
+	http.SetCookie(w, h.GetInvalidCookie())
+	w.WriteHeader(http.StatusUnauthorized)
 }
 
 func (jc JwtController) AuthenticatedMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		cookie, _ := r.Cookie(jc.cookieName)
+		cookie, _ := r.Cookie(h.AuthCookieName)
 		claimsUser, err := jc.jwtService.ValidateAuth(r.Header.Get("Authorization"), cookie)
 
 		if err != nil {
-			http.SetCookie(w, &http.Cookie{Name: jc.cookieName, MaxAge: -1})
+			http.SetCookie(w, h.GetInvalidCookie())
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -98,11 +92,11 @@ func (jc JwtController) AuthenticatedMiddleware(next http.Handler) http.Handler 
 func (jc JwtController) UnauthenticatedMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		cookie, _ := r.Cookie(jc.cookieName)
+		cookie, _ := r.Cookie(h.AuthCookieName)
 		claimsUser, _ := jc.jwtService.ValidateAuth(r.Header.Get("Authorization"), cookie)
 
 		if claimsUser != nil {
-			http.SetCookie(w, &http.Cookie{Name: jc.cookieName, MaxAge: -1})
+			http.SetCookie(w, h.GetInvalidCookie())
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	h "ddgodeliv/api/http"
+	as "ddgodeliv/application/auth"
 	s "ddgodeliv/application/services"
 	v "ddgodeliv/domains/vehicle"
 
@@ -14,16 +16,19 @@ import (
 type VehicleController struct {
 	vehicleModelService *s.VehicleModelService
 	vehicleService      *s.VehicleService
+	claimsService       *as.ClaimsService
 }
 
 func GetNewVehicleController(
 	vehicleModelService *s.VehicleModelService,
 	vehicleService *s.VehicleService,
+	claimsService *as.ClaimsService,
 ) *VehicleController {
 
 	return &VehicleController{
 		vehicleModelService: vehicleModelService,
 		vehicleService:      vehicleService,
+		claimsService:       claimsService,
 	}
 }
 
@@ -87,13 +92,18 @@ func (vc VehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request
 
 func (vc VehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Request) {
 
-	user, ok := r.Context().Value("user").(*s.ClaimsUser)
-	if !ok || user.Driver.CompanyId == 0 {
-		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+	user, err := vc.claimsService.GetClaimsUserFromContext(r.Context())
+	if err != nil {
+		http.SetCookie(w, h.GetInvalidCookie())
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	if err := vc.claimsService.GetWithDriverInfo(user); err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 
-	vehicles, err := vc.vehicleService.FindByCompanyId(user.Driver.CompanyId)
+	vehicles, err := vc.vehicleService.FindByCompanyId(user.GetCompanyId())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -109,9 +119,13 @@ func (vc VehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Re
 
 func (vc VehicleController) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
 
-	user, ok := r.Context().Value("user").(*s.ClaimsUser)
-	if !ok || user.Driver.CompanyId == 0 {
+	user, err := vc.claimsService.GetClaimsUserFromContext(r.Context())
+	if err != nil {
 		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+		return
+	}
+	if err := vc.claimsService.GetWithDriverInfo(user); err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 
@@ -121,7 +135,7 @@ func (vc VehicleController) DeleteVehicle(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	vehicle := v.GetNewVehicle().SetId(vehicleId).SetCompanyId(user.Driver.CompanyId)
+	vehicle := v.GetNewVehicle().SetId(vehicleId).SetCompanyId(user.GetCompanyId())
 
 	if err := vc.vehicleService.FindById(vehicle); err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)

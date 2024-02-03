@@ -1,4 +1,4 @@
-package services
+package auth
 
 import (
 	"fmt"
@@ -12,23 +12,6 @@ import (
 	d "ddgodeliv/domains/driver"
 	u "ddgodeliv/domains/user"
 )
-
-type ClaimsUser struct {
-	Id    int    `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
-
-	Driver struct {
-		Id        int `json:"driver_id"`
-		CompanyId int `json:"company_id"`
-	} `json:"driver"`
-}
-
-func (u *ClaimsUser) SetDriver(driver d.IDriver) *ClaimsUser {
-	u.Driver.Id = driver.GetId()
-	u.Driver.CompanyId = driver.GetCompanyId()
-	return u
-}
 
 type customClaims struct {
 	ClaimsUser
@@ -57,22 +40,28 @@ func GetNewJwtAuthService(
 }
 
 func (jas JwtAuthService) claims() *customClaims {
-	return &customClaims{ClaimsUser: ClaimsUser{}, RegisteredClaims: jwt.RegisteredClaims{}}
+	return &customClaims{
+		ClaimsUser: ClaimsUser{}, RegisteredClaims: jwt.RegisteredClaims{},
+	}
 }
 
 func (jas JwtAuthService) keyFunc(t *jwt.Token) (interface{}, error) {
 	return *jas.secret, nil
 }
 
-func (jas JwtAuthService) generateToken(user *ClaimsUser, expiresAt time.Time) (string, error) {
+func (jas JwtAuthService) generateToken(
+	user *ClaimsUser, expiresAt time.Time,
+) (string, error) {
 
 	if driver, err := jas.driverRepository.FindByUserId(user.Id); err != nil {
 		user.SetDriver(driver)
 	}
 
 	claims := &customClaims{
-		ClaimsUser:       *user,
-		RegisteredClaims: jwt.RegisteredClaims{ExpiresAt: jwt.NewNumericDate(expiresAt)},
+		ClaimsUser: *user,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -85,7 +74,9 @@ func (jas JwtAuthService) generateToken(user *ClaimsUser, expiresAt time.Time) (
 	return tokenStr, nil
 }
 
-func (jas JwtAuthService) getUnparsedToken(authorization string, cookie *http.Cookie) string {
+func (jas JwtAuthService) getUnparsedToken(
+	authorization string, cookie *http.Cookie,
+) string {
 	if authorization != "" {
 		token, found := strings.CutPrefix(authorization, "Bearer ")
 		if found {
@@ -98,7 +89,9 @@ func (jas JwtAuthService) getUnparsedToken(authorization string, cookie *http.Co
 	return ""
 }
 
-func (jas JwtAuthService) ValidateAuth(authorization string, cookie *http.Cookie) (*ClaimsUser, error) {
+func (jas JwtAuthService) ValidateAuth(
+	authorization string, cookie *http.Cookie,
+) (*ClaimsUser, error) {
 
 	unparsedToken := jas.getUnparsedToken(authorization, cookie)
 	if unparsedToken == "" {
