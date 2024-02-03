@@ -22,6 +22,11 @@ func GetNewVehicleModelService(
 }
 
 func (vms VehicleModelService) Create(vehicleModel ve.IVehicleModel) error {
+
+	if validationErrs := vms.ValidateStruct(vehicleModel); validationErrs != nil {
+		return validationErrs
+	}
+
 	if err := vms.vehicleModelRepository.Create(vehicleModel); err != nil {
 		return fmt.Errorf("Internal Error creating vehicle model: %v", err.Error())
 	}

@@ -23,6 +23,10 @@ func GetNewVehicleService(
 }
 
 func (vs VehicleService) Create(vehicle ve.IVehicle) error {
+	if validationErrs := vs.ValidateStruct(vehicle); validationErrs != nil {
+		return validationErrs
+	}
+
 	if err := vs.vehicleRepository.Create(vehicle); err != nil {
 		return fmt.Errorf("Internal Error creating vehicle: %v", err.Error())
 	}

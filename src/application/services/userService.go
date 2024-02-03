@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	e "ddgodeliv/application/errors"
 	v "ddgodeliv/application/validation"
 	u "ddgodeliv/domains/user"
 )
@@ -24,7 +25,11 @@ func GetNewUserService(userRepository u.IUserRepository, validator *v.Validator)
 func (us UserService) Create(user u.IUser) error {
 
 	if us.userRepository.ExistsByEmail(user.GetEmail()) {
-		return fmt.Errorf("Invalid Email")
+		return fmt.Errorf("Invalid Email: %w", e.BadRequestError)
+	}
+
+	if validationErrs := us.ValidateStruct(user); validationErrs != nil {
+		return validationErrs
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword(
