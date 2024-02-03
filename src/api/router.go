@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	c "ddgodeliv/api/controllers"
+	a "ddgodeliv/application/auth"
 	s "ddgodeliv/application/services"
 	"ddgodeliv/application/validation"
 	r "ddgodeliv/infrastructure/repository/postgresql"
@@ -32,9 +33,13 @@ func (ro *router) SetSecret(secret []byte) *router {
 	return ro
 }
 
-func (ro router) userRoutes(userService *s.UserService, jwtController *c.JwtController) *chi.Mux {
+func (ro router) userRoutes(
+	userService *s.UserService,
+	jwtController *c.JwtController,
+	claimsService *a.ClaimsService,
+) *chi.Mux {
 
-	userController := c.GetNewUserController(userService)
+	userController := c.GetNewUserController(userService, claimsService)
 
 	userSubrouter := chi.NewRouter()
 
@@ -60,14 +65,18 @@ func (ro router) Build() *chi.Mux {
 
 	v := validation.NewValidator()
 
+	// Repositories
 	userRepository := r.GetNewUserRepository(ro.db)
-	userService := s.GetNewUserService(userRepository, v)
-
 	driverRepository := r.GetNewDriverRepository(ro.db)
 
-	jwtAuthService := s.GetNewJwtAuthService(
+	// Services
+	userService := s.GetNewUserService(userRepository, v)
+	jwtAuthService := a.GetNewJwtAuthService(
 		userRepository, driverRepository, r.GetNewSessionRepository(), ro.secret,
 	)
+	claimsService := a.GetNewClaimsService(driverRepository)
+
+	// Controllers
 	jwtController := c.NewJwtController(jwtAuthService)
 
 	router := chi.NewRouter()
@@ -86,7 +95,7 @@ func (ro router) Build() *chi.Mux {
 		Delete("/logout", jwtController.Logout)
 
 	// User Routes
-	router.Mount("/user", ro.userRoutes(userService, jwtController))
+	router.Mount("/user", ro.userRoutes(userService, jwtController, claimsService))
 
 	return router
 }
