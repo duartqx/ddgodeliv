@@ -2,15 +2,19 @@ package validation
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-playground/validator/v10"
+
+	e "ddgodeliv/application/errors"
 )
 
 type validationErr struct {
-	Tag   string
-	Value interface{}
+	Tag   string      `json:"tag"`
+	Value interface{} `json:"value"`
 }
 
 type Validator struct {
@@ -36,7 +40,7 @@ func (v Validator) Decode(errs error) *map[string]interface{} {
 	validationErrors := map[string]interface{}{}
 
 	for _, err := range errs.(validator.ValidationErrors) {
-		validationErrors[err.Field()] = validationErr{
+		validationErrors[strings.ToLower(err.Field())] = validationErr{
 			Tag:   err.Tag(),
 			Value: err.Value(),
 		}
@@ -59,7 +63,7 @@ func (v Validator) ValidateStructJson(s interface{}) *[]byte {
 
 func (v Validator) ValidateStruct(s interface{}) error {
 	if errs := v.Struct(s); errs != nil {
-		return fmt.Errorf(string(*v.JSON(errs)))
+		return &e.ValidationError{Message: string(*v.JSON(errs))}
 	}
 	return nil
 }
