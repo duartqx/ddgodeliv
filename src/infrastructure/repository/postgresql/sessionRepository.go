@@ -1,32 +1,26 @@
 package postgresql
 
 import (
-	"fmt"
 	"time"
 
-	u "ddgodeliv/domains/user"
+	a "ddgodeliv/domains/auth"
 )
 
 type Session struct {
-	UserId    int
+	User      a.ISessionUser
 	CreatedAt time.Time
-	Token     string
 }
 
-func (s Session) GetUserId() int {
-	return s.UserId
+func (s Session) GetUser() a.ISessionUser {
+	return s.User
 }
 
 func (s Session) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
-func (s Session) GetToken() string {
-	return s.Token
-}
-
 type sessionStore struct {
-	sessions *map[string]u.ISession
+	sessions *map[string]a.ISession
 }
 
 type SessionRepository struct {
@@ -36,27 +30,27 @@ type SessionRepository struct {
 func GetNewSessionRepository() *SessionRepository {
 	return &SessionRepository{
 		store: &sessionStore{
-			sessions: &map[string]u.ISession{},
+			sessions: &map[string]a.ISession{},
 		},
 	}
 }
 
-func (sr SessionRepository) Get(token string) (u.ISession, error) {
-	session, found := (*sr.store.sessions)[token]
+func (sr SessionRepository) Get(user a.ISessionUser) (a.ISession, error) {
+	session, found := (*sr.store.sessions)[user.GetEmail()]
 	if !found {
-		return nil, fmt.Errorf("Session Not Found!")
+		session = &Session{User: user, CreatedAt: time.Now()}
 	}
 	return session, nil
 }
 
-func (sr SessionRepository) Set(token string, createdAt time.Time, userId int) error {
-	(*sr.store.sessions)[token] = &Session{
-		UserId: userId, CreatedAt: createdAt, Token: token,
+func (sr SessionRepository) Set(user a.ISessionUser, createdAt time.Time) error {
+	(*sr.store.sessions)[user.GetEmail()] = &Session{
+		User: user, CreatedAt: createdAt,
 	}
 	return nil
 }
 
-func (sr SessionRepository) Delete(token string) error {
-	delete((*sr.store.sessions), token)
+func (sr SessionRepository) Delete(user a.ISessionUser) error {
+	delete((*sr.store.sessions), user.GetEmail())
 	return nil
 }
