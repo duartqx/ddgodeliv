@@ -42,12 +42,19 @@ func (v Validator) Decode(errs error) *map[string]interface{} {
 		}
 	}
 
-	return &validationErrors
+	return &map[string]interface{}{"error": validationErrors}
 }
 
 func (v Validator) JSON(errs error) *[]byte {
 	res, _ := json.Marshal(v.Decode(errs))
 	return &res
+}
+
+func (v Validator) ValidateStructJson(s interface{}) *[]byte {
+	if errs := v.Struct(s); errs != nil {
+		return v.JSON(errs)
+	}
+	return nil
 }
 
 func (v Validator) ValidateStruct(s interface{}) error {

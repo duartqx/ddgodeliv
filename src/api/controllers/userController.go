@@ -29,18 +29,14 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if err := uc.userService.Create(user); err != nil {
-
-		creationErr := err.Error()
-		var errs interface{}
-
-		err = json.Unmarshal([]byte(creationErr), &errs)
-		if err != nil {
-			errs = creationErr
-		}
-
+	if validationErrs := uc.userService.ValidateStructJson(user); validationErrs != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{"error": errs})
+		w.Write(*validationErrs)
+		return
+	}
+
+	if err := uc.userService.Create(user); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -57,7 +53,13 @@ func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(
+		u.GetNewUser().
+			SetId(user.Id).
+			SetEmail(user.Name).
+			SetName(user.Name).
+			Clean(),
+	)
 }
 
 func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) {

@@ -23,10 +23,6 @@ func GetNewUserService(userRepository u.IUserRepository, validator *v.Validator)
 
 func (us UserService) Create(user u.IUser) error {
 
-	if err := us.ValidateStruct(user); err != nil {
-		return err
-	}
-
 	if us.userRepository.ExistsByEmail(user.GetEmail()) {
 		return fmt.Errorf("Invalid Email")
 	}
