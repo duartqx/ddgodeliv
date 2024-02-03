@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
-	h "ddgodeliv/api/http"
 	as "ddgodeliv/application/auth"
+	e "ddgodeliv/application/errors"
 	s "ddgodeliv/application/services"
 	v "ddgodeliv/domains/vehicle"
 
@@ -16,19 +17,19 @@ import (
 type VehicleController struct {
 	vehicleModelService *s.VehicleModelService
 	vehicleService      *s.VehicleService
-	claimsService       *as.ClaimsService
+	sessionService      *as.SessionService
 }
 
 func GetNewVehicleController(
 	vehicleModelService *s.VehicleModelService,
 	vehicleService *s.VehicleService,
-	claimsService *as.ClaimsService,
+	sessionService *as.SessionService,
 ) *VehicleController {
 
 	return &VehicleController{
 		vehicleModelService: vehicleModelService,
 		vehicleService:      vehicleService,
-		claimsService:       claimsService,
+		sessionService:      sessionService,
 	}
 }
 
@@ -41,17 +42,20 @@ func (vc VehicleController) CreateVehicleModel(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	if validationErrs := vc.vehicleModelService.ValidateStructJson(vehicleModel); validationErrs != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(*validationErrs)
-		return
-	}
-
 	if err := vc.vehicleModelService.Create(vehicleModel); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		var valError *e.ValidationError
+		switch {
+		case errors.As(err, &valError):
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(valError.Decode())
+		case errors.Is(err, e.BadRequestError):
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -70,17 +74,19 @@ func (vc VehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	if validationErrs := vc.vehicleService.ValidateStructJson(vehicle); validationErrs != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(*validationErrs)
-		return
-	}
-
 	if err := vc.vehicleService.Create(vehicle); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		switch {
+		case errors.Is(err, &e.ValidationError{}):
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(vc.vehicleModelService.Decode(err))
+			return
+		case errors.Is(err, e.BadRequestError):
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -92,14 +98,9 @@ func (vc VehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request
 
 func (vc VehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Request) {
 
-	user, err := vc.claimsService.GetClaimsUserFromContext(r.Context())
-	if err != nil {
-		http.SetCookie(w, h.GetInvalidCookie())
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-	if err := vc.claimsService.GetWithDriverInfo(user); err != nil {
-		http.Error(w, err.Error(), http.StatusForbidden)
+	user := vc.sessionService.GetSessionUserWithCompany(r.Context())
+	if user == nil {
+		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
@@ -119,13 +120,9 @@ func (vc VehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Re
 
 func (vc VehicleController) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
 
-	user, err := vc.claimsService.GetClaimsUserFromContext(r.Context())
-	if err != nil {
-		http.Error(w, "Not Authorized", http.StatusUnauthorized)
-		return
-	}
-	if err := vc.claimsService.GetWithDriverInfo(user); err != nil {
-		http.Error(w, err.Error(), http.StatusForbidden)
+	user := vc.sessionService.GetSessionUserWithCompany(r.Context())
+	if user == nil {
+		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
