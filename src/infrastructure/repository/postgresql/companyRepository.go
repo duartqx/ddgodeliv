@@ -17,14 +17,13 @@ func GetNewCompanyRepository(db *sqlx.DB) *CompanyRepository {
 	return &CompanyRepository{db: db}
 }
 
-func (cr CompanyRepository) FindById(id int) (c.ICompany, error) {
-	company := c.GetNewCompany()
-
-	if err := cr.db.Get(company, "SELECT * FROM companies WHERE id = $1", id); err != nil {
-		return nil, err
+func (cr CompanyRepository) FindById(company c.ICompany) error {
+	if err := cr.db.Get(
+		company, "SELECT * FROM companies WHERE id = $1", company.GetId(),
+	); err != nil {
+		return err
 	}
-
-	return company, nil
+	return nil
 }
 
 func (cr CompanyRepository) ExistsByName(name string) (exists bool) {

@@ -1,7 +1,7 @@
 package company
 
 type ICompanyRepository interface {
-	FindById(id int) (ICompany, error)
+	FindById(company ICompany) error
 
 	ExistsByName(name string) bool
 

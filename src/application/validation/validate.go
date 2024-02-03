@@ -70,3 +70,10 @@ func (v Validator) ValidateVar(i interface{}, tag string) error {
 	}
 	return nil
 }
+
+func (v Validator) ValidateVarJson(i interface{}, tag string) *[]byte {
+	if errs := v.Var(i, tag); errs != nil {
+		return v.JSON(errs)
+	}
+	return nil
+}

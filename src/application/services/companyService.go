@@ -18,10 +18,6 @@ func GetNewCompanyService(companyRepository c.ICompanyRepository, validator *v.V
 
 func (cs CompanyService) CreateCompany(company c.ICompany, licenseId string) error {
 
-	if err := cs.ValidateStruct(company); err != nil {
-		return err
-	}
-
 	if cs.companyRepository.ExistsByName(company.GetName()) {
 		return fmt.Errorf("Company with this name already exists!")
 	}
@@ -35,7 +31,7 @@ func (cs CompanyService) CreateCompany(company c.ICompany, licenseId string) err
 
 func (cs CompanyService) DeleteCompany(userId int, company c.ICompany) error {
 
-	if company.GetId() == 0 {
+	if company.HasInvalidId() {
 		return fmt.Errorf("Invalid Company Id")
 	}
 
@@ -44,4 +40,16 @@ func (cs CompanyService) DeleteCompany(userId int, company c.ICompany) error {
 	}
 
 	return cs.companyRepository.Delete(company)
+}
+
+func (cs CompanyService) FindById(company c.ICompany) error {
+
+	if company.HasInvalidId() {
+		return fmt.Errorf("Invalid Company Id")
+	}
+
+	if err := cs.companyRepository.FindById(company); err != nil {
+		return fmt.Errorf("Internal Error trying to find company")
+	}
+	return nil
 }

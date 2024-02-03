@@ -103,3 +103,11 @@ func (ds DriverService) UpdateDriverLicense(driver d.IDriver) error {
 
 	return nil
 }
+
+func (ds DriverService) FindByUserId(id int) (d.IDriver, error) {
+	driver, err := ds.FindByUserId(id)
+	if err != nil {
+		return nil, fmt.Errorf("Error trying to find user driver: %v", err.Error())
+	}
+	return driver, nil
+}
