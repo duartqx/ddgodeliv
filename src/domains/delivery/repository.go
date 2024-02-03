@@ -5,6 +5,8 @@ import "time"
 type IDeliveryRepository interface {
 	FindById(delivery IDelivery) error
 
+	FindPendingWithNoDriver() (*[]IDelivery, error)
+
 	FindByDriverId(id int) (*[]IDelivery, error)
 	ExistsByDriverId(id int) *bool
 

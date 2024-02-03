@@ -26,10 +26,10 @@ func (dr DeliveryRepository) FindById(delivery d.IDelivery) error {
 	return nil
 }
 
-func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
+func (dr DeliveryRepository) findMany(query string, args ...interface{}) (*[]d.IDelivery, error) {
 	deliveries := []d.IDelivery{}
 
-	rows, err := dr.db.Query("SELECT * FROM deliveries WHERE driver_id = $1", id)
+	rows, err := dr.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,6 +47,11 @@ func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
 	}
 
 	return &deliveries, nil
+
+}
+
+func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
+	return dr.findMany("SELECT * FROM deliveries WHERE driver_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsByDriverId(id int) (exists *bool) {
@@ -59,29 +64,10 @@ func (dr DeliveryRepository) ExistsByDriverId(id int) (exists *bool) {
 }
 
 func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]d.IDelivery, error) {
-	deliveries := []d.IDelivery{}
-
-	rows, err := dr.db.Query(
+	return dr.findMany(
 		"SELECT * FROM deliveries WHERE driver_id = $1 AND status = $2",
 		id, status,
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		delivery := d.GetNewDelivery()
-
-		if err := rows.Scan(delivery); err != nil {
-			return nil, err
-		}
-
-		var castedDelivery d.IDelivery = delivery
-
-		deliveries = append(deliveries, castedDelivery)
-	}
-
-	return &deliveries, nil
 }
 
 func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exists *bool) {
@@ -94,55 +80,16 @@ func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exi
 }
 
 func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]d.IDelivery, error) {
-	deliveries := []d.IDelivery{}
-
-	rows, err := dr.db.Query(
+	return dr.findMany(
 		"SELECT * FROM deliveries WHERE deadline BETWEEN $1 AND $2", start, end,
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		delivery := d.GetNewDelivery()
-
-		if err := rows.Scan(delivery); err != nil {
-			return nil, err
-		}
-
-		var castedDelivery d.IDelivery = delivery
-
-		deliveries = append(deliveries, castedDelivery)
-	}
-
-	return &deliveries, nil
 }
 
 func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]d.IDelivery, error) {
-
-	deliveries := []d.IDelivery{}
-
-	rows, err := dr.db.Query(
+	return dr.findMany(
 		"SELECT * FROM deliveries WHERE deadline::date = $1",
 		deadline.Format("2006-01-02"),
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		delivery := d.GetNewDelivery()
-
-		if err := rows.Scan(delivery); err != nil {
-			return nil, err
-		}
-
-		var castedDelivery d.IDelivery = delivery
-
-		deliveries = append(deliveries, castedDelivery)
-	}
-
-	return &deliveries, nil
 }
 
 func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists *bool) {
@@ -156,27 +103,7 @@ func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists *b
 }
 
 func (dr DeliveryRepository) FindBySenderId(id int) (*[]d.IDelivery, error) {
-
-	deliveries := []d.IDelivery{}
-
-	rows, err := dr.db.Query("SELECT * FROM deliveries WHERE sender_id = $1", id)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		delivery := d.GetNewDelivery()
-
-		if err := rows.Scan(delivery); err != nil {
-			return nil, err
-		}
-
-		var castedDelivery d.IDelivery = delivery
-
-		deliveries = append(deliveries, castedDelivery)
-	}
-
-	return &deliveries, nil
+	return dr.findMany("SELECT * FROM deliveries WHERE sender_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsBySenderId(id int) (exists *bool) {
@@ -189,27 +116,7 @@ func (dr DeliveryRepository) ExistsBySenderId(id int) (exists *bool) {
 }
 
 func (dr DeliveryRepository) FindByCompanyId(id int) (*[]d.IDelivery, error) {
-
-	deliveries := []d.IDelivery{}
-
-	rows, err := dr.db.Query("SELECT * FROM deliveries WHERE company_id = $1", id)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next() {
-		delivery := d.GetNewDelivery()
-
-		if err := rows.Scan(delivery); err != nil {
-			return nil, err
-		}
-
-		var castedDelivery d.IDelivery = delivery
-
-		deliveries = append(deliveries, castedDelivery)
-	}
-
-	return &deliveries, nil
+	return dr.findMany("SELECT * FROM deliveries WHERE company_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsByCompanyId(id int) (exists *bool) {
@@ -283,4 +190,11 @@ func (dr DeliveryRepository) Delete(delivery d.IDelivery) error {
 	_, err := dr.db.Exec("DELETE FROM deliveries WHERE id = $1", delivery.GetId())
 
 	return err
+}
+
+func (dr DeliveryRepository) FindPendingWithNoDriver() (*[]d.IDelivery, error) {
+	return dr.findMany(
+		"SELECT * FROM deliveries WHERE status = $1 AND driver_id = NULL",
+		d.StatusChoices.Pending,
+	)
 }
