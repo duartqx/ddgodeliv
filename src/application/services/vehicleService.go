@@ -23,10 +23,6 @@ func GetNewVehicleService(
 }
 
 func (vs VehicleService) Create(vehicle ve.IVehicle) error {
-	if err := vs.ValidateStruct(vehicle); err != nil {
-		return err
-	}
-
 	if err := vs.vehicleRepository.Create(vehicle); err != nil {
 		return fmt.Errorf("Internal Error creating vehicle: %v", err.Error())
 	}
@@ -41,12 +37,12 @@ func (vs VehicleService) FindById(vehicle ve.IVehicle) error {
 	return nil
 }
 
-func (vs VehicleService) FindByCompanyId(vehicle ve.IVehicle) (*[]ve.IVehicle, error) {
-	if vehicle.GetCompanyId() == 0 {
+func (vs VehicleService) FindByCompanyId(companyId int) (*[]ve.IVehicle, error) {
+	if companyId == 0 {
 		return nil, fmt.Errorf("Invalid Company Id")
 	}
 
-	vehicles, err := vs.vehicleRepository.FindByCompanyId(vehicle.GetCompanyId())
+	vehicles, err := vs.vehicleRepository.FindByCompanyId(companyId)
 
 	if err != nil {
 		return nil, fmt.Errorf("Internal Error trying to locate vehicles: %v", err.Error())
@@ -56,6 +52,9 @@ func (vs VehicleService) FindByCompanyId(vehicle ve.IVehicle) (*[]ve.IVehicle, e
 }
 
 func (vs VehicleService) Delete(vehicle ve.IVehicle) error {
+	if vehicle.GetId() == 0 {
+		return fmt.Errorf("Invalid Vehicle Id")
+	}
 	if vehicle.GetCompanyId() == 0 {
 		return fmt.Errorf("Invalid Company Id")
 	}

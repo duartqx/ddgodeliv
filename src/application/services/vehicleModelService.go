@@ -3,6 +3,7 @@ package services
 import (
 	v "ddgodeliv/application/validation"
 	ve "ddgodeliv/domains/vehicle"
+	"fmt"
 )
 
 type VehicleModelService struct {
@@ -21,8 +22,8 @@ func GetNewVehicleModelService(
 }
 
 func (vms VehicleModelService) Create(vehicleModel ve.IVehicleModel) error {
-	if err := vms.ValidateStruct(vehicleModel); err != nil {
-		return err
+	if err := vms.vehicleModelRepository.Create(vehicleModel); err != nil {
+		return fmt.Errorf("Internal Error creating vehicle model: %v", err.Error())
 	}
-	return vms.vehicleModelRepository.Create(vehicleModel)
+	return nil
 }
