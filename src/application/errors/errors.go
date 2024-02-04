@@ -7,8 +7,9 @@ import (
 
 var (
 	BadRequestError = errors.New("Bad Request")
-	InternalError   = errors.New("Internal")
 	ForbiddenError  = errors.New("Forbidden")
+	InternalError   = errors.New("Internal")
+	NotFoundError   = errors.New("Not Found")
 )
 
 type ValidationError struct {
