@@ -38,15 +38,15 @@ GET http://{{ HOST }}/user
 Authorization: Bearer {{ JWT }}
 
 ###
-GET http://{{ HOST }}/vehicles/4
+GET http://{{ HOST }}/vehicle/4
 Authorization: Bearer {{ JWT }}
 
 ###
-GET http://{{ HOST }}/vehicles
+GET http://{{ HOST }}/vehicle
 Authorization: Bearer {{ JWT }}
 
 ###
-POST http://{{ HOST }}/vehicles
+POST http://{{ HOST }}/vehicle
 Authorization: Bearer {{ JWT }}
 
 {
@@ -56,11 +56,11 @@ Authorization: Bearer {{ JWT }}
 }
 
 ###
-GET http://{{ HOST }}/vehicles/model
+GET http://{{ HOST }}/vehiclemodel
 Authorization: Bearer {{ JWT }}
 
 ###
-POST http://{{ HOST }}/vehicles/model
+POST http://{{ HOST }}/vehiclemodel
 Authorization: Bearer {{ JWT }}
 
 {
