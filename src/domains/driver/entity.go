@@ -11,14 +11,14 @@ type Driver struct {
 	CompanyId int    `db:"company_id" json:"company_id" validate:"required,gt=0"`
 	LicenseId string `db:"license_id" json:"license_id" validate:"required,min=3,max=250"`
 
-	User    u.IUser    `json:"user"`
-	Company c.ICompany `json:"company"`
+	User    u.CleanUser `db:"user" json:"user" validate:"-"`
+	Company c.Company   `db:"company" json:"company" validate:"-"`
 }
 
 func GetNewDriver() *Driver {
 	return &Driver{
-		User:    u.GetNewUser(),
-		Company: c.GetNewCompany(),
+		User:    *u.GetNewCleanUser(),
+		Company: *c.GetNewCompany(),
 	}
 }
 

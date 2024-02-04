@@ -4,10 +4,10 @@ type IDriverRepository interface {
 	FindById(id int) (IDriver, error)
 
 	FindByUserId(id int) (IDriver, error)
-	ExistsByUserId(id int) *bool
+	ExistsByUserId(id int) bool
 
 	FindByCompanyId(id int) (*[]IDriver, error)
-	ExistsByCompanyId(id int) *bool
+	ExistsByCompanyId(id int) bool
 
 	Create(driver IDriver) error
 	Update(driver IDriver) error
