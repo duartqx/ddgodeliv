@@ -32,3 +32,11 @@ func (vms VehicleModelService) Create(vehicleModel ve.IVehicleModel) error {
 	}
 	return nil
 }
+
+func (vms VehicleModelService) All() (*[]ve.IVehicleModel, error) {
+	models, err := vms.vehicleModelRepository.All()
+	if err != nil {
+		return nil, fmt.Errorf("Internal Error trying to list all models: %v", err.Error())
+	}
+	return models, nil
+}
