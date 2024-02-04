@@ -36,3 +36,36 @@ Content-Type: application/json
 ###
 GET http://{{ HOST }}/user
 Authorization: Bearer {{ JWT }}
+
+###
+GET http://{{ HOST }}/vehicles/4
+Authorization: Bearer {{ JWT }}
+
+###
+GET http://{{ HOST }}/vehicles
+Authorization: Bearer {{ JWT }}
+
+###
+POST http://{{ HOST }}/vehicles
+Authorization: Bearer {{ JWT }}
+
+{
+    "license_id": "1281092-12",
+    "model_id": 1
+
+}
+
+###
+GET http://{{ HOST }}/vehicles/model
+Authorization: Bearer {{ JWT }}
+
+###
+POST http://{{ HOST }}/vehicles/model
+Authorization: Bearer {{ JWT }}
+
+{
+    "manufacturer": "Peugeot",
+    "year": 2008,
+    "max_load": 88
+
+}

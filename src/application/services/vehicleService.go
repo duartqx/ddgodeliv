@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 
+	e "ddgodeliv/application/errors"
 	v "ddgodeliv/application/validation"
 	ve "ddgodeliv/domains/vehicle"
 )
@@ -27,8 +28,12 @@ func (vs VehicleService) Create(vehicle ve.IVehicle) error {
 		return validationErrs
 	}
 
+	if !vs.vehicleRepository.ModelExists(vehicle.GetModelId()) {
+		return fmt.Errorf("Model does not exists: %w", e.BadRequestError)
+	}
+
 	if err := vs.vehicleRepository.Create(vehicle); err != nil {
-		return fmt.Errorf("Internal Error creating vehicle: %v", err.Error())
+		return err
 	}
 
 	return nil
@@ -36,20 +41,20 @@ func (vs VehicleService) Create(vehicle ve.IVehicle) error {
 
 func (vs VehicleService) FindById(vehicle ve.IVehicle) error {
 	if err := vs.vehicleRepository.FindById(vehicle); err != nil {
-		return fmt.Errorf("Internal Error trying to locate vehicle: %v", err.Error())
+		return err
 	}
 	return nil
 }
 
 func (vs VehicleService) FindByCompanyId(companyId int) (*[]ve.IVehicle, error) {
 	if companyId == 0 {
-		return nil, fmt.Errorf("Invalid Company Id")
+		return nil, fmt.Errorf("Invalid Company Id: %w", e.BadRequestError)
 	}
 
 	vehicles, err := vs.vehicleRepository.FindByCompanyId(companyId)
 
 	if err != nil {
-		return nil, fmt.Errorf("Internal Error trying to locate vehicles: %v", err.Error())
+		return nil, err
 	}
 
 	return vehicles, nil
@@ -57,10 +62,10 @@ func (vs VehicleService) FindByCompanyId(companyId int) (*[]ve.IVehicle, error) 
 
 func (vs VehicleService) Delete(vehicle ve.IVehicle) error {
 	if vehicle.GetId() == 0 {
-		return fmt.Errorf("Invalid Vehicle Id")
+		return fmt.Errorf("Invalid Vehicle Id: %w", e.BadRequestError)
 	}
 	if vehicle.GetCompanyId() == 0 {
-		return fmt.Errorf("Invalid Company Id")
+		return fmt.Errorf("Invalid Company Id: %w", e.BadRequestError)
 	}
 	return vs.vehicleRepository.Delete(vehicle)
 }
