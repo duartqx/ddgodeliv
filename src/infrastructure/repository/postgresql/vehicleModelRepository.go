@@ -20,7 +20,11 @@ func (vmr VehicleModelRepository) FindById(id int) (v.IVehicleModel, error) {
 
 	vehicleModel := v.GetNewVehicleModel()
 
-	if err := vmr.db.Get(vehicleModel, "SELECT * FROM users WHERE id = $1", id); err != nil {
+	if err := vmr.db.Get(
+		vehicleModel,
+		"SELECT * FROM users WHERE id = $1",
+		id,
+	); err != nil {
 		return nil, err
 	}
 
@@ -55,7 +59,12 @@ func (vmr VehicleModelRepository) Create(model v.IVehicleModel) error {
 	var id int
 
 	if err := vmr.db.QueryRow(
-		"INSERT INTO vehiclemodels (manufacturer, year, max_load) VALUES ($1, $2, $3) RETURNING id",
+		`
+			INSERT INTO vehiclemodels (name, manufacturer, year, max_load)
+			VALUES ($1, $2, $3, $4)
+			RETURNING id
+		`,
+		model.GetName(),
 		model.GetManufacturer(),
 		model.GetYear(),
 		model.GetMaxLoad(),
@@ -72,9 +81,10 @@ func (vmr VehicleModelRepository) Update(model v.IVehicleModel) error {
 	_, err := vmr.db.Exec(
 		`
 			UPDATE vehiclemodels
-			SET manufacturer = $1, year = $2, max_load = $3
+			SET name = $1, manufacturer = $2, year = $3, max_load = $4
 			WHERE id = $2
 		`,
+		model.GetName(),
 		model.GetManufacturer(),
 		model.GetYear(),
 		model.GetMaxLoad(),

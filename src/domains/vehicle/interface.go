@@ -26,6 +26,9 @@ type IVehicleModel interface {
 	GetId() int
 	SetId(id int) IVehicleModel
 
+	GetName() string
+	SetName(name string) IVehicleModel
+
 	GetManufacturer() string // Normalize
 	SetManufacturer(manufacturer string) IVehicleModel
 

@@ -2,6 +2,7 @@ package vehicle
 
 type VehicleModel struct {
 	Id           int    `db:"id" json:"id"`
+	Name         string `db:"name" json:"name" validate:"required,min=3"`
 	Manufacturer string `db:"manufacturer" json:"manufacturer" validate:"required,min=3"`
 	Year         int    `db:"year" json:"year" validate:"gt=1900,lt=9999"`
 	MaxLoad      int    `db:"max_load" json:"max_load" validate:"required"`
@@ -18,6 +19,16 @@ func (m VehicleModel) GetId() int {
 
 func (m *VehicleModel) SetId(id int) IVehicleModel {
 	m.Id = id
+	return m
+}
+
+func (m VehicleModel) GetName() string {
+	return m.Name
+
+}
+
+func (m *VehicleModel) SetName(name string) IVehicleModel {
+	m.Name = name
 	return m
 }
 
