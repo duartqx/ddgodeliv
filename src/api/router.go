@@ -1,6 +1,8 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 
@@ -13,6 +15,11 @@ import (
 	lm "github.com/duartqx/ddgomiddlewares/logger"
 	rm "github.com/duartqx/ddgomiddlewares/recovery"
 )
+
+type AuthHandler interface {
+	AuthenticatedMiddleware(http.Handler) http.Handler
+	UnauthenticatedMiddleware(http.Handler) http.Handler
+}
 
 type router struct {
 	db     *sqlx.DB
@@ -35,30 +42,81 @@ func (ro *router) SetSecret(secret []byte) *router {
 
 func (ro router) userRoutes(
 	userService *s.UserService,
-	jwtController *c.JwtController,
-	claimsService *a.SessionService,
+	sessionService *a.SessionService,
+	authHandler AuthHandler,
 ) *chi.Mux {
 
-	userController := c.GetNewUserController(userService, claimsService)
+	userController := c.GetNewUserController(userService, sessionService)
 
-	userSubrouter := chi.NewRouter()
+	userSubRouter := chi.NewRouter()
 
 	// POST: Create User
-	userSubrouter.
-		With(jwtController.UnauthenticatedMiddleware).
+	userSubRouter.
+		With(authHandler.UnauthenticatedMiddleware).
 		Post("/", userController.Create)
 
 	// GET: Self (Good for checking if the user is authenticated)
-	userSubrouter.
-		With(jwtController.AuthenticatedMiddleware).
+	userSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
 		Get("/", userController.Get)
 
 	// PATCH: Password Update
-	userSubrouter.
-		With(jwtController.AuthenticatedMiddleware).
+	userSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
 		Patch("/password", userController.UpdatePassword)
 
-	return userSubrouter
+	return userSubRouter
+}
+
+func (ro router) vehicleRoutes(
+	sessionRepository *a.SessionService,
+	v *validation.Validator,
+	authHandler AuthHandler,
+) *chi.Mux {
+
+	// Repositories
+	vehicleRepository := r.GetNewVehicleRepository(ro.db)
+	vehicleModelRepository := r.GetNewVehicleModelRepository(ro.db)
+
+	// Services
+	vehicleService := s.GetNewVehicleService(vehicleRepository, v)
+	vehicleModelService := s.GetNewVehicleModelService(vehicleModelRepository, v)
+
+	// Controllers
+	vehicleController := c.GetNewVehicleController(
+		vehicleService, sessionRepository,
+	)
+	vehicleModelController := c.GetNewVehicleModelController(vehicleModelService)
+
+	vehiclesSubRouter := chi.NewRouter()
+
+	// Vehicle Routes
+	vehiclesSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Post("/", vehicleController.CreateVehicle)
+
+	vehiclesSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Get("/", vehicleController.GetCompanyVehicles)
+
+	vehiclesSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Get("/{id:[0-9]+}", vehicleController.GetVehicle)
+
+	vehiclesSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Delete("/{id:[0-9]+}", vehicleController.DeleteVehicle)
+
+	// VehicleModel Routes
+	vehiclesSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Get("/model", vehicleModelController.ListModels)
+
+	vehiclesSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Post("/model", vehicleModelController.CreateVehicleModel)
+
+	return vehiclesSubRouter
 }
 
 func (ro router) Build() *chi.Mux {
@@ -96,7 +154,20 @@ func (ro router) Build() *chi.Mux {
 		Delete("/logout", jwtController.Logout)
 
 	// User Routes
-	router.Mount("/user", ro.userRoutes(userService, jwtController, sessionService))
+	router.Mount(
+		"/user",
+		ro.userRoutes(
+			userService,
+			sessionService,
+			jwtController,
+		),
+	)
+
+	// Vehicle Routes
+	router.Mount(
+		"/vehicles",
+		ro.vehicleRoutes(sessionService, v, jwtController),
+	)
 
 	return router
 }
