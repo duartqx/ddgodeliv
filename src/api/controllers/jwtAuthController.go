@@ -7,25 +7,26 @@ import (
 
 	h "ddgodeliv/api/http"
 	a "ddgodeliv/application/auth"
+	e "ddgodeliv/application/errors"
 	u "ddgodeliv/domains/user"
 )
 
-type JwtController struct {
+type jwtController struct {
 	jwtService *a.JwtAuthService
 }
 
-func NewJwtController(jwtService *a.JwtAuthService) *JwtController {
-	return &JwtController{
+func NewJwtController(jwtService *a.JwtAuthService) *jwtController {
+	return &jwtController{
 		jwtService: jwtService,
 	}
 }
 
-func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {
+func (jc jwtController) Login(w http.ResponseWriter, r *http.Request) {
 
 	user := u.GetNewUser()
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -56,7 +57,7 @@ func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (jc JwtController) Logout(w http.ResponseWriter, r *http.Request) {
+func (jc jwtController) Logout(w http.ResponseWriter, r *http.Request) {
 
 	cookie, _ := r.Cookie(h.AuthCookieName)
 
@@ -70,7 +71,7 @@ func (jc JwtController) Logout(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusUnauthorized)
 }
 
-func (jc JwtController) AuthenticatedMiddleware(next http.Handler) http.Handler {
+func (jc jwtController) AuthenticatedMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		cookie, _ := r.Cookie(h.AuthCookieName)
@@ -89,7 +90,7 @@ func (jc JwtController) AuthenticatedMiddleware(next http.Handler) http.Handler 
 	})
 }
 
-func (jc JwtController) UnauthenticatedMiddleware(next http.Handler) http.Handler {
+func (jc jwtController) UnauthenticatedMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		cookie, _ := r.Cookie(h.AuthCookieName)

@@ -11,25 +11,25 @@ import (
 	u "ddgodeliv/domains/user"
 )
 
-type UserController struct {
+type userController struct {
 	userService    *s.UserService
 	sessionService *as.SessionService
 }
 
 func GetNewUserController(
 	userService *s.UserService, sessionService *as.SessionService,
-) *UserController {
-	return &UserController{
+) *userController {
+	return &userController{
 		userService: userService, sessionService: sessionService,
 	}
 }
 
-func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
+func (uc userController) Create(w http.ResponseWriter, r *http.Request) {
 
 	user := u.GetNewUser()
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user.Clean())
 }
 
-func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
+func (uc userController) Get(w http.ResponseWriter, r *http.Request) {
 
 	user := uc.sessionService.GetSessionUser(r.Context())
 	if user == nil {
@@ -65,7 +65,7 @@ func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+func (uc userController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 
 	user := uc.sessionService.GetSessionUser(r.Context())
 	if user == nil {
