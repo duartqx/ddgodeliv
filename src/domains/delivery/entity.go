@@ -16,14 +16,14 @@ type Delivery struct {
 	Deadline    time.Time `db:"deadline" json:"deadline" validate:"future"`
 	Status      uint8     `db:"status" json:"status" validate:"required,gte=0,lte=4"`
 
-	Driver d.IDriver `json:"driver"`
-	Sender u.IUser   `json:"sender"`
+	Driver d.Driver    `db:"driver" json:"driver" validate:"-"`
+	Sender u.CleanUser `db:"sender" json:"sender" validate:"-"`
 }
 
 func GetNewDelivery() *Delivery {
 	return &Delivery{
-		Driver: d.GetNewDriver(),
-		Sender: u.GetNewUser(),
+		Driver: *d.GetNewDriver(),
+		Sender: *u.GetNewCleanUser(),
 	}
 }
 
@@ -95,11 +95,11 @@ func (d *Delivery) SetSenderId(senderId int) IDelivery {
 }
 
 func (d Delivery) GetDriver() d.IDriver {
-	return d.Driver
+	return &d.Driver
 }
 
 func (d Delivery) GetSender() u.IUser {
-	return d.Sender
+	return &d.Sender
 }
 
 func (d Delivery) HasInvalidId() bool {
