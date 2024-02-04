@@ -8,14 +8,14 @@ type Vehicle struct {
 	CompanyId int    `db:"company_id" json:"company_id" validate:"required,gte=1"`
 	LicenseId string `db:"license_id" json:"license_id" validate:"required"`
 
-	Model   IVehicleModel `json:"model"`
-	Company c.ICompany    `json:"company"`
+	Model   VehicleModel `db:"model" json:"model" validate:"-"`
+	Company c.Company    `db:"company" json:"company" validate:"-"`
 }
 
 func GetNewVehicle() *Vehicle {
 	return &Vehicle{
-		Model:   &VehicleModel{},
-		Company: c.GetNewCompany(),
+		Model:   *GetNewVehicleModel(),
+		Company: *c.GetNewCompany(),
 	}
 }
 
@@ -56,19 +56,26 @@ func (v *Vehicle) SetLicenseId(licenseId string) IVehicle {
 }
 
 func (v Vehicle) GetModel() IVehicleModel {
-	return v.Model
+	return &v.Model
 }
 
 func (v *Vehicle) SetModel(model IVehicleModel) IVehicle {
-	v.Model = model
+	v.Model.
+		SetId(model.GetId()).
+		SetYear(model.GetYear()).
+		SetMaxLoad(model.GetMaxLoad()).
+		SetManufacturer(model.GetManufacturer())
 	return v
 }
 
 func (v Vehicle) GetCompany() c.ICompany {
-	return v.Company
+	return &v.Company
 }
 
 func (v *Vehicle) SetCompany(company c.ICompany) IVehicle {
-	v.Company = company
+	v.Company.
+		SetId(company.GetId()).
+		SetName(company.GetName()).
+		SetOwnerId(company.GetOwnerId())
 	return v
 }
