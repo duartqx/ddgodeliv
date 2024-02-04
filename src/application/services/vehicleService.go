@@ -32,6 +32,8 @@ func (vs VehicleService) Create(vehicle ve.IVehicle) error {
 		return fmt.Errorf("Model does not exists: %w", e.BadRequestError)
 	}
 
+	// TODO: Check if license is not unique
+
 	if err := vs.vehicleRepository.Create(vehicle); err != nil {
 		return err
 	}

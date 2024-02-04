@@ -26,8 +26,37 @@ func (dr DeliveryRepository) FindById(delivery d.IDelivery) error {
 	return nil
 }
 
-func (dr DeliveryRepository) findMany(query string, args ...interface{}) (*[]d.IDelivery, error) {
+func (dr DeliveryRepository) findMany(where string, args ...interface{}) (*[]d.IDelivery, error) {
 	deliveries := []d.IDelivery{}
+
+	query := fmt.Sprintf(`
+		SELECT
+			de.id AS id,
+			de.driver_id AS driver_id,
+			de.sender_id AS sender_id,
+			de.origin AS origin,
+			de.destination AS destination,
+			de.deadline AS deadline,
+			de.status AS status,
+
+			dr.id AS "driver.id",
+			dr.user_id AS "driver.user_id",
+			dr.company_id AS "driver.company_id",
+			dr.license_id AS "driver.license_id",
+
+			u.id AS "driver.user.id"
+			u.name AS "driver.user.name"
+			u.email AS "driver.user.email"
+
+			c.id AS "company.id",
+			c.owner_id AS "company.owner_id",
+			c.name AS "company.name"
+		FROM deliveries de
+		INNER JOIN companies c ON de.company_id = c.id
+		INNER JOIN drivers dr ON de.driver_id = dr.id
+		INNER JOIN users u ON dr.user_id = u.id
+		WHERE %s
+	`, where)
 
 	rows, err := dr.db.Queryx(query, args...)
 	if err != nil {
@@ -51,7 +80,7 @@ func (dr DeliveryRepository) findMany(query string, args ...interface{}) (*[]d.I
 }
 
 func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
-	return dr.findMany("SELECT * FROM deliveries WHERE driver_id = $1", id)
+	return dr.findMany("driver_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsByDriverId(id int) (exists bool) {
@@ -64,10 +93,7 @@ func (dr DeliveryRepository) ExistsByDriverId(id int) (exists bool) {
 }
 
 func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]d.IDelivery, error) {
-	return dr.findMany(
-		"SELECT * FROM deliveries WHERE driver_id = $1 AND status = $2",
-		id, status,
-	)
+	return dr.findMany("driver_id = $1 AND status = $2", id, status)
 }
 
 func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exists bool) {
@@ -80,16 +106,11 @@ func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exi
 }
 
 func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]d.IDelivery, error) {
-	return dr.findMany(
-		"SELECT * FROM deliveries WHERE deadline BETWEEN $1 AND $2", start, end,
-	)
+	return dr.findMany("deadline BETWEEN $1 AND $2", start, end)
 }
 
 func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]d.IDelivery, error) {
-	return dr.findMany(
-		"SELECT * FROM deliveries WHERE deadline::date = $1",
-		deadline.Format("2006-01-02"),
-	)
+	return dr.findMany("deadline::date = $1", deadline.Format("2006-01-02"))
 }
 
 func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists bool) {
@@ -103,7 +124,7 @@ func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists bo
 }
 
 func (dr DeliveryRepository) FindBySenderId(id int) (*[]d.IDelivery, error) {
-	return dr.findMany("SELECT * FROM deliveries WHERE sender_id = $1", id)
+	return dr.findMany("sender_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsBySenderId(id int) (exists bool) {
@@ -116,7 +137,7 @@ func (dr DeliveryRepository) ExistsBySenderId(id int) (exists bool) {
 }
 
 func (dr DeliveryRepository) FindByCompanyId(id int) (*[]d.IDelivery, error) {
-	return dr.findMany("SELECT * FROM deliveries WHERE company_id = $1", id)
+	return dr.findMany("company_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsByCompanyId(id int) (exists bool) {
@@ -193,8 +214,5 @@ func (dr DeliveryRepository) Delete(delivery d.IDelivery) error {
 }
 
 func (dr DeliveryRepository) FindPendingWithNoDriver() (*[]d.IDelivery, error) {
-	return dr.findMany(
-		"SELECT * FROM deliveries WHERE status = $1 AND driver_id = NULL",
-		d.StatusChoices.Pending,
-	)
+	return dr.findMany("status = $1 AND driver_id = NULL", d.StatusChoices.Pending)
 }
