@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 
+	e "ddgodeliv/application/errors"
 	v "ddgodeliv/application/validation"
 	d "ddgodeliv/domains/driver"
 )
@@ -71,30 +72,50 @@ func (ds DriverService) CreateDriver(driver d.IDriver) error {
 	return nil
 }
 
-func (ds DriverService) DeleteDriver(driver d.IDriver) error {
-	if driver.GetId() == 0 || driver.GetUserId() == 0 || driver.GetCompanyId() == 0 {
-		return fmt.Errorf("Invalid Driver")
-	}
+func (ds DriverService) DeleteDriver(ownerId int, driver d.IDriver) error {
 
-	if driver.GetUserId() == driver.GetCompany().GetOwnerId() {
-		return fmt.Errorf("The company owner can't delete it's own driver")
+	switch {
+	case driver.GetId() == 0 || driver.GetUserId() == 0 || driver.GetCompanyId() == 0:
+		return fmt.Errorf("Invalid Driver: %w", e.ForbiddenError)
+	case ownerId == 0:
+		return fmt.Errorf("Invalid Owner: %w", e.ForbiddenError)
+	case ownerId != driver.GetCompanyId():
+		return fmt.Errorf(
+			"Only the onwer can delete it's drivers: %w",
+			e.ForbiddenError,
+		)
+	case driver.GetUserId() == driver.GetCompany().GetOwnerId():
+		return fmt.Errorf(
+			"The company owner can't delete it's own driver: %w",
+			e.ForbiddenError,
+		)
 	}
 
 	if err := ds.driverRepository.Delete(driver); err != nil {
-		return fmt.Errorf("Internal Error deleting the driver: %v", err.Error())
+		return fmt.Errorf("Internal Error deleting the driver: %w", err)
 	}
 
 	// Warns the user and the company owner of the driver deletion
 	if err := ds.sendDriverDeletionEmails(driver); err != nil {
-		return fmt.Errorf("Internal Error sending Driver Deletion Emails: %v", err.Error())
+		return fmt.Errorf("Internal Error sending Driver Deletion Emails: %w", err)
 	}
 
 	return nil
 }
 
-func (ds DriverService) UpdateDriverLicense(driver d.IDriver) error {
+func (ds DriverService) UpdateDriverLicense(userId int, driver d.IDriver) error {
+	switch {
+	case driver.GetId() == 0:
+		return fmt.Errorf("Invalid Driver: %w", e.BadRequestError)
+	case userId != driver.GetUserId() || userId != driver.GetCompany().GetOwnerId():
+		return fmt.Errorf(
+			"Only Company owner or the driver can change their license: %w",
+			e.ForbiddenError,
+		)
+	}
+
 	if err := ds.Validator.Var(driver.GetLicenseId(), "required,min=3,max=250"); err != nil {
-		return fmt.Errorf("Invalid Driver License")
+		return err
 	}
 
 	if err := ds.driverRepository.Update(driver); err != nil {
@@ -105,9 +126,25 @@ func (ds DriverService) UpdateDriverLicense(driver d.IDriver) error {
 }
 
 func (ds DriverService) FindByUserId(id int) (d.IDriver, error) {
-	driver, err := ds.FindByUserId(id)
+	driver, err := ds.driverRepository.FindByUserId(id)
 	if err != nil {
 		return nil, fmt.Errorf("Error trying to find user driver: %v", err.Error())
 	}
 	return driver, nil
+}
+
+func (ds DriverService) FindById(id, companyId int) (d.IDriver, error) {
+	driver, err := ds.driverRepository.FindById(id, companyId)
+	if err != nil {
+		return nil, fmt.Errorf("Error trying to find user driver: %v", err.Error())
+	}
+	return driver, nil
+}
+
+func (ds DriverService) ListCompanyDriversById(id int) (*[]d.IDriver, error) {
+	drivers, err := ds.driverRepository.FindByCompanyId(id)
+	if err != nil {
+		return nil, fmt.Errorf("Error trying to find user driver: %v", err.Error())
+	}
+	return drivers, nil
 }

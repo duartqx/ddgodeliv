@@ -17,11 +17,38 @@ func GetNewDriverRepository(db *sqlx.DB) *DriverRepository {
 	return &DriverRepository{db: db}
 }
 
-func (dr DriverRepository) FindById(id int) (d.IDriver, error) {
+func (dr DriverRepository) baseJoinedQuery(where string) string {
+	return fmt.Sprintf(
+		`
+			SELECT
+				d.id AS "id",
+				d.user_id AS "user_id",
+				d.company_id AS "company_id",
+				d.license_id AS "licence_id",
+
+				u.id AS "user.id",
+				u.name AS "user.name",
+				u.email AS "user.email",
+				
+				c.id AS "company.id",
+				c.owner_id AS "company.owner_id",
+				c.name AS "company.name"
+			FROM drivers d
+			INNER JOIN users u ON d.user_id = u.id
+			INNER JOIN companies c ON d.company_id = c.id
+			WHERE %s
+		`,
+		where,
+	)
+}
+
+func (dr DriverRepository) FindById(id, companyId int) (d.IDriver, error) {
 
 	driver := d.GetNewDriver()
 
-	if err := dr.db.Get(driver, "SELECT * FROM drivers WHERE id = $1", id); err != nil {
+	if err := dr.db.Get(
+		driver, dr.baseJoinedQuery("id = $1 AND company_id = $2"), id, companyId,
+	); err != nil {
 		return nil, err
 	}
 
@@ -31,7 +58,9 @@ func (dr DriverRepository) FindById(id int) (d.IDriver, error) {
 func (dr DriverRepository) FindByUserId(id int) (d.IDriver, error) {
 	driver := d.GetNewDriver()
 
-	if err := dr.db.Get(driver, "SELECT * FROM drivers WHERE user_id = $1", id); err != nil {
+	if err := dr.db.Get(
+		driver, dr.baseJoinedQuery("user_id = $1"), id,
+	); err != nil {
 		return nil, err
 	}
 
@@ -50,7 +79,7 @@ func (dr DriverRepository) ExistsByUserId(id int) (exists bool) {
 func (dr DriverRepository) FindByCompanyId(id int) (*[]d.IDriver, error) {
 	drivers := []d.IDriver{}
 
-	rows, err := dr.db.Queryx("SELECT * FROM drivers WHERE company_id = $1", id)
+	rows, err := dr.db.Queryx(dr.baseJoinedQuery("company_id = $1"), id)
 	if err != nil {
 		return nil, err
 	}
