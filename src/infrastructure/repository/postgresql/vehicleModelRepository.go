@@ -16,13 +16,6 @@ func GetNewVehicleModelRepository(db *sqlx.DB) *VehicleModelRepository {
 	return &VehicleModelRepository{db: db}
 }
 
-func (vrm VehicleModelRepository) simpleValidate(model v.IVehicleModel) error {
-	if model.GetManufacturer() == "" || model.GetYear() == 0 || model.GetMaxLoad() == 0 {
-		return fmt.Errorf("Invalid Vehicle Model")
-	}
-	return nil
-}
-
 func (vmr VehicleModelRepository) FindById(id int) (v.IVehicleModel, error) {
 
 	vehicleModel := v.GetNewVehicleModel()
@@ -34,11 +27,31 @@ func (vmr VehicleModelRepository) FindById(id int) (v.IVehicleModel, error) {
 	return vehicleModel, nil
 }
 
-func (vmr VehicleModelRepository) Create(model v.IVehicleModel) error {
-	if err := vmr.simpleValidate(model); err != nil {
-		return err
+func (vmr VehicleModelRepository) All() (*[]v.IVehicleModel, error) {
+	models := []v.IVehicleModel{}
+
+	rows, err := vmr.db.Queryx("SELECT * FROM vehiclemodels")
+	if err != nil {
+		return nil, err
 	}
 
+	for rows.Next() {
+
+		driver := v.GetNewVehicleModel()
+
+		if err := rows.StructScan(driver); err != nil {
+			return nil, err
+		}
+
+		var castedDriver v.IVehicleModel = driver
+
+		models = append(models, castedDriver)
+	}
+
+	return &models, nil
+}
+
+func (vmr VehicleModelRepository) Create(model v.IVehicleModel) error {
 	var id int
 
 	if err := vmr.db.QueryRow(
@@ -56,13 +69,6 @@ func (vmr VehicleModelRepository) Create(model v.IVehicleModel) error {
 }
 
 func (vmr VehicleModelRepository) Update(model v.IVehicleModel) error {
-	if err := vmr.simpleValidate(model); err != nil {
-		return err
-	}
-	if model.GetId() == 0 {
-		return fmt.Errorf("Invalid Vehicle Model Id")
-	}
-
 	_, err := vmr.db.Exec(
 		`
 			UPDATE vehiclemodels

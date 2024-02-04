@@ -29,7 +29,7 @@ func (dr DeliveryRepository) FindById(delivery d.IDelivery) error {
 func (dr DeliveryRepository) findMany(query string, args ...interface{}) (*[]d.IDelivery, error) {
 	deliveries := []d.IDelivery{}
 
-	rows, err := dr.db.Query(query, args...)
+	rows, err := dr.db.Queryx(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (dr DeliveryRepository) findMany(query string, args ...interface{}) (*[]d.I
 	for rows.Next() {
 		delivery := d.GetNewDelivery()
 
-		if err := rows.Scan(delivery); err != nil {
+		if err := rows.StructScan(delivery); err != nil {
 			return nil, err
 		}
 
@@ -54,7 +54,7 @@ func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
 	return dr.findMany("SELECT * FROM deliveries WHERE driver_id = $1", id)
 }
 
-func (dr DeliveryRepository) ExistsByDriverId(id int) (exists *bool) {
+func (dr DeliveryRepository) ExistsByDriverId(id int) (exists bool) {
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE driver_id = $1)",
 		id,
@@ -70,7 +70,7 @@ func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]d.
 	)
 }
 
-func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exists *bool) {
+func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exists bool) {
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE driver_id = $1 AND status = $2)",
 		id, status,
@@ -92,7 +92,7 @@ func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]d.IDeliv
 	)
 }
 
-func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists *bool) {
+func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists bool) {
 
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE deadline::date = $1)",
@@ -106,7 +106,7 @@ func (dr DeliveryRepository) FindBySenderId(id int) (*[]d.IDelivery, error) {
 	return dr.findMany("SELECT * FROM deliveries WHERE sender_id = $1", id)
 }
 
-func (dr DeliveryRepository) ExistsBySenderId(id int) (exists *bool) {
+func (dr DeliveryRepository) ExistsBySenderId(id int) (exists bool) {
 
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE sender_id = $1)", id,
@@ -119,7 +119,7 @@ func (dr DeliveryRepository) FindByCompanyId(id int) (*[]d.IDelivery, error) {
 	return dr.findMany("SELECT * FROM deliveries WHERE company_id = $1", id)
 }
 
-func (dr DeliveryRepository) ExistsByCompanyId(id int) (exists *bool) {
+func (dr DeliveryRepository) ExistsByCompanyId(id int) (exists bool) {
 
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE company_id = $1)", id,

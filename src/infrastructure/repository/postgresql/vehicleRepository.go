@@ -13,15 +13,8 @@ type VehicleRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewVehicleRepository(db *sqlx.DB) *VehicleModelRepository {
-	return &VehicleModelRepository{db: db}
-}
-
-func (vr VehicleRepository) simpleValidate(vehicle v.IVehicle) error {
-	if vehicle.GetModelId() == 0 || vehicle.GetCompanyId() == 0 || vehicle.GetLicenseId() == "" {
-		return fmt.Errorf("Invalid vehicle: Missing Model, Company or License")
-	}
-	return nil
+func GetNewVehicleRepository(db *sqlx.DB) *VehicleRepository {
+	return &VehicleRepository{db: db}
 }
 
 func (vr VehicleRepository) FindById(vehicle v.IVehicle) error {
@@ -38,7 +31,27 @@ func (vr VehicleRepository) FindById(vehicle v.IVehicle) error {
 func (vr VehicleRepository) FindByCompanyId(id int) (*[]v.IVehicle, error) {
 	vehicles := []v.IVehicle{}
 
-	rows, err := vr.db.Query("SELECT * FROM vehicles WHERE company_id = $1", id)
+	rows, err := vr.db.Queryx(
+		`SELECT
+			v.id AS id,
+			v.model_id AS model_id,
+			v.company_id AS company_id,
+			v.license_id AS license_id,
+
+			m.id AS "model.id",
+			m.manufacturer AS "model.manufacturer",
+			m.year AS "model.year",
+			m.max_load AS "model.max_load",
+
+			c.id AS "company.id",
+			c.owner_id AS "company.owner_id",
+			c.name AS "company.name"
+		FROM vehicles v
+		INNER JOIN vehiclemodels m ON v.model_id = m.id
+		INNER JOIN companies c ON v.company_id = c.id
+		WHERE company_id = $1`,
+		id,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +60,7 @@ func (vr VehicleRepository) FindByCompanyId(id int) (*[]v.IVehicle, error) {
 
 		vehicle := v.GetNewVehicle()
 
-		if err := rows.Scan(vehicle); err != nil {
+		if err := rows.StructScan(vehicle); err != nil {
 			return nil, err
 		}
 
@@ -60,7 +73,7 @@ func (vr VehicleRepository) FindByCompanyId(id int) (*[]v.IVehicle, error) {
 
 }
 
-func (vr VehicleRepository) ExistsByCompanyId(id int) (exists *bool) {
+func (vr VehicleRepository) ExistsByCompanyId(id int) (exists bool) {
 	vr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM vehicles WHERE company_id = $1)",
 		id,
@@ -69,11 +82,16 @@ func (vr VehicleRepository) ExistsByCompanyId(id int) (exists *bool) {
 	return exists
 }
 
-func (vr VehicleRepository) Create(vehicle v.IVehicle) error {
-	if err := vr.simpleValidate(vehicle); err != nil {
-		return err
-	}
+func (vr VehicleRepository) ModelExists(id int) (exists bool) {
+	vr.db.QueryRow(
+		"SELECT EXISTS (SELECT 1 FROM vehiclemodels WHERE id = $1)",
+		id,
+	).Scan(&exists)
 
+	return exists
+}
+
+func (vr VehicleRepository) Create(vehicle v.IVehicle) error {
 	var id int
 
 	if err := vr.db.QueryRow(
@@ -95,13 +113,6 @@ func (vr VehicleRepository) Create(vehicle v.IVehicle) error {
 }
 
 func (vr VehicleRepository) Update(vehicle v.IVehicle) error {
-	if err := vr.simpleValidate(vehicle); err != nil {
-		return err
-	}
-	if vehicle.GetId() == 0 {
-		return fmt.Errorf("Invalid Vehicle Id")
-	}
-
 	res, err := vr.db.Exec(
 		`
 			UPDATE vehicles

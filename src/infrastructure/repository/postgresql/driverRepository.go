@@ -17,13 +17,6 @@ func GetNewDriverRepository(db *sqlx.DB) *DriverRepository {
 	return &DriverRepository{db: db}
 }
 
-func (dr DriverRepository) simpleValidation(driver d.IDriver) error {
-	if driver.GetUserId() == 0 || driver.GetCompanyId() == 0 || driver.GetLicenseId() == "" {
-		return fmt.Errorf("Invalid Driver, missing user or license")
-	}
-	return nil
-}
-
 func (dr DriverRepository) FindById(id int) (d.IDriver, error) {
 
 	driver := d.GetNewDriver()
@@ -45,7 +38,7 @@ func (dr DriverRepository) FindByUserId(id int) (d.IDriver, error) {
 	return driver, nil
 }
 
-func (dr DriverRepository) ExistsByUserId(id int) (exists *bool) {
+func (dr DriverRepository) ExistsByUserId(id int) (exists bool) {
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM drivers WHERE user_id = $1)",
 		id,
@@ -57,7 +50,7 @@ func (dr DriverRepository) ExistsByUserId(id int) (exists *bool) {
 func (dr DriverRepository) FindByCompanyId(id int) (*[]d.IDriver, error) {
 	drivers := []d.IDriver{}
 
-	rows, err := dr.db.Query("SELECT * FROM drivers WHERE company_id = $1", id)
+	rows, err := dr.db.Queryx("SELECT * FROM drivers WHERE company_id = $1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +59,7 @@ func (dr DriverRepository) FindByCompanyId(id int) (*[]d.IDriver, error) {
 
 		driver := d.GetNewDriver()
 
-		if err := rows.Scan(driver); err != nil {
+		if err := rows.StructScan(driver); err != nil {
 			return nil, err
 		}
 
@@ -78,7 +71,7 @@ func (dr DriverRepository) FindByCompanyId(id int) (*[]d.IDriver, error) {
 	return &drivers, nil
 }
 
-func (dr DriverRepository) ExistsByCompanyId(id int) (exists *bool) {
+func (dr DriverRepository) ExistsByCompanyId(id int) (exists bool) {
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM drivers WHERE company_id = $1)",
 		id,
@@ -88,10 +81,6 @@ func (dr DriverRepository) ExistsByCompanyId(id int) (exists *bool) {
 }
 
 func (dr DriverRepository) Create(driver d.IDriver) error {
-	if err := dr.simpleValidation(driver); err != nil {
-		return err
-	}
-
 	var id int
 
 	if err := dr.db.QueryRow(
@@ -113,10 +102,6 @@ func (dr DriverRepository) Create(driver d.IDriver) error {
 }
 
 func (dr DriverRepository) Update(driver d.IDriver) error {
-	if err := dr.simpleValidation(driver); err != nil {
-		return err
-	}
-
 	if driver.GetId() == 0 {
 		return fmt.Errorf("Invalid Driver Id")
 	}
