@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	h "ddgodeliv/api/http"
-	a "ddgodeliv/application/auth"
 	e "ddgodeliv/application/errors"
+	a "ddgodeliv/application/services/auth"
 	u "ddgodeliv/domains/user"
 )
 

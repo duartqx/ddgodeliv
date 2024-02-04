@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	as "ddgodeliv/application/auth"
 	e "ddgodeliv/application/errors"
 	s "ddgodeliv/application/services"
+	as "ddgodeliv/application/services/auth"
 	u "ddgodeliv/domains/user"
 )
 

@@ -7,8 +7,8 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	c "ddgodeliv/api/controllers"
-	a "ddgodeliv/application/auth"
 	s "ddgodeliv/application/services"
+	a "ddgodeliv/application/services/auth"
 	"ddgodeliv/application/validation"
 	r "ddgodeliv/infrastructure/repository/postgresql"
 

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
-	as "ddgodeliv/application/auth"
 	e "ddgodeliv/application/errors"
 	s "ddgodeliv/application/services"
+	as "ddgodeliv/application/services/auth"
 	v "ddgodeliv/domains/vehicle"
 
 	"github.com/go-chi/chi/v5"
