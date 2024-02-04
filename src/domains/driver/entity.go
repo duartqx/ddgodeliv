@@ -59,11 +59,11 @@ func (d *Driver) SetCompanyId(companyId int) IDriver {
 }
 
 func (d Driver) GetUser() u.IUser {
-	return d.User
+	return u.GetNewUser().SetId(d.User.Id).SetName(d.User.Name).SetEmail(d.User.Email)
 }
 
 func (d Driver) GetCompany() c.ICompany {
-	return d.Company
+	return &d.Company
 }
 
 func (d Driver) HasInvalidId() bool {

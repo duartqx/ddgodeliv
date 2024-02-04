@@ -99,7 +99,10 @@ func (d Delivery) GetDriver() d.IDriver {
 }
 
 func (d Delivery) GetSender() u.IUser {
-	return &d.Sender
+	return u.GetNewUser().
+		SetId(d.Sender.Id).
+		SetName(d.Sender.Name).
+		SetEmail(d.Sender.Email)
 }
 
 func (d Delivery) HasInvalidId() bool {
