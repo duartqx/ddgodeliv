@@ -27,7 +27,10 @@ func main() {
 	}
 	defer db.Close()
 
-	mux := api.NewRouterBuilder().SetDb(db).SetSecret([]byte("secret")).Build()
+	mux := api.NewRouterBuilder().
+		SetDb(db).
+		SetSecret([]byte(os.Getenv("SECRET_KEY"))).
+		Build()
 
 	var addr string = fmt.Sprintf(
 		"%s:%s", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"),
