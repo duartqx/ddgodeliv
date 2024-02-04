@@ -53,19 +53,42 @@ func (ro router) userRoutes(
 	// POST: Create User
 	userSubRouter.
 		With(authHandler.UnauthenticatedMiddleware).
-		Post("/", userController.Create)
+		Post("/user", userController.Create)
 
 	// GET: Self (Good for checking if the user is authenticated)
 	userSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/", userController.Get)
+		Get("/user", userController.Get)
 
 	// PATCH: Password Update
 	userSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Patch("/password", userController.UpdatePassword)
+		Patch("/user/password", userController.UpdatePassword)
 
 	return userSubRouter
+}
+
+func (ro router) companyRoutes(
+	sessionService *a.SessionService, v *validation.Validator, authHandler AuthHandler,
+) *chi.Mux {
+
+	companyRepository := r.GetNewCompanyRepository(ro.db)
+	companyService := s.GetNewCompanyService(companyRepository, v)
+	companyController := c.GetNewCompanyController(companyService, sessionService)
+
+	companySubRouter := chi.NewRouter()
+
+	// POST: Create company
+	companySubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Post("/company", companyController.Create)
+
+	// DELETE: Owner can delete it's company
+	companySubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Delete("/company", companyController.Delete)
+
+	return companySubRouter
 }
 
 func (ro router) vehicleRoutes(
@@ -93,28 +116,28 @@ func (ro router) vehicleRoutes(
 	// Vehicle Routes
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Post("/", vehicleController.CreateVehicle)
+		Post("/vehicle", vehicleController.CreateVehicle)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/", vehicleController.GetCompanyVehicles)
+		Get("/vehicle", vehicleController.GetCompanyVehicles)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/{id:[0-9]+}", vehicleController.GetVehicle)
+		Get("/vehicle/{id:[0-9]+}", vehicleController.GetVehicle)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Delete("/{id:[0-9]+}", vehicleController.DeleteVehicle)
+		Delete("/vehicle/{id:[0-9]+}", vehicleController.DeleteVehicle)
 
 	// VehicleModel Routes
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/model", vehicleModelController.ListModels)
+		Get("/vehiclemodel", vehicleModelController.ListModels)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Post("/model", vehicleModelController.CreateVehicleModel)
+		Post("/vehiclemodel", vehicleModelController.CreateVehicleModel)
 
 	return vehiclesSubRouter
 }
@@ -154,20 +177,13 @@ func (ro router) Build() *chi.Mux {
 		Delete("/logout", jwtController.Logout)
 
 	// User Routes
-	router.Mount(
-		"/user",
-		ro.userRoutes(
-			userService,
-			sessionService,
-			jwtController,
-		),
-	)
+	router.Mount("/", ro.userRoutes(userService, sessionService, jwtController))
 
 	// Vehicle Routes
-	router.Mount(
-		"/vehicles",
-		ro.vehicleRoutes(sessionService, v, jwtController),
-	)
+	router.Mount("/", ro.vehicleRoutes(sessionService, v, jwtController))
+
+	// Company Routes
+	router.Mount("/", ro.companyRoutes(sessionService, v, jwtController))
 
 	return router
 }
