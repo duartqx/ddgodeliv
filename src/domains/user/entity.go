@@ -1,9 +1,9 @@
 package user
 
 type CleanUser struct {
-	Id    int    `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	Id    int    `db:"id" json:"id"`
+	Email string `db:"email" json:"email"`
+	Name  string `db:"name" json:"name"`
 }
 
 type User struct {
@@ -15,6 +15,10 @@ type User struct {
 
 func GetNewUser() *User {
 	return &User{}
+}
+
+func GetNewCleanUser() *CleanUser {
+	return &CleanUser{}
 }
 
 func (u User) Clean() interface{} {
