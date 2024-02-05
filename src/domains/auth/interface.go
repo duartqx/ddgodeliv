@@ -15,6 +15,7 @@ type ISessionUser interface {
 	SetName(name string) ISessionUser
 
 	SetDriver(driver d.IDriver) ISessionUser
+	ResetDriver() ISessionUser
 	SetFromAnother(user ISessionUser)
 
 	HasInvalidCompany() bool

@@ -2,15 +2,23 @@ package auth
 
 import d "ddgodeliv/domains/driver"
 
+type sessionDriver struct {
+	Id        int `json:"driver_id"`
+	CompanyId int `json:"company_id"`
+}
+
 type SessionUser struct {
 	Id    int    `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
 
-	Driver struct {
-		Id        int `json:"driver_id"`
-		CompanyId int `json:"company_id"`
-	} `json:"driver"`
+	Driver sessionDriver `json:"driver"`
+}
+
+func GetNewSessionUser() *SessionUser {
+	return &SessionUser{
+		Driver: sessionDriver{},
+	}
 }
 
 func (u SessionUser) GetId() int {
@@ -43,6 +51,12 @@ func (u *SessionUser) SetName(name string) ISessionUser {
 func (u *SessionUser) SetDriver(driver d.IDriver) ISessionUser {
 	u.Driver.Id = driver.GetId()
 	u.Driver.CompanyId = driver.GetCompanyId()
+	return u
+}
+
+func (u *SessionUser) ResetDriver() ISessionUser {
+	u.Driver.Id = 0
+	u.Driver.CompanyId = 0
 	return u
 }
 
