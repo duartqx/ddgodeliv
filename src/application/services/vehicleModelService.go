@@ -1,29 +1,29 @@
 package services
 
 import (
+	"fmt"
+
 	v "ddgodeliv/application/validation"
 	ve "ddgodeliv/domains/vehicle"
-	"fmt"
 )
 
 type VehicleModelService struct {
 	vehicleModelRepository ve.IVehicleModelRepository
-	*v.Validator
+	validator              *v.Validator
 }
 
 func GetNewVehicleModelService(
 	vehicleModelRepository ve.IVehicleModelRepository,
-	validator *v.Validator,
 ) *VehicleModelService {
 	return &VehicleModelService{
 		vehicleModelRepository: vehicleModelRepository,
-		Validator:              validator,
+		validator:              v.NewValidator(),
 	}
 }
 
 func (vms VehicleModelService) Create(vehicleModel ve.IVehicleModel) error {
 
-	if validationErrs := vms.ValidateStruct(vehicleModel); validationErrs != nil {
+	if validationErrs := vms.validator.ValidateStruct(vehicleModel); validationErrs != nil {
 		return validationErrs
 	}
 

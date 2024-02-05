@@ -10,21 +10,20 @@ import (
 
 type VehicleService struct {
 	vehicleRepository ve.IVehicleRepository
-	*v.Validator
+	validator         *v.Validator
 }
 
 func GetNewVehicleService(
 	vehicleRepository ve.IVehicleRepository,
-	validator *v.Validator,
 ) *VehicleService {
 	return &VehicleService{
 		vehicleRepository: vehicleRepository,
-		Validator:         validator,
+		validator:         v.NewValidator(),
 	}
 }
 
 func (vs VehicleService) Create(vehicle ve.IVehicle) error {
-	if validationErrs := vs.ValidateStruct(vehicle); validationErrs != nil {
+	if validationErrs := vs.validator.ValidateStruct(vehicle); validationErrs != nil {
 		return validationErrs
 	}
 

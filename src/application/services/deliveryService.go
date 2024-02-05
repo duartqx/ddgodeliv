@@ -12,21 +12,20 @@ import (
 
 type DeliveryService struct {
 	deliveryRepository de.IDeliveryRepository
-	*v.Validator
+	validator          *v.Validator
 }
 
 func GetNewDeliveryService(
 	deliveryRepository de.IDeliveryRepository,
-	validator *v.Validator,
 ) *DeliveryService {
 	return &DeliveryService{
 		deliveryRepository: deliveryRepository,
-		Validator:          validator,
+		validator:          v.NewValidator(),
 	}
 }
 
 func (ds DeliveryService) Create(delivery de.IDelivery) error {
-	if err := ds.ValidateStruct(delivery); err != nil {
+	if err := ds.validator.ValidateStruct(delivery); err != nil {
 		return err
 	}
 	return ds.deliveryRepository.Create(delivery)
@@ -50,7 +49,7 @@ func (ds DeliveryService) AssignDriver(delivery de.IDelivery, driver d.IDriver) 
 }
 
 func (ds DeliveryService) UpdateStatus(delivery de.IDelivery) error {
-	if err := ds.ValidateVar(delivery.GetStatus(), "required,gte=0,lte=4"); err != nil {
+	if err := ds.validator.ValidateVar(delivery.GetStatus(), "required,gte=0,lte=4"); err != nil {
 		return err
 	}
 

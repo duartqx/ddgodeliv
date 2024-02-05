@@ -10,22 +10,22 @@ import (
 
 type CompanyService struct {
 	companyRepository c.ICompanyRepository
-	*v.Validator
+	validator         *v.Validator
 }
 
-func GetNewCompanyService(
-	companyRepository c.ICompanyRepository, validator *v.Validator,
-) *CompanyService {
-	return &CompanyService{companyRepository: companyRepository, Validator: validator}
+func GetNewCompanyService(companyRepository c.ICompanyRepository) *CompanyService {
+	return &CompanyService{
+		companyRepository: companyRepository, validator: v.NewValidator(),
+	}
 }
 
 func (cs CompanyService) CreateCompany(company c.ICompany, licenseId string) error {
 
-	if err := cs.ValidateVar(licenseId, "required,min=3,max=250"); err != nil {
+	if err := cs.validator.ValidateVar(licenseId, "required,min=3,max=250"); err != nil {
 		return fmt.Errorf("Invalid Driver License: %w", e.BadRequestError)
 	}
 
-	if validationsErrs := cs.ValidateStruct(company); validationsErrs != nil {
+	if validationsErrs := cs.validator.ValidateStruct(company); validationsErrs != nil {
 		return validationsErrs
 	}
 
@@ -70,5 +70,5 @@ func (cs CompanyService) FindById(company c.ICompany) error {
 }
 
 func (cs CompanyService) ValidateDriverLicense(license string) error {
-	return cs.ValidateVar(license, "required,min=3,max=250")
+	return cs.validator.ValidateVar(license, "required,min=3,max=250")
 }

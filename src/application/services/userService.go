@@ -12,13 +12,13 @@ import (
 
 type UserService struct {
 	userRepository u.IUserRepository
-	*v.Validator
+	validator      *v.Validator
 }
 
-func GetNewUserService(userRepository u.IUserRepository, validator *v.Validator) *UserService {
+func GetNewUserService(userRepository u.IUserRepository) *UserService {
 	return &UserService{
 		userRepository: userRepository,
-		Validator:      validator,
+		validator:      v.NewValidator(),
 	}
 }
 
@@ -28,7 +28,7 @@ func (us UserService) Create(user u.IUser) error {
 		return fmt.Errorf("Invalid Email: %w", e.BadRequestError)
 	}
 
-	if validationErrs := us.ValidateStruct(user); validationErrs != nil {
+	if validationErrs := us.validator.ValidateStruct(user); validationErrs != nil {
 		return validationErrs
 	}
 
@@ -49,7 +49,7 @@ func (us UserService) Create(user u.IUser) error {
 }
 
 func (us UserService) UpdatePassword(user u.IUser) error {
-	if err := us.Validator.Var(user.GetPassword(), "required,min=8,max=200"); err != nil {
+	if err := us.validator.Var(user.GetPassword(), "required,min=8,max=200"); err != nil {
 		return fmt.Errorf("Invalid Password")
 	}
 

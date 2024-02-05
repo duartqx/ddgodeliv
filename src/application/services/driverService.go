@@ -12,19 +12,18 @@ type DriverService struct {
 	driverRepository d.IDriverRepository
 	userService      *UserService
 	// emailService     *EmailService
-	*v.Validator
+	validator *v.Validator
 }
 
 func GetNewDriverService(
 	driverRepository d.IDriverRepository,
 	userService *UserService,
-	validator *v.Validator,
 	// emailService *EmailService
 ) *DriverService {
 	return &DriverService{
 		driverRepository: driverRepository,
 		userService:      userService,
-		Validator:        validator,
+		validator:        v.NewValidator(),
 		// emailService:     emailService,
 	}
 }
@@ -43,11 +42,11 @@ func (cs DriverService) sendDriverDeletionEmails(driver d.IDriver) error {
 // A Company owner automatically has an driver created for its user, then all
 // other drivers of it's company are created by a manager
 func (ds DriverService) CreateDriver(driver d.IDriver) error {
-	if err := ds.ValidateStruct(driver); err != nil {
+	if err := ds.validator.ValidateStruct(driver); err != nil {
 		return err
 	}
 
-	if err := ds.ValidateStruct(driver.GetUser()); err != nil {
+	if err := ds.validator.ValidateStruct(driver.GetUser()); err != nil {
 		return err
 	}
 
@@ -114,7 +113,7 @@ func (ds DriverService) UpdateDriverLicense(userId int, driver d.IDriver) error 
 		)
 	}
 
-	if err := ds.Validator.Var(driver.GetLicenseId(), "required,min=3,max=250"); err != nil {
+	if err := ds.validator.Var(driver.GetLicenseId(), "required,min=3,max=250"); err != nil {
 		return err
 	}
 
