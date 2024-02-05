@@ -9,10 +9,13 @@ import (
 
 type Delivery struct {
 	Id          int       `db:"id" json:"id"`
+	Loadout     string    `db:"loadout" json:"loadout" validate:"required"`
+	Weight      int       `db:"weight" json:"weight"` // milligrams
 	DriverId    int       `db:"driver_id" json:"driver_id"`
 	SenderId    int       `db:"sender_id" json:"sender_id" validate:"required,gt=0"`
 	Origin      string    `db:"origin" json:"origin" validate:"required,min=2"`
 	Destination string    `db:"destination" json:"destination" validate:"required,min=2"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	Deadline    time.Time `db:"deadline" json:"deadline" validate:"future"`
 	Status      uint8     `db:"status" json:"status" validate:"required,gte=0,lte=4"`
 
@@ -36,6 +39,24 @@ func (d *Delivery) SetId(id int) IDelivery {
 	return d
 }
 
+func (d Delivery) GetLoadout() string {
+	return d.Loadout
+}
+
+func (d *Delivery) SetLoadout(loadout string) IDelivery {
+	d.Loadout = loadout
+	return d
+}
+
+func (d Delivery) GetWeight() int {
+	return d.Weight
+}
+
+func (d *Delivery) SetWeight(weight int) IDelivery {
+	d.Weight = weight
+	return d
+}
+
 func (d Delivery) GetOrigin() string {
 	return d.Origin
 }
@@ -51,6 +72,15 @@ func (d Delivery) GetDestination() string {
 
 func (d *Delivery) SetDestination(destination string) IDelivery {
 	d.Destination = destination
+	return d
+}
+
+func (d Delivery) GetCreatedAt() time.Time {
+	return d.CreatedAt
+}
+
+func (d *Delivery) SetCreatedAt(createdAt time.Time) IDelivery {
+	d.CreatedAt = createdAt
 	return d
 }
 

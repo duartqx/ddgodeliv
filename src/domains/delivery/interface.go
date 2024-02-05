@@ -11,11 +11,20 @@ type IDelivery interface {
 	GetId() int
 	SetId(id int) IDelivery
 
+	GetLoadout() string
+	SetLoadout(loadout string) IDelivery
+
+	GetWeight() int
+	SetWeight(weight int) IDelivery
+
 	GetOrigin() string
 	SetOrigin(origin string) IDelivery
 
 	GetDestination() string
 	SetDestination(destination string) IDelivery
+
+	GetCreatedAt() time.Time
+	SetCreatedAt(deadline time.Time) IDelivery
 
 	GetDeadline() time.Time
 	SetDeadline(deadline time.Time) IDelivery
