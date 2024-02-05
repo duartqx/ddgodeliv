@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -115,8 +116,12 @@ func (dc driverController) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	driver, err := dc.driverService.FindById(driverId, user.GetCompanyId())
-	if err != nil {
+	switch {
+	case err != nil && errors.Is(err, sql.ErrNoRows):
 		http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
+		return
+	case err != nil:
+		http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -148,11 +153,11 @@ func (dc driverController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(driver); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
 }
 
 func (dc driverController) ListCompanyDrivers(w http.ResponseWriter, r *http.Request) {
@@ -168,9 +173,39 @@ func (dc driverController) ListCompanyDrivers(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(drivers); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (dc driverController) Get(w http.ResponseWriter, r *http.Request) {
+	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
+	if user == nil {
+		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
+		return
+	}
+
+	driverId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
+		return
+	}
+
+	driver, err := dc.driverService.FindById(driverId, user.GetCompanyId())
+	switch {
+	case err != nil && errors.Is(err, sql.ErrNoRows):
+		http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
+		return
+	case err != nil:
+		http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(driver); err != nil {
+		http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
+		return
+	}
 }
