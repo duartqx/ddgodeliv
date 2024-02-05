@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 
+	e "ddgodeliv/common/errors"
 	a "ddgodeliv/domains/auth"
 	d "ddgodeliv/domains/driver"
 	u "ddgodeliv/domains/user"
@@ -135,7 +135,7 @@ func (jas JwtAuthService) Login(user u.IUser) (token string, expiresAt time.Time
 		SetName(dbUser.GetName())
 
 	driver, err := jas.driverRepository.FindByUserId(claimsUser.GetId())
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err != nil && !errors.Is(err, e.NotFoundError) {
 		return token, expiresAt, err
 	}
 

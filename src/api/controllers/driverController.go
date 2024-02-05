@@ -1,15 +1,14 @@
 package controllers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
 
-	e "ddgodeliv/application/errors"
 	s "ddgodeliv/application/services"
 	as "ddgodeliv/application/services/auth"
+	e "ddgodeliv/common/errors"
 	d "ddgodeliv/domains/driver"
 
 	"github.com/go-chi/chi/v5"
@@ -116,12 +115,13 @@ func (dc driverController) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	driver, err := dc.driverService.FindById(driverId, user.GetCompanyId())
-	switch {
-	case err != nil && errors.Is(err, sql.ErrNoRows):
-		http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
-		return
-	case err != nil:
-		http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
+	if err != nil {
+		switch {
+		case errors.Is(err, e.NotFoundError):
+			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
+		default:
+			http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -194,12 +194,13 @@ func (dc driverController) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	driver, err := dc.driverService.FindById(driverId, user.GetCompanyId())
-	switch {
-	case err != nil && errors.Is(err, sql.ErrNoRows):
-		http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
-		return
-	case err != nil:
-		http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
+	if err != nil {
+		switch {
+		case errors.Is(err, e.NotFoundError):
+			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
+		default:
+			http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	e "ddgodeliv/application/errors"
+	e "ddgodeliv/common/errors"
 )
 
 type validationErr struct {

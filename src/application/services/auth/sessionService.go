@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	e "ddgodeliv/application/errors"
+	e "ddgodeliv/common/errors"
 	a "ddgodeliv/domains/auth"
 	d "ddgodeliv/domains/driver"
 )

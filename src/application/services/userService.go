@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	e "ddgodeliv/application/errors"
 	v "ddgodeliv/application/validation"
+	e "ddgodeliv/common/errors"
 	u "ddgodeliv/domains/user"
 )
 

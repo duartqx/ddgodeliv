@@ -1,15 +1,14 @@
 package controllers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
 
-	e "ddgodeliv/application/errors"
 	s "ddgodeliv/application/services"
 	as "ddgodeliv/application/services/auth"
+	e "ddgodeliv/common/errors"
 	v "ddgodeliv/domains/vehicle"
 
 	"github.com/go-chi/chi/v5"
@@ -107,10 +106,10 @@ func (vc vehicleController) GetVehicle(w http.ResponseWriter, r *http.Request) {
 
 	if err := vc.vehicleService.FindById(vehicle); err != nil {
 		switch {
-		case !errors.Is(err, sql.ErrNoRows):
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		default:
+		case errors.Is(err, e.NotFoundError):
 			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -140,10 +139,10 @@ func (vc vehicleController) DeleteVehicle(w http.ResponseWriter, r *http.Request
 
 	if err := vc.vehicleService.FindById(vehicle); err != nil {
 		switch {
-		case !errors.Is(err, sql.ErrNoRows):
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		default:
+		case errors.Is(err, e.NotFoundError):
 			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}

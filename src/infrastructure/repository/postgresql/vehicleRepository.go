@@ -1,11 +1,14 @@
 package postgresql
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
 
+	e "ddgodeliv/common/errors"
 	v "ddgodeliv/domains/vehicle"
 )
 
@@ -23,6 +26,9 @@ func (vr VehicleRepository) FindById(vehicle v.IVehicle) error {
 		"SELECT * FROM vehicles WHERE id = $1 AND company_id = $2",
 		vehicle.GetId(), vehicle.GetCompanyId(),
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return e.NotFoundError
+		}
 		return err
 	}
 	return nil
@@ -113,7 +119,7 @@ func (vr VehicleRepository) Create(vehicle v.IVehicle) error {
 }
 
 func (vr VehicleRepository) Update(vehicle v.IVehicle) error {
-	res, err := vr.db.Exec(
+	_, err := vr.db.Exec(
 		`
 			UPDATE vehicles
 			SET model_id = $1, company_id = $2, license_id = $3
@@ -127,11 +133,6 @@ func (vr VehicleRepository) Update(vehicle v.IVehicle) error {
 		return fmt.Errorf("Error trying to update vehicle: %v", err.Error())
 	}
 
-	if count, err := res.RowsAffected(); err != nil {
-		return fmt.Errorf("Error trying to count affected rows: %v", err.Error())
-	} else if count < 1 {
-		return fmt.Errorf("No rows were affected!")
-	}
 	return err
 }
 
@@ -140,19 +141,13 @@ func (vr VehicleRepository) Delete(vehicle v.IVehicle) error {
 		return fmt.Errorf("Invalid Vehicle Id")
 	}
 
-	res, err := vr.db.Exec(
+	_, err := vr.db.Exec(
 		"DELETE FROM vehicles WHERE id = $1 AND company_id = $2",
 		vehicle.GetId(),
 		vehicle.GetCompanyId(),
 	)
 	if err != nil {
 		return fmt.Errorf("Error trying to exec Delete query: %v", err.Error())
-	}
-
-	if count, err := res.RowsAffected(); err != nil {
-		return fmt.Errorf("Error trying to count affected rows: %v", err.Error())
-	} else if count < 1 {
-		return fmt.Errorf("No rows affected")
 	}
 
 	return nil

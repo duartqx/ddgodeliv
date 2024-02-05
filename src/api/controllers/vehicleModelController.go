@@ -5,8 +5,8 @@ import (
 	"errors"
 	"net/http"
 
-	e "ddgodeliv/application/errors"
 	s "ddgodeliv/application/services"
+	e "ddgodeliv/common/errors"
 	v "ddgodeliv/domains/vehicle"
 )
 

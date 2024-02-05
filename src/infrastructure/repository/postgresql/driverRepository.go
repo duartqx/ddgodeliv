@@ -1,11 +1,14 @@
 package postgresql
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
 
+	e "ddgodeliv/common/errors"
 	d "ddgodeliv/domains/driver"
 )
 
@@ -49,6 +52,9 @@ func (dr DriverRepository) FindById(id, companyId int) (d.IDriver, error) {
 	if err := dr.db.Get(
 		driver, dr.baseJoinedQuery("d.id = $1 AND d.company_id = $2"), id, companyId,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, e.NotFoundError
+		}
 		return nil, err
 	}
 
@@ -59,6 +65,9 @@ func (dr DriverRepository) FindByUserId(id int) (d.IDriver, error) {
 	driver := d.GetNewDriver()
 
 	if err := dr.db.Get(driver, dr.baseJoinedQuery("d.user_id = $1"), id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, e.NotFoundError
+		}
 		return nil, err
 	}
 
@@ -79,6 +88,9 @@ func (dr DriverRepository) FindByCompanyId(id int) (*[]d.IDriver, error) {
 
 	rows, err := dr.db.Queryx(dr.baseJoinedQuery("d.company_id = $1"), id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, e.NotFoundError
+		}
 		return nil, err
 	}
 
@@ -120,6 +132,9 @@ func (dr DriverRepository) Create(driver d.IDriver) error {
 		driver.GetCompanyId(),
 		strings.ToLower(driver.GetLicenseId()),
 	).Scan(&id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return e.NotFoundError
+		}
 		return err
 	}
 

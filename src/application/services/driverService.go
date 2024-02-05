@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	e "ddgodeliv/application/errors"
 	v "ddgodeliv/application/validation"
+	e "ddgodeliv/common/errors"
 	d "ddgodeliv/domains/driver"
 )
 
@@ -55,17 +55,17 @@ func (ds DriverService) CreateDriver(driver d.IDriver) error {
 	)
 
 	if err := ds.userService.Create(driver.GetUser()); err != nil {
-		return fmt.Errorf("Internal Error creating the user: %v", err.Error())
+		return fmt.Errorf("Internal Error creating the user: %w", err)
 	}
 
 	if err := ds.driverRepository.Create(driver); err != nil {
-		return fmt.Errorf("Internal Error creating the driver: %v", err.Error())
+		return fmt.Errorf("Internal Error creating the driver: %w", err)
 	}
 
 	// Asks the new user to activate it's account and warns the company owner
 	// of the new driver creation
 	if err := ds.sendDriverCreationEmails(driver); err != nil {
-		return fmt.Errorf("Internal Error sending Driver Creation Emails: %v", err.Error())
+		return fmt.Errorf("Internal Error sending Driver Creation Emails: %w", err)
 	}
 
 	return nil
@@ -127,7 +127,7 @@ func (ds DriverService) UpdateDriverLicense(userId int, driver d.IDriver) error 
 func (ds DriverService) FindByUserId(id int) (d.IDriver, error) {
 	driver, err := ds.driverRepository.FindByUserId(id)
 	if err != nil {
-		return nil, fmt.Errorf("Error trying to find user driver: %v", err.Error())
+		return nil, fmt.Errorf("Error trying to find user driver: %w", err)
 	}
 	return driver, nil
 }
@@ -135,7 +135,7 @@ func (ds DriverService) FindByUserId(id int) (d.IDriver, error) {
 func (ds DriverService) FindById(id, companyId int) (d.IDriver, error) {
 	driver, err := ds.driverRepository.FindById(id, companyId)
 	if err != nil {
-		return nil, fmt.Errorf("Error trying to find user driver: %v", err.Error())
+		return nil, fmt.Errorf("Error trying to find user driver: %w", err)
 	}
 	return driver, nil
 }
@@ -143,7 +143,7 @@ func (ds DriverService) FindById(id, companyId int) (d.IDriver, error) {
 func (ds DriverService) ListCompanyDriversById(id int) (*[]d.IDriver, error) {
 	drivers, err := ds.driverRepository.FindByCompanyId(id)
 	if err != nil {
-		return nil, fmt.Errorf("Error trying to find user driver: %v", err.Error())
+		return nil, fmt.Errorf("Error trying to find user driver: %w", err)
 	}
 	return drivers, nil
 }
