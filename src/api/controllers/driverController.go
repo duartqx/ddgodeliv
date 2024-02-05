@@ -52,14 +52,12 @@ func (dc driverController) Create(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(valError.Decode())
 		case errors.Is(err, e.ForbiddenError):
 			http.Error(w, err.Error(), http.StatusForbidden)
-			return
 		case errors.Is(err, e.BadRequestError):
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
 		default:
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

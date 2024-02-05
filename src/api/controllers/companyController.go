@@ -54,11 +54,10 @@ func (cc companyController) Create(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(valError.Decode())
 		case errors.Is(err, e.BadRequestError):
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
 		default:
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
+		return
 	}
 
 	if err := json.NewEncoder(w).Encode(company); err != nil {
@@ -90,11 +89,10 @@ func (cc companyController) Delete(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(valError.Decode())
 		case errors.Is(err, e.ForbiddenError):
 			http.Error(w, err.Error(), http.StatusForbidden)
-			return
 		default:
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
+		return
 	}
 
 	// Removes driver/company information on sessionUser

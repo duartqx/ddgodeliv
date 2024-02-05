@@ -36,11 +36,10 @@ func (vmc vehicleModelController) CreateVehicleModel(w http.ResponseWriter, r *h
 			json.NewEncoder(w).Encode(valError.Decode())
 		case errors.Is(err, e.BadRequestError):
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
 		default:
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
