@@ -9,7 +9,6 @@ import (
 	c "ddgodeliv/api/controllers"
 	s "ddgodeliv/application/services"
 	a "ddgodeliv/application/services/auth"
-	"ddgodeliv/application/validation"
 	r "ddgodeliv/infrastructure/repository/postgresql"
 
 	lm "github.com/duartqx/ddgomiddlewares/logger"
@@ -53,27 +52,27 @@ func (ro router) userRoutes(
 	// POST: Create User
 	userSubRouter.
 		With(authHandler.UnauthenticatedMiddleware).
-		Post("/user", userController.Create)
+		Post("/", userController.Create)
 
 	// GET: Self (Good for checking if the user is authenticated)
 	userSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/user", userController.Get)
+		Get("/", userController.Get)
 
 	// PATCH: Password Update
 	userSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Patch("/user/password", userController.UpdatePassword)
+		Patch("/password", userController.UpdatePassword)
 
 	return userSubRouter
 }
 
 func (ro router) companyRoutes(
-	sessionService *a.SessionService, v *validation.Validator, authHandler AuthHandler,
+	sessionService *a.SessionService, authHandler AuthHandler,
 ) *chi.Mux {
 
 	companyRepository := r.GetNewCompanyRepository(ro.db)
-	companyService := s.GetNewCompanyService(companyRepository, v)
+	companyService := s.GetNewCompanyService(companyRepository)
 	companyController := c.GetNewCompanyController(companyService, sessionService)
 
 	companySubRouter := chi.NewRouter()
@@ -81,19 +80,58 @@ func (ro router) companyRoutes(
 	// POST: Create company
 	companySubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Post("/company", companyController.Create)
+		Post("/", companyController.Create)
 
 	// DELETE: Owner can delete it's company
 	companySubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Delete("/company", companyController.Delete)
+		Delete("/", companyController.Delete)
 
 	return companySubRouter
 }
 
+func (ro router) driverRoutes(
+	sessionService *a.SessionService,
+	userService *s.UserService,
+	authHandler AuthHandler,
+) *chi.Mux {
+
+	// Repositories
+	driverRepository := r.GetNewDriverRepository(ro.db)
+
+	// Services
+	driverService := s.GetNewDriverService(driverRepository, userService)
+
+	// Controlllers
+	driverController := c.GetNewDriverController(driverService, sessionService)
+
+	driverSubRouter := chi.NewRouter()
+
+	driverSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Get("/", driverController.ListCompanyDrivers)
+
+	driverSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Post("/", driverController.Create)
+
+	driverSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Get("/{id:[0-9]+}", driverController.Get)
+
+	driverSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Patch("/{id:[0-9]+}", driverController.Update)
+
+	driverSubRouter.
+		With(authHandler.AuthenticatedMiddleware).
+		Delete("/{id:[0-9]+}", driverController.Delete)
+
+	return driverSubRouter
+}
+
 func (ro router) vehicleRoutes(
-	sessionRepository *a.SessionService,
-	v *validation.Validator,
+	sessionService *a.SessionService,
 	authHandler AuthHandler,
 ) *chi.Mux {
 
@@ -102,12 +140,12 @@ func (ro router) vehicleRoutes(
 	vehicleModelRepository := r.GetNewVehicleModelRepository(ro.db)
 
 	// Services
-	vehicleService := s.GetNewVehicleService(vehicleRepository, v)
-	vehicleModelService := s.GetNewVehicleModelService(vehicleModelRepository, v)
+	vehicleService := s.GetNewVehicleService(vehicleRepository)
+	vehicleModelService := s.GetNewVehicleModelService(vehicleModelRepository)
 
 	// Controllers
 	vehicleController := c.GetNewVehicleController(
-		vehicleService, sessionRepository,
+		vehicleService, sessionService,
 	)
 	vehicleModelController := c.GetNewVehicleModelController(vehicleModelService)
 
@@ -116,35 +154,33 @@ func (ro router) vehicleRoutes(
 	// Vehicle Routes
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Post("/vehicle", vehicleController.CreateVehicle)
+		Post("/", vehicleController.CreateVehicle)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/vehicle", vehicleController.GetCompanyVehicles)
+		Get("/", vehicleController.GetCompanyVehicles)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/vehicle/{id:[0-9]+}", vehicleController.GetVehicle)
+		Get("/{id:[0-9]+}", vehicleController.GetVehicle)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Delete("/vehicle/{id:[0-9]+}", vehicleController.DeleteVehicle)
+		Delete("/{id:[0-9]+}", vehicleController.DeleteVehicle)
 
 	// VehicleModel Routes
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Get("/vehiclemodel", vehicleModelController.ListModels)
+		Get("/model", vehicleModelController.ListModels)
 
 	vehiclesSubRouter.
 		With(authHandler.AuthenticatedMiddleware).
-		Post("/vehiclemodel", vehicleModelController.CreateVehicleModel)
+		Post("/model", vehicleModelController.CreateVehicleModel)
 
 	return vehiclesSubRouter
 }
 
 func (ro router) Build() *chi.Mux {
-
-	v := validation.NewValidator()
 
 	// Repositories
 	driverRepository := r.GetNewDriverRepository(ro.db)
@@ -156,7 +192,7 @@ func (ro router) Build() *chi.Mux {
 		userRepository, driverRepository, sessionRepository, ro.secret,
 	)
 	sessionService := a.GetNewSessionService(driverRepository, sessionRepository)
-	userService := s.GetNewUserService(userRepository, v)
+	userService := s.GetNewUserService(userRepository)
 
 	// Controllers
 	jwtController := c.NewJwtController(jwtAuthService)
@@ -177,13 +213,16 @@ func (ro router) Build() *chi.Mux {
 		Delete("/logout", jwtController.Logout)
 
 	// User Routes
-	router.Mount("/", ro.userRoutes(userService, sessionService, jwtController))
+	router.Mount("/user", ro.userRoutes(userService, sessionService, jwtController))
 
 	// Vehicle Routes
-	router.Mount("/", ro.vehicleRoutes(sessionService, v, jwtController))
+	router.Mount("/vehicle", ro.vehicleRoutes(sessionService, jwtController))
 
 	// Company Routes
-	router.Mount("/", ro.companyRoutes(sessionService, v, jwtController))
+	router.Mount("/company", ro.companyRoutes(sessionService, jwtController))
+
+	// Driver Routes
+	router.Mount("/driver", ro.driverRoutes(sessionService, userService, jwtController))
 
 	return router
 }
