@@ -64,6 +64,9 @@ func (cc companyController) Create(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(company); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	// Sets driver/company info on sessionUser
+	go cc.sessionService.SetSessionUserCompany(user)
 }
 
 func (cc companyController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -74,9 +77,11 @@ func (cc companyController) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := cc.companyService.DeleteCompany(
-		user.GetId(), c.GetNewCompany().SetId(user.GetCompanyId()),
-	); err != nil {
+	company := c.GetNewCompany().
+		SetId(user.GetCompanyId()).
+		SetOwnerId(user.GetId())
+
+	if err := cc.companyService.DeleteCompany(user.GetId(), company); err != nil {
 		var valError *e.ValidationError
 		switch {
 		case errors.As(err, &valError):
@@ -91,4 +96,7 @@ func (cc companyController) Delete(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// Removes driver/company information on sessionUser
+	go cc.sessionService.SetSessionUserNoCompany(user)
 }

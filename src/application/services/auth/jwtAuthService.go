@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -42,7 +44,7 @@ func GetNewJwtAuthService(
 
 func (jas JwtAuthService) claims() *customClaims {
 	return &customClaims{
-		SessionUser: a.SessionUser{}, RegisteredClaims: jwt.RegisteredClaims{},
+		SessionUser: *a.GetNewSessionUser(), RegisteredClaims: jwt.RegisteredClaims{},
 	}
 }
 
@@ -50,9 +52,7 @@ func (jas JwtAuthService) keyFunc(t *jwt.Token) (interface{}, error) {
 	return *jas.secret, nil
 }
 
-func (jas JwtAuthService) generateToken(
-	user *a.SessionUser, expiresAt time.Time,
-) (string, error) {
+func (jas JwtAuthService) generateToken(user *a.SessionUser, expiresAt time.Time) (string, error) {
 
 	claims := &customClaims{
 		SessionUser: *user,
@@ -127,22 +127,28 @@ func (jas JwtAuthService) Login(user u.IUser) (token string, expiresAt time.Time
 	createdAt := time.Now()
 	expiresAt = createdAt.Add(time.Hour * 12)
 
-	claimsUser := a.SessionUser{
-		Id:    dbUser.GetId(),
-		Email: dbUser.GetEmail(),
-		Name:  dbUser.GetName(),
+	claimsUser := a.GetNewSessionUser()
+
+	claimsUser.
+		SetId(dbUser.GetId()).
+		SetEmail(dbUser.GetEmail()).
+		SetName(dbUser.GetName())
+
+	driver, err := jas.driverRepository.FindByUserId(claimsUser.GetId())
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return token, expiresAt, err
 	}
 
-	if driver, err := jas.driverRepository.FindByUserId(claimsUser.GetId()); err != nil {
+	if driver != nil {
 		claimsUser.SetDriver(driver)
 	}
 
-	token, err = jas.generateToken(&claimsUser, expiresAt)
+	token, err = jas.generateToken(claimsUser, expiresAt)
 	if err != nil {
 		return "", expiresAt, fmt.Errorf("Could not generate token")
 	}
 
-	if err := jas.sessionRepository.Set(&claimsUser, createdAt); err != nil {
+	if err := jas.sessionRepository.Set(claimsUser, createdAt); err != nil {
 		return "", expiresAt, err
 	}
 
