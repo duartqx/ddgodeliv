@@ -99,15 +99,13 @@ func (ro router) companyRoutes() *chi.Mux {
 
 	companySubRouter := chi.NewRouter()
 
+	companySubRouter.Use(ro.jwtController.AuthenticatedMiddleware)
+
 	// POST: Create company
-	companySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
-		Post("/", ro.companyController.Create)
+	companySubRouter.Post("/", ro.companyController.Create)
 
 	// DELETE: Owner can delete it's company
-	companySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
-		Delete("/", ro.companyController.Delete)
+	companySubRouter.Delete("/", ro.companyController.Delete)
 
 	return companySubRouter
 }
@@ -116,24 +114,21 @@ func (ro router) driverRoutes() *chi.Mux {
 
 	driverSubRouter := chi.NewRouter()
 
+	driverSubRouter.Use(ro.jwtController.AuthenticatedMiddleware)
+
 	driverSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/", ro.driverController.ListCompanyDrivers)
 
 	driverSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Post("/", ro.driverController.Create)
 
 	driverSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/{id:[0-9]+}", ro.driverController.Get)
 
 	driverSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Patch("/{id:[0-9]+}", ro.driverController.Update)
 
 	driverSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Delete("/{id:[0-9]+}", ro.driverController.Delete)
 
 	return driverSubRouter
@@ -143,30 +138,26 @@ func (ro router) vehicleRoutes() *chi.Mux {
 
 	vehiclesSubRouter := chi.NewRouter()
 
+	vehiclesSubRouter.Use(ro.jwtController.AuthenticatedMiddleware)
+
 	// Vehicle Routes
 	vehiclesSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Post("/", ro.vehicleController.CreateVehicle)
 
 	vehiclesSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/", ro.vehicleController.GetCompanyVehicles)
 
 	vehiclesSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/{id:[0-9]+}", ro.vehicleController.GetVehicle)
 
 	vehiclesSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Delete("/{id:[0-9]+}", ro.vehicleController.DeleteVehicle)
 
 	// VehicleModel Routes
 	vehiclesSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/model", ro.vehicleModelController.ListModels)
 
 	vehiclesSubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Post("/model", ro.vehicleModelController.CreateVehicleModel)
 
 	return vehiclesSubRouter
@@ -176,36 +167,30 @@ func (ro router) deliveryRoutes() *chi.Mux {
 
 	deliverySubRouter := chi.NewRouter()
 
+	deliverySubRouter.Use(ro.jwtController.AuthenticatedMiddleware)
+
 	deliverySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Post("/", ro.deliveryController.Create)
 
 	deliverySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/{id:[0+9]+}", ro.deliveryController.Get)
 
 	deliverySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Patch("/{id:[0+9]+}/status", ro.deliveryController.UpdateStatus)
 
 	deliverySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Patch("/{id:[0+9]+}/assign", ro.deliveryController.AssignDriver)
 
 	deliverySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Delete("/{id:[0+9]+}", ro.deliveryController.Delete)
 
 	// deliverySubRouter.
-	// 	With(ro.jwtController.AuthenticatedMiddleware).
 	// 	Get("/", ro.deliveryController.ListAllForSender)
 
 	deliverySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/company", ro.deliveryController.ListByCompany)
 
 	deliverySubRouter.
-		With(ro.jwtController.AuthenticatedMiddleware).
 		Get("/pending", ro.deliveryController.ListAllPendingsWithoutDriver)
 
 	return deliverySubRouter
