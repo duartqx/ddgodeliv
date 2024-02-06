@@ -21,7 +21,7 @@ import (
 	rm "github.com/duartqx/ddgomiddlewares/recovery"
 )
 
-type AuthHandler interface {
+type authHandler interface {
 	AuthenticatedMiddleware(http.Handler) http.Handler
 	UnauthenticatedMiddleware(http.Handler) http.Handler
 }
@@ -196,6 +196,41 @@ func (ro router) deliveryRoutes() *chi.Mux {
 	return deliverySubRouter
 }
 
+func (ro router) SetupRoutes() *chi.Mux {
+
+	r := chi.NewRouter()
+
+	r.Use(rm.RecoveryMiddleware, lm.LoggerMiddleware)
+
+	// Auth Routes
+	// POST: User Login
+	r.
+		With(ro.jwtController.UnauthenticatedMiddleware).
+		Post("/login", ro.jwtController.Login)
+
+	// DELETE: User Logout
+	r.
+		With(ro.jwtController.AuthenticatedMiddleware).
+		Delete("/logout", ro.jwtController.Logout)
+
+	// User Routes
+	r.Mount("/user", ro.userRoutes())
+
+	// Vehicle Routes
+	r.Mount("/vehicle", ro.vehicleRoutes())
+
+	// Company Routes
+	r.Mount("/company", ro.companyRoutes())
+
+	// Driver Routes
+	r.Mount("/driver", ro.driverRoutes())
+
+	// Delivery Routes
+	r.Mount("/delivery", ro.deliveryRoutes())
+
+	return r
+}
+
 func (ro router) SetupRepositories() router {
 
 	ro.companyRepository = r.GetNewCompanyRepository(ro.db)
@@ -253,36 +288,5 @@ func (ro router) SetupControllers() router {
 }
 
 func (ro router) Build() *chi.Mux {
-
-	router := chi.NewRouter()
-
-	router.Use(rm.RecoveryMiddleware, lm.LoggerMiddleware)
-
-	// Auth Routes
-	// POST: User Login
-	router.
-		With(ro.jwtController.UnauthenticatedMiddleware).
-		Post("/login", ro.jwtController.Login)
-
-	// DELETE: User Logout
-	router.
-		With(ro.jwtController.AuthenticatedMiddleware).
-		Delete("/logout", ro.jwtController.Logout)
-
-	// User Routes
-	router.Mount("/user", ro.userRoutes())
-
-	// Vehicle Routes
-	router.Mount("/vehicle", ro.vehicleRoutes())
-
-	// Company Routes
-	router.Mount("/company", ro.companyRoutes())
-
-	// Driver Routes
-	router.Mount("/driver", ro.driverRoutes())
-
-	// Delivery Routes
-	router.Mount("/delivery", ro.deliveryRoutes())
-
-	return router
+	return ro.SetupRepositories().SetupServices().SetupControllers().SetupRoutes()
 }
