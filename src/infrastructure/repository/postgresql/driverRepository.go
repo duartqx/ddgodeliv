@@ -74,10 +74,23 @@ func (dr DriverRepository) FindByUserId(id int) (d.IDriver, error) {
 	return driver, nil
 }
 
+func (dr DriverRepository) ExistsById(id, companyId int) (exists bool) {
+	dr.db.QueryRow(
+		`
+			SELECT EXISTS (
+				SELECT 1 FROM drivers
+				WHERE id = $1 AND company_id = $2
+			)
+		`,
+		id, companyId,
+	).Scan(&exists)
+
+	return exists
+}
+
 func (dr DriverRepository) ExistsByUserId(id int) (exists bool) {
 	dr.db.QueryRow(
-		"SELECT EXISTS (SELECT 1 FROM drivers WHERE user_id = $1)",
-		id,
+		`SELECT EXISTS (SELECT 1 FROM drivers WHERE user_id = $1)`, id,
 	).Scan(&exists)
 
 	return exists

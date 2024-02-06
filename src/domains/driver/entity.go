@@ -62,10 +62,22 @@ func (d Driver) GetUser() u.IUser {
 	return u.GetNewUser().SetId(d.User.Id).SetName(d.User.Name).SetEmail(d.User.Email)
 }
 
+func (d *Driver) SetUser(user u.IUser) IDriver {
+	d.User.Id = user.GetId()
+	d.User.Name = user.GetName()
+	d.User.Email = user.GetEmail()
+
+	return d
+}
+
 func (d Driver) GetCompany() c.ICompany {
 	return &d.Company
 }
 
 func (d Driver) HasInvalidId() bool {
 	return d.GetId() == 0
+}
+
+func (d Driver) HasValidCompanyId() bool {
+	return d.GetCompanyId() != 0
 }

@@ -19,7 +19,9 @@ type IDriver interface {
 	SetCompanyId(companyId int) IDriver
 
 	GetUser() u.IUser
+	SetUser(user u.IUser) IDriver
 	GetCompany() c.ICompany
 
 	HasInvalidId() bool
+	HasValidCompanyId() bool
 }

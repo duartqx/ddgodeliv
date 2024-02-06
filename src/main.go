@@ -30,6 +30,9 @@ func main() {
 	mux := api.NewRouterBuilder().
 		SetDb(db).
 		SetSecret([]byte(os.Getenv("SECRET_KEY"))).
+		SetupRepositories().
+		SetupServices().
+		SetupControllers().
 		Build()
 
 	var addr string = fmt.Sprintf(

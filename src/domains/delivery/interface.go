@@ -35,6 +35,7 @@ type IDelivery interface {
 
 	GetDriverId() int
 	SetDriverId(driverId int) IDelivery
+	SetDriver(driver d.IDriver) IDelivery
 
 	GetSenderId() int
 	SetSenderId(senderId int) IDelivery
@@ -43,4 +44,5 @@ type IDelivery interface {
 	GetSender() u.IUser
 
 	HasInvalidId() bool
+	DriverIsNull() bool
 }

@@ -1,6 +1,9 @@
 package auth
 
-import d "ddgodeliv/domains/driver"
+import (
+	d "ddgodeliv/domains/driver"
+	u "ddgodeliv/domains/user"
+)
 
 type ISessionUser interface {
 	GetId() int
@@ -19,4 +22,5 @@ type ISessionUser interface {
 	SetFromAnother(user ISessionUser)
 
 	HasInvalidCompany() bool
+	ToUser() u.IUser
 }

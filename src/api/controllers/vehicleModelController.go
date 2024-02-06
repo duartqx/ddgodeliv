@@ -10,15 +10,15 @@ import (
 	v "ddgodeliv/domains/vehicle"
 )
 
-type vehicleModelController struct {
+type VehicleModelController struct {
 	vehicleModelService *s.VehicleModelService
 }
 
-func GetNewVehicleModelController(vehicleModelService *s.VehicleModelService) *vehicleModelController {
-	return &vehicleModelController{vehicleModelService: vehicleModelService}
+func GetNewVehicleModelController(vehicleModelService *s.VehicleModelService) *VehicleModelController {
+	return &VehicleModelController{vehicleModelService: vehicleModelService}
 }
 
-func (vmc vehicleModelController) CreateVehicleModel(w http.ResponseWriter, r *http.Request) {
+func (vmc VehicleModelController) CreateVehicleModel(w http.ResponseWriter, r *http.Request) {
 
 	vehicleModel := v.GetNewVehicleModel()
 
@@ -50,7 +50,7 @@ func (vmc vehicleModelController) CreateVehicleModel(w http.ResponseWriter, r *h
 	}
 }
 
-func (vmc vehicleModelController) ListModels(w http.ResponseWriter, r *http.Request) {
+func (vmc VehicleModelController) ListModels(w http.ResponseWriter, r *http.Request) {
 	models, err := vmc.vehicleModelService.All()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

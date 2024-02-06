@@ -1,6 +1,9 @@
 package auth
 
-import d "ddgodeliv/domains/driver"
+import (
+	d "ddgodeliv/domains/driver"
+	"ddgodeliv/domains/user"
+)
 
 type sessionDriver struct {
 	Id        int `json:"driver_id"`
@@ -78,4 +81,8 @@ func (u *SessionUser) SetFromAnother(user ISessionUser) {
 	u.Name = user.GetName()
 	u.Driver.Id = user.GetDriverId()
 	u.Driver.CompanyId = user.GetCompanyId()
+}
+
+func (u *SessionUser) ToUser() user.IUser {
+	return user.GetNewUser().SetId(u.Id).SetName(u.Name).SetEmail(u.Email)
 }

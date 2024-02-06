@@ -115,6 +115,22 @@ func (d *Delivery) SetDriverId(driverId int) IDelivery {
 	return d
 }
 
+func (d *Delivery) SetDriver(driver d.IDriver) IDelivery {
+
+	d.SetDriverId(driver.GetId())
+
+	d.Driver.
+		SetId(driver.GetId()).
+		SetUserId(driver.GetUserId()).
+		SetCompanyId(driver.GetCompanyId())
+
+	d.Driver.User.Id = driver.GetUserId()
+	d.Driver.User.Name = driver.GetUser().GetName()
+	d.Driver.User.Email = driver.GetUser().GetEmail()
+
+	return d
+}
+
 func (d Delivery) GetSenderId() int {
 	return d.SenderId
 }
@@ -137,4 +153,8 @@ func (d Delivery) GetSender() u.IUser {
 
 func (d Delivery) HasInvalidId() bool {
 	return d.GetId() == 0
+}
+
+func (d Delivery) DriverIsNull() bool {
+	return d.GetDriverId() == 0
 }

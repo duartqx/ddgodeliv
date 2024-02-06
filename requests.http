@@ -38,7 +38,7 @@ GET http://{{HOST}}/user
 Authorization: Bearer {{JWT}}
 
 ###
-GET http://{{HOST}}/vehicle/4
+GET http://{{HOST}}/vehicle/
 Authorization: Bearer {{JWT}}
 
 ###
@@ -63,6 +63,7 @@ POST http://{{HOST}}/vehicle/model
 Authorization: Bearer {{JWT}}
 
 {
+    "name": "207",
     "manufacturer": "Peugeot",
     "year": 2008,
     "max_load": 88

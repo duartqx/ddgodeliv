@@ -11,21 +11,21 @@ import (
 	c "ddgodeliv/domains/company"
 )
 
-type companyController struct {
+type CompanyController struct {
 	companyService *s.CompanyService
 	sessionService *as.SessionService
 }
 
 func GetNewCompanyController(
 	companyService *s.CompanyService, sessionService *as.SessionService,
-) *companyController {
-	return &companyController{
+) *CompanyController {
+	return &CompanyController{
 		companyService: companyService,
 		sessionService: sessionService,
 	}
 }
 
-func (cc companyController) Create(w http.ResponseWriter, r *http.Request) {
+func (cc CompanyController) Create(w http.ResponseWriter, r *http.Request) {
 
 	user, err := cc.sessionService.GetSessionUserWithoutCompany(r.Context())
 	if err != nil {
@@ -68,7 +68,7 @@ func (cc companyController) Create(w http.ResponseWriter, r *http.Request) {
 	go cc.sessionService.SetSessionUserCompany(user)
 }
 
-func (cc companyController) Delete(w http.ResponseWriter, r *http.Request) {
+func (cc CompanyController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	user := cc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {

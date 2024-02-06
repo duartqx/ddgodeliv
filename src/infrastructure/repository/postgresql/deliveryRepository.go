@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 
+	e "ddgodeliv/common/errors"
 	d "ddgodeliv/domains/delivery"
 )
 
@@ -193,6 +195,13 @@ func (dr DeliveryRepository) Create(delivery d.IDelivery) error {
 		delivery.GetDeadline(),
 		delivery.GetStatus(),
 	).Scan(&id); err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23503" {
+			// "foreign_key_violation"
+			return fmt.Errorf(
+				"Foreign Key Constrainst Violation: %w",
+				e.BadRequestError,
+			)
+		}
 		return err
 	}
 

@@ -11,20 +11,20 @@ import (
 	u "ddgodeliv/domains/user"
 )
 
-type userController struct {
+type UserController struct {
 	userService    *s.UserService
 	sessionService *as.SessionService
 }
 
 func GetNewUserController(
 	userService *s.UserService, sessionService *as.SessionService,
-) *userController {
-	return &userController{
+) *UserController {
+	return &UserController{
 		userService: userService, sessionService: sessionService,
 	}
 }
 
-func (uc userController) Create(w http.ResponseWriter, r *http.Request) {
+func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 
 	user := u.GetNewUser()
 
@@ -53,7 +53,7 @@ func (uc userController) Create(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user.Clean())
 }
 
-func (uc userController) Get(w http.ResponseWriter, r *http.Request) {
+func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 
 	user := uc.sessionService.GetSessionUser(r.Context())
 	if user == nil {
@@ -65,7 +65,7 @@ func (uc userController) Get(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func (uc userController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 
 	user := uc.sessionService.GetSessionUser(r.Context())
 	if user == nil {

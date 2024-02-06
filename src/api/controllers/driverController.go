@@ -14,21 +14,21 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type driverController struct {
+type DriverController struct {
 	driverService  *s.DriverService
 	sessionService *as.SessionService
 }
 
 func GetNewDriverController(
 	driverService *s.DriverService, sessionService *as.SessionService,
-) *driverController {
-	return &driverController{
+) *DriverController {
+	return &DriverController{
 		driverService:  driverService,
 		sessionService: sessionService,
 	}
 }
 
-func (dc driverController) Create(w http.ResponseWriter, r *http.Request) {
+func (dc DriverController) Create(w http.ResponseWriter, r *http.Request) {
 
 	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
@@ -68,7 +68,7 @@ func (dc driverController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (dc driverController) Delete(w http.ResponseWriter, r *http.Request) {
+func (dc DriverController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
@@ -99,7 +99,7 @@ func (dc driverController) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (dc driverController) Update(w http.ResponseWriter, r *http.Request) {
+func (dc DriverController) Update(w http.ResponseWriter, r *http.Request) {
 	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
 		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
@@ -158,7 +158,7 @@ func (dc driverController) Update(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (dc driverController) ListCompanyDrivers(w http.ResponseWriter, r *http.Request) {
+func (dc DriverController) ListCompanyDrivers(w http.ResponseWriter, r *http.Request) {
 
 	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
@@ -178,7 +178,7 @@ func (dc driverController) ListCompanyDrivers(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (dc driverController) Get(w http.ResponseWriter, r *http.Request) {
+func (dc DriverController) Get(w http.ResponseWriter, r *http.Request) {
 	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
 		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)

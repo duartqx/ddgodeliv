@@ -14,7 +14,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type vehicleController struct {
+type VehicleController struct {
 	vehicleService *s.VehicleService
 	sessionService *as.SessionService
 }
@@ -22,15 +22,15 @@ type vehicleController struct {
 func GetNewVehicleController(
 	vehicleService *s.VehicleService,
 	sessionService *as.SessionService,
-) *vehicleController {
+) *VehicleController {
 
-	return &vehicleController{
+	return &VehicleController{
 		vehicleService: vehicleService,
 		sessionService: sessionService,
 	}
 }
 
-func (vc vehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request) {
+func (vc VehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request) {
 
 	user := vc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
@@ -68,7 +68,7 @@ func (vc vehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (vc vehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Request) {
+func (vc VehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Request) {
 
 	user := vc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
@@ -89,7 +89,7 @@ func (vc vehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (vc vehicleController) GetVehicle(w http.ResponseWriter, r *http.Request) {
+func (vc VehicleController) GetVehicle(w http.ResponseWriter, r *http.Request) {
 	user := vc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
 		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
@@ -121,7 +121,7 @@ func (vc vehicleController) GetVehicle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (vc vehicleController) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
+func (vc VehicleController) DeleteVehicle(w http.ResponseWriter, r *http.Request) {
 
 	user := vc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
