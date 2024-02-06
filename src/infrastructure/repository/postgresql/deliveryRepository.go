@@ -32,10 +32,13 @@ func (dr DeliveryRepository) findMany(where string, args ...interface{}) (*[]d.I
 	query := fmt.Sprintf(`
 		SELECT
 			de.id AS id,
+			de.loadout AS loadout,
+			de.weight AS weight,
 			de.driver_id AS driver_id,
 			de.sender_id AS sender_id,
 			de.origin AS origin,
 			de.destination AS destination,
+			de.created_at AS created_at,
 			de.deadline AS deadline,
 			de.status AS status,
 
@@ -80,7 +83,7 @@ func (dr DeliveryRepository) findMany(where string, args ...interface{}) (*[]d.I
 }
 
 func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
-	return dr.findMany("driver_id = $1", id)
+	return dr.findMany("de.driver_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsByDriverId(id int) (exists bool) {
@@ -106,11 +109,15 @@ func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exi
 }
 
 func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]d.IDelivery, error) {
-	return dr.findMany("deadline BETWEEN $1 AND $2", start, end)
+	return dr.findMany("de.deadline BETWEEN $1 AND $2", start, end)
+}
+
+func (dr DeliveryRepository) FindByCreatedAtDate(createdAt time.Time) (*[]d.IDelivery, error) {
+	return dr.findMany("de.created_at::date = $1", createdAt.Format("2006-01-02"))
 }
 
 func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]d.IDelivery, error) {
-	return dr.findMany("deadline::date = $1", deadline.Format("2006-01-02"))
+	return dr.findMany("de.deadline::date = $1", deadline.Format("2006-01-02"))
 }
 
 func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists bool) {
@@ -124,7 +131,7 @@ func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists bo
 }
 
 func (dr DeliveryRepository) FindBySenderId(id int) (*[]d.IDelivery, error) {
-	return dr.findMany("sender_id = $1", id)
+	return dr.findMany("de.sender_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsBySenderId(id int) (exists bool) {
@@ -137,7 +144,7 @@ func (dr DeliveryRepository) ExistsBySenderId(id int) (exists bool) {
 }
 
 func (dr DeliveryRepository) FindByCompanyId(id int) (*[]d.IDelivery, error) {
-	return dr.findMany("company_id = $1", id)
+	return dr.findMany("dr.company_id = $1", id)
 }
 
 func (dr DeliveryRepository) ExistsByCompanyId(id int) (exists bool) {
@@ -164,11 +171,22 @@ func (dr DeliveryRepository) Create(delivery d.IDelivery) error {
 
 	if err := dr.db.QueryRow(
 		`
-			INSERT INTO deliveries (driver_id, sender_id, origin, destination, deadline, status)
-			VALUES ($1, $2, $3, $4, $5, $6)
+			INSERT INTO deliveries (
+				loadout,
+				weight,
+				driver_id,
+				sender_id,
+				origin,
+				destination,
+				deadline,
+				status
+			)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			RETURNING id
 		`,
 		dr.getDriverIdToQuery(delivery.GetDriverId()),
+		delivery.GetLoadout(),
+		delivery.GetWeight(),
 		delivery.GetSenderId(),
 		delivery.GetOrigin(),
 		delivery.GetDestination(),
@@ -193,8 +211,10 @@ func (dr DeliveryRepository) Update(delivery d.IDelivery) error {
 				origin = $3,
 				destination = $4,
 				deadline = $5,
-				status = $6
-			WHERE id = $7
+				status = $6,
+				loadout = $7,
+				wegith = $8
+			WHERE id = $9
 		`,
 		dr.getDriverIdToQuery(delivery.GetDriverId()),
 		delivery.GetSenderId(),
@@ -202,6 +222,8 @@ func (dr DeliveryRepository) Update(delivery d.IDelivery) error {
 		delivery.GetDestination(),
 		delivery.GetDeadline(),
 		delivery.GetStatus(),
+		delivery.GetLoadout(),
+		delivery.GetWeight(),
 		delivery.GetId(),
 	)
 	return err
@@ -214,5 +236,5 @@ func (dr DeliveryRepository) Delete(delivery d.IDelivery) error {
 }
 
 func (dr DeliveryRepository) FindPendingWithNoDriver() (*[]d.IDelivery, error) {
-	return dr.findMany("status = $1 AND driver_id = NULL", d.StatusChoices.Pending)
+	return dr.findMany("de.status = $1 AND de.driver_id = NULL", d.StatusChoices.Pending)
 }

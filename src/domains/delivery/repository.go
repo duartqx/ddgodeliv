@@ -13,6 +13,8 @@ type IDeliveryRepository interface {
 	FindByStatusByDriverId(id int, status uint8) (*[]IDelivery, error)
 	ExistsByStatusByDriverId(id int, status uint8) bool
 
+	FindByCreatedAtDate(createdAt time.Time) (*[]IDelivery, error)
+
 	FindByDeadlineDateRange(start, end time.Time) (*[]IDelivery, error)
 	FindByDeadlineDate(deadline time.Time) (*[]IDelivery, error)
 	ExistsByDeadlineDate(deadline time.Time) bool
