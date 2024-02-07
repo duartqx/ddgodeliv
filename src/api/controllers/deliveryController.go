@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -42,12 +43,27 @@ func (dc DeliveryController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	delivery := de.GetNewDelivery()
+	body := struct {
+		Loadout     string    `json:"loadout"`
+		Weight      int       `json:"weight"`
+		DriverId    int       `json:"driver_id"`
+		Origin      string    `json:"origin"`
+		Destination string    `json:"destination"`
+		Deadline    time.Time `json:"deadline"`
+	}{}
 
-	if err := json.NewDecoder(r.Body).Decode(&delivery); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	delivery := de.GetNewDelivery().
+		SetLoadout(body.Loadout).
+		SetWeight(body.Weight).
+		SetDriverId(body.DriverId).
+		SetOrigin(body.Origin).
+		SetDestination(body.Destination).
+		SetDeadline(body.Deadline)
 
 	if err := dc.deliveryService.Create(delivery); err != nil {
 		var valError *e.ValidationError

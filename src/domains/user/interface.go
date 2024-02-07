@@ -1,8 +1,6 @@
 package user
 
 type IUser interface {
-	Clean() interface{}
-
 	GetId() int
 	SetId(id int) IUser
 

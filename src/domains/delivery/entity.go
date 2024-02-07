@@ -11,22 +11,22 @@ type Delivery struct {
 	Id          int       `db:"id" json:"id"`
 	Loadout     string    `db:"loadout" json:"loadout" validate:"required"`
 	Weight      int       `db:"weight" json:"weight"` // milligrams
-	DriverId    int       `db:"driver_id" json:"driver_id"`
-	SenderId    int       `db:"sender_id" json:"sender_id" validate:"required,gt=0"`
+	DriverId    int       `db:"driver_id" json:"-"`
+	SenderId    int       `db:"sender_id" json:"-" validate:"required,gt=0"`
 	Origin      string    `db:"origin" json:"origin" validate:"required,min=2"`
 	Destination string    `db:"destination" json:"destination" validate:"required,min=2"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	Deadline    time.Time `db:"deadline" json:"deadline" validate:"future"`
 	Status      uint8     `db:"status" json:"status" validate:"required,gte=0,lte=4"`
 
-	Driver d.Driver    `db:"driver" json:"driver" validate:"-"`
-	Sender u.CleanUser `db:"sender" json:"sender" validate:"-"`
+	Driver d.Driver `db:"driver" json:"driver" validate:"-"`
+	Sender u.User   `db:"sender" json:"sender" validate:"-"`
 }
 
 func GetNewDelivery() *Delivery {
 	return &Delivery{
 		Driver: *d.GetNewDriver(),
-		Sender: *u.GetNewCleanUser(),
+		Sender: *u.GetNewUser(),
 	}
 }
 
@@ -145,10 +145,7 @@ func (d Delivery) GetDriver() d.IDriver {
 }
 
 func (d Delivery) GetSender() u.IUser {
-	return u.GetNewUser().
-		SetId(d.Sender.Id).
-		SetName(d.Sender.Name).
-		SetEmail(d.Sender.Email)
+	return &d.Sender
 }
 
 func (d Delivery) HasInvalidId() bool {

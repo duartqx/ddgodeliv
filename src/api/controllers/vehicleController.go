@@ -38,12 +38,20 @@ func (vc VehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	vehicle := v.GetNewVehicle().SetCompanyId(user.GetCompanyId())
+	body := struct {
+		LicenseId string `json:"license_id"`
+		ModelId   int    `json:"model_id"`
+	}{}
 
-	if err := json.NewDecoder(r.Body).Decode(&vehicle); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
 	}
+
+	vehicle := v.GetNewVehicle().
+		SetCompanyId(user.GetCompanyId()).
+		SetLicenseId(body.LicenseId).
+		SetModelId(body.ModelId)
 
 	if err := vc.vehicleService.Create(vehicle); err != nil {
 		var valError *e.ValidationError

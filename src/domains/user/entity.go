@@ -1,32 +1,14 @@
 package user
 
-type CleanUser struct {
-	Id    int    `db:"id" json:"id"`
-	Email string `db:"email" json:"email"`
-	Name  string `db:"name" json:"name"`
-}
-
 type User struct {
 	Id       int    `db:"id" json:"id"`
 	Email    string `db:"email" json:"email" validate:"email,required"`
-	Password string `db:"password" json:"password" validate:"required,min=8,max=200"`
+	Password string `db:"password" json:"-" validate:"required,min=8,max=200"`
 	Name     string `db:"name" json:"name" validate:"required,min=3,max=50"`
 }
 
 func GetNewUser() *User {
 	return &User{}
-}
-
-func GetNewCleanUser() *CleanUser {
-	return &CleanUser{}
-}
-
-func (u User) Clean() interface{} {
-	return &CleanUser{
-		Id:    u.GetId(),
-		Email: u.GetEmail(),
-		Name:  u.GetName(),
-	}
 }
 
 func (u User) GetId() int {

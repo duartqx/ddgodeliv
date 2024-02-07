@@ -7,17 +7,17 @@ import (
 
 type Driver struct {
 	Id        int    `db:"id" json:"id"`
-	UserId    int    `db:"user_id" json:"user_id" validate:"required,gt=0"`
-	CompanyId int    `db:"company_id" json:"company_id" validate:"required,gt=0"`
+	UserId    int    `db:"user_id" json:"-" validate:"required,gt=0"`
+	CompanyId int    `db:"company_id" json:"-" validate:"required,gt=0"`
 	LicenseId string `db:"license_id" json:"license_id" validate:"required,min=3,max=250"`
 
-	User    u.CleanUser `db:"user" json:"user" validate:"-"`
-	Company c.Company   `db:"company" json:"company" validate:"-"`
+	User    u.User    `db:"user" json:"user" validate:"-"`
+	Company c.Company `db:"company" json:"company" validate:"-"`
 }
 
 func GetNewDriver() *Driver {
 	return &Driver{
-		User:    *u.GetNewCleanUser(),
+		User:    *u.GetNewUser(),
 		Company: *c.GetNewCompany(),
 	}
 }
@@ -59,7 +59,7 @@ func (d *Driver) SetCompanyId(companyId int) IDriver {
 }
 
 func (d Driver) GetUser() u.IUser {
-	return u.GetNewUser().SetId(d.User.Id).SetName(d.User.Name).SetEmail(d.User.Email)
+	return &d.User
 }
 
 func (d *Driver) SetUser(user u.IUser) IDriver {

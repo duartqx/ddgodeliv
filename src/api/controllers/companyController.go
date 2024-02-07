@@ -33,19 +33,19 @@ func (cc CompanyController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpComp := struct {
+	body := struct {
 		Name      string `json:"name"`
 		LicenseId string `json:"license_id"`
 	}{}
 
-	if err := json.NewDecoder(r.Body).Decode(&tmpComp); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	company := c.GetNewCompany().SetOwnerId(user.GetId()).SetName(tmpComp.Name)
+	company := c.GetNewCompany().SetOwnerId(user.GetId()).SetName(body.Name)
 
-	if err := cc.companyService.CreateCompany(company, tmpComp.LicenseId); err != nil {
+	if err := cc.companyService.CreateCompany(company, body.LicenseId); err != nil {
 		var valError *e.ValidationError
 		switch {
 		case errors.As(err, &valError):

@@ -26,12 +26,21 @@ func GetNewUserController(
 
 func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 
-	user := u.GetNewUser()
+	body := struct {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}{}
 
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
 	}
+
+	user := u.GetNewUser().
+		SetName(body.Name).
+		SetEmail(body.Email).
+		SetPassword(body.Password)
 
 	if err := uc.userService.Create(user); err != nil {
 		var valError *e.ValidationError
@@ -50,7 +59,9 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user.Clean())
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +73,9 @@ func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
@@ -88,8 +101,6 @@ func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // updateName or updateEmail must also update the jwt

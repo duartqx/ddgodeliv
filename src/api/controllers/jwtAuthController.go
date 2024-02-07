@@ -23,12 +23,17 @@ func NewJwtController(jwtService *a.JwtAuthService) *JwtController {
 
 func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {
 
-	user := u.GetNewUser()
+	body := struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}{}
 
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
 	}
+
+	user := u.GetNewUser().SetEmail(body.Email).SetPassword(body.Password)
 
 	token, expiresAt, err := jc.jwtService.Login(user)
 

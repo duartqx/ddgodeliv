@@ -10,6 +10,7 @@ import (
 	as "ddgodeliv/application/services/auth"
 	e "ddgodeliv/common/errors"
 	d "ddgodeliv/domains/driver"
+	u "ddgodeliv/domains/user"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -36,14 +37,27 @@ func (dc DriverController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver := d.GetNewDriver()
+	body := struct {
+		LicenseId string `json:"license_id"`
+		User      struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+		} `json:"user"`
+	}{}
 
-	if err := json.NewDecoder(r.Body).Decode(&driver); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	driver.SetCompanyId(user.GetCompanyId())
+	driver := d.GetNewDriver().
+		SetUser(
+			u.GetNewUser().
+				SetEmail(body.User.Email).
+				SetName(body.User.Name),
+		).
+		SetLicenseId(body.LicenseId).
+		SetCompanyId(user.GetCompanyId())
 
 	if err := dc.driverService.CreateDriver(driver); err != nil {
 		var valError *e.ValidationError
