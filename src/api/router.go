@@ -196,41 +196,6 @@ func (ro router) deliveryRoutes() *chi.Mux {
 	return deliverySubRouter
 }
 
-func (ro router) SetupRoutes() *chi.Mux {
-
-	r := chi.NewRouter()
-
-	r.Use(rm.RecoveryMiddleware, lm.LoggerMiddleware)
-
-	// Auth Routes
-	// POST: User Login
-	r.
-		With(ro.jwtController.UnauthenticatedMiddleware).
-		Post("/login", ro.jwtController.Login)
-
-	// DELETE: User Logout
-	r.
-		With(ro.jwtController.AuthenticatedMiddleware).
-		Delete("/logout", ro.jwtController.Logout)
-
-	// User Routes
-	r.Mount("/user", ro.userRoutes())
-
-	// Vehicle Routes
-	r.Mount("/vehicle", ro.vehicleRoutes())
-
-	// Company Routes
-	r.Mount("/company", ro.companyRoutes())
-
-	// Driver Routes
-	r.Mount("/driver", ro.driverRoutes())
-
-	// Delivery Routes
-	r.Mount("/delivery", ro.deliveryRoutes())
-
-	return r
-}
-
 func (ro router) SetupRepositories() router {
 
 	ro.companyRepository = r.GetNewCompanyRepository(ro.db)
@@ -285,6 +250,41 @@ func (ro router) SetupControllers() router {
 	ro.userController = c.GetNewUserController(ro.userService, ro.sessionService)
 
 	return ro
+}
+
+func (ro router) SetupRoutes() *chi.Mux {
+
+	mux := chi.NewRouter()
+
+	mux.Use(rm.RecoveryMiddleware, lm.LoggerMiddleware)
+
+	// Auth Routes
+	// POST: User Login
+	mux.
+		With(ro.jwtController.UnauthenticatedMiddleware).
+		Post("/login", ro.jwtController.Login)
+
+	// DELETE: User Logout
+	mux.
+		With(ro.jwtController.AuthenticatedMiddleware).
+		Delete("/logout", ro.jwtController.Logout)
+
+	// User Routes
+	mux.Mount("/user", ro.userRoutes())
+
+	// Vehicle Routes
+	mux.Mount("/vehicle", ro.vehicleRoutes())
+
+	// Company Routes
+	mux.Mount("/company", ro.companyRoutes())
+
+	// Driver Routes
+	mux.Mount("/driver", ro.driverRoutes())
+
+	// Delivery Routes
+	mux.Mount("/delivery", ro.deliveryRoutes())
+
+	return mux
 }
 
 func (ro router) Build() *chi.Mux {
