@@ -158,3 +158,7 @@ func (d Delivery) HasInvalidId() bool {
 func (d Delivery) DriverIsNull() bool {
 	return d.GetDriverId() == 0
 }
+
+func (d Delivery) IsPending() bool {
+	return d.Status == StatusChoices.Pending
+}

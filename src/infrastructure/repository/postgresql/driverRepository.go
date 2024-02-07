@@ -45,20 +45,19 @@ func (dr DriverRepository) baseJoinedQuery(where string) string {
 	)
 }
 
-func (dr DriverRepository) FindById(id, companyId int) (d.IDriver, error) {
-
-	driver := d.GetNewDriver()
+func (dr DriverRepository) FindById(driver d.IDriver) error {
 
 	if err := dr.db.Get(
-		driver, dr.baseJoinedQuery("d.id = $1 AND d.company_id = $2"), id, companyId,
+		driver, dr.baseJoinedQuery("d.id = $1 AND d.company_id = $2"),
+		driver.GetId(), driver.GetCompanyId(),
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, e.NotFoundError
+			return e.NotFoundError
 		}
-		return nil, err
+		return err
 	}
 
-	return driver, nil
+	return nil
 }
 
 func (dr DriverRepository) FindByUserId(id int) (d.IDriver, error) {

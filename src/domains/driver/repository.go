@@ -1,7 +1,7 @@
 package driver
 
 type IDriverRepository interface {
-	FindById(id, companyId int) (IDriver, error)
+	FindById(driver IDriver) error
 	ExistsById(id, companyId int) bool
 
 	FindByUserId(id int) (IDriver, error)

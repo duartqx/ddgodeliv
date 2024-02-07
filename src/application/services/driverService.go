@@ -132,12 +132,15 @@ func (ds DriverService) FindByUserId(id int) (d.IDriver, error) {
 	return driver, nil
 }
 
-func (ds DriverService) FindById(id, companyId int) (d.IDriver, error) {
-	driver, err := ds.driverRepository.FindById(id, companyId)
-	if err != nil {
-		return nil, fmt.Errorf("Error trying to find user driver: %w", err)
+func (ds DriverService) FindById(driver d.IDriver) error {
+	if driver.HasInvalidId() || !driver.HasValidCompanyId() {
+		return fmt.Errorf("%w: Invalid Driver", e.BadRequestError)
 	}
-	return driver, nil
+
+	if err := ds.driverRepository.FindById(driver); err != nil {
+		return fmt.Errorf("%w: Error trying to find user driver", err)
+	}
+	return nil
 }
 
 func (ds DriverService) ListCompanyDriversById(id int) (*[]d.IDriver, error) {

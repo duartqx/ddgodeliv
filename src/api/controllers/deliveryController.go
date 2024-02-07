@@ -292,3 +292,30 @@ func (dc DeliveryController) ListAllPendingsWithoutDriver(w http.ResponseWriter,
 		return
 	}
 }
+
+func (dc DeliveryController) ListAllForSender(w http.ResponseWriter, r *http.Request) {
+	user := dc.sessionService.GetSessionUser(r.Context())
+	if user == nil {
+		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
+		return
+	}
+
+	deliveries, err := dc.deliveryService.FindBySenderId(user.ToUser())
+	if err != nil {
+		switch {
+		case errors.Is(err, e.BadRequestError):
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		case errors.Is(err, e.NotFoundError):
+			http.Error(w, err.Error(), http.StatusNotFound)
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(deliveries); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}

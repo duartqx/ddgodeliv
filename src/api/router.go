@@ -173,6 +173,9 @@ func (ro router) deliveryRoutes() *chi.Mux {
 		Post("/", ro.deliveryController.Create)
 
 	deliverySubRouter.
+		Get("/", ro.deliveryController.ListAllForSender)
+
+	deliverySubRouter.
 		Get("/{id:[0+9]+}", ro.deliveryController.Get)
 
 	deliverySubRouter.
@@ -183,9 +186,6 @@ func (ro router) deliveryRoutes() *chi.Mux {
 
 	deliverySubRouter.
 		Delete("/{id:[0+9]+}", ro.deliveryController.Delete)
-
-	// deliverySubRouter.
-	// 	Get("/", ro.deliveryController.ListAllForSender)
 
 	deliverySubRouter.
 		Get("/company", ro.deliveryController.ListByCompany)

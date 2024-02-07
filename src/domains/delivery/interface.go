@@ -45,4 +45,5 @@ type IDelivery interface {
 
 	HasInvalidId() bool
 	DriverIsNull() bool
+	IsPending() bool
 }

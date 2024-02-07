@@ -67,8 +67,7 @@ func (ds DeliveryService) AssignDriver(delivery de.IDelivery, driver d.IDriver) 
 	// If is not pending, returns an error
 	if !(delivery.GetStatus() == de.StatusChoices.Pending) {
 		return fmt.Errorf(
-			"%w: This delivery is not pending",
-			e.BadRequestError,
+			"%w: This delivery is not pending", e.BadRequestError,
 		)
 	}
 
@@ -78,11 +77,7 @@ func (ds DeliveryService) AssignDriver(delivery de.IDelivery, driver d.IDriver) 
 
 	// Checks if driver.Id + driver.CompanyId are a valid driver (avoids
 	// assigning to driver from different company)
-	// TODO: refactor this method to pass just the driver pointer instead of two int
-	driver, err := ds.driverRepository.FindById(
-		driver.GetId(), driver.GetCompanyId(),
-	)
-	if err != nil {
+	if err := ds.driverRepository.FindById(driver); err != nil {
 		return err
 	}
 
@@ -131,16 +126,24 @@ func (ds DeliveryService) FindById(user u.IUser, delivery de.IDelivery) error {
 		return fmt.Errorf("%w: Invalid Delivery", e.BadRequestError)
 	}
 
-	// TODO: Validate if user is delivery.Sender or if the delivery has
-	// DriverId, check if this user is from the same company as the driver
-	// assigned to this delivery
-
 	if err := ds.deliveryRepository.FindById(delivery); err != nil {
-		// TODO: Refactor this
-		return fmt.Errorf("%w: Invalid Delivery", err)
+		return e.NotFoundError
 	}
 
-	return nil
+	// The sender can always see their delivery
+	if delivery.GetSenderId() == user.GetId() {
+		return nil
+	}
+
+	driver, _ := ds.driverRepository.FindByUserId(user.GetId())
+
+	// Allows all drivers to see the delivery if it's pending
+	// Otherwise only allows drivers from same company
+	if driver != nil && (delivery.IsPending() || delivery.GetDriver().GetCompanyId() == driver.GetCompanyId()) {
+		return nil
+	}
+
+	return e.NotFoundError
 }
 
 func (ds DeliveryService) FindByCompanyId(company c.ICompany) (*[]de.IDelivery, error) {
@@ -164,7 +167,7 @@ func (ds DeliveryService) Delete(user u.IUser, delivery de.IDelivery) error {
 	// assigned to this delivery
 
 	if err := ds.deliveryRepository.Delete(delivery); err != nil {
-		return fmt.Errorf("Internal Error trying to delete delivery: %v", err.Error())
+		return fmt.Errorf("%w: %v", e.InternalError, err.Error())
 	}
 
 	return nil
@@ -173,7 +176,15 @@ func (ds DeliveryService) Delete(user u.IUser, delivery de.IDelivery) error {
 func (ds DeliveryService) FindPendingWithoutDriver() (*[]de.IDelivery, error) {
 	deliveries, err := ds.deliveryRepository.FindPendingWithNoDriver()
 	if err != nil {
-		return nil, fmt.Errorf("Internal Error trying to find pending deliveries: %v", err.Error())
+		return nil, fmt.Errorf("%w: %v", e.InternalError, err.Error())
+	}
+	return deliveries, nil
+}
+
+func (ds DeliveryService) FindBySenderId(user u.IUser) (*[]de.IDelivery, error) {
+	deliveries, err := ds.deliveryRepository.FindBySenderId(user.GetId())
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", e.InternalError, err.Error())
 	}
 	return deliveries, nil
 }

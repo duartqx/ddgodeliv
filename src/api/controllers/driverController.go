@@ -82,8 +82,9 @@ func (dc DriverController) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, err := dc.driverService.FindById(driverId, user.GetCompanyId())
-	if err != nil {
+	driver := d.GetNewDriver().SetId(driverId).SetCompanyId(user.GetCompanyId())
+
+	if err := dc.driverService.FindById(driver); err != nil {
 		http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
 		return
 	}
@@ -112,8 +113,9 @@ func (dc DriverController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, err := dc.driverService.FindById(driverId, user.GetCompanyId())
-	if err != nil {
+	driver := d.GetNewDriver().SetId(driverId).SetCompanyId(user.GetCompanyId())
+
+	if err := dc.driverService.FindById(driver); err != nil {
 		switch {
 		case errors.Is(err, e.NotFoundError):
 			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
@@ -191,8 +193,9 @@ func (dc DriverController) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver, err := dc.driverService.FindById(driverId, user.GetCompanyId())
-	if err != nil {
+	driver := d.GetNewDriver().SetId(driverId).SetCompanyId(user.GetCompanyId())
+
+	if err := dc.driverService.FindById(driver); err != nil {
 		switch {
 		case errors.Is(err, e.NotFoundError):
 			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
