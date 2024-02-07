@@ -43,6 +43,8 @@ func (dc DriverController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	driver.SetCompanyId(user.GetCompanyId())
+
 	if err := dc.driverService.CreateDriver(driver); err != nil {
 		var valError *e.ValidationError
 		switch {
@@ -130,7 +132,7 @@ func (dc DriverController) Update(w http.ResponseWriter, r *http.Request) {
 	}{}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid License Id", http.StatusBadRequest)
 		return
 	}
 

@@ -3,6 +3,7 @@
 
 ###
 # If user with same email exists, responds with 400 Bad Request
+# @name CreateUser
 POST http://{{HOST}}/user
 Content-Type: application/json
 
@@ -14,6 +15,7 @@ Content-Type: application/json
 
 ###
 # 400 Bad Request with Errors
+# @name CreateUserWithErrors
 POST http://{{HOST}}/user
 Content-Type: application/json
 
@@ -34,18 +36,17 @@ Content-Type: application/json
 }
 
 ###
+# @name SessionUserInfo
 GET http://{{HOST}}/user
 Authorization: Bearer {{JWT}}
 
 ###
-GET http://{{HOST}}/vehicle/
-Authorization: Bearer {{JWT}}
-
-###
+# @name VehicleListByCompany
 GET http://{{HOST}}/vehicle
 Authorization: Bearer {{JWT}}
 
 ###
+# @name VehicleCreateByCompany
 POST http://{{HOST}}/vehicle
 Authorization: Bearer {{JWT}}
 
@@ -55,10 +56,12 @@ Authorization: Bearer {{JWT}}
 }
 
 ###
+# @name VehicleModelList
 GET http://{{HOST}}/vehicle/model
 Authorization: Bearer {{JWT}}
 
 ###
+# @name VehicleModelCreate
 POST http://{{HOST}}/vehicle/model
 Authorization: Bearer {{JWT}}
 
@@ -70,6 +73,7 @@ Authorization: Bearer {{JWT}}
 }
 
 ###
+# @name CompanyCreate
 POST http://{{HOST}}/company
 Authorization: Bearer {{JWT}}
 
@@ -79,17 +83,43 @@ Authorization: Bearer {{JWT}}
 }
 
 ###
+# @name CompanyDelete
 DELETE http://{{HOST}}/company
 Authorization: Bearer {{JWT}}
 
 ###
+# @name DriverCreate
+POST http://{{HOST}}/driver/
+Authorization: Bearer {{JWT}}
+
+{
+    "license_id": "9897-6d8978f6fklj5",
+    "user": {
+        "name": "Fifth created driver",
+        "email": "driverfifth@teste.com"
+    }
+}
+
+###
+# @name DriverListByCompany
 GET http://{{HOST}}/driver/
 Authorization: Bearer {{JWT}}
 
 ###
+# @name DriverGetOne
+GET http://{{HOST}}/driver/4
+Authorization: Bearer {{JWT}}
+
+###
+# @name DriverUpdateLicense
 PATCH http://{{HOST}}/driver/2
 Authorization: Bearer {{JWT}}
 
 {
     "license_id": "9897987-65565"
 }
+
+###
+# @name DriverDelete
+DELETE http://{{HOST}}/driver/7
+Authorization: Bearer {{JWT}}

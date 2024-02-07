@@ -63,6 +63,7 @@ func (d Driver) GetUser() u.IUser {
 }
 
 func (d *Driver) SetUser(user u.IUser) IDriver {
+	d.UserId = user.GetId()
 	d.User.Id = user.GetId()
 	d.User.Name = user.GetName()
 	d.User.Email = user.GetEmail()

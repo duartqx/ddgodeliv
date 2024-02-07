@@ -10,6 +10,8 @@ type IDriverRepository interface {
 	FindByCompanyId(id int) (*[]IDriver, error)
 	ExistsByCompanyId(id int) bool
 
+	ExistsByLicenseId(licenseId string) bool
+
 	Create(driver IDriver) error
 	Update(driver IDriver) error
 	Delete(driver IDriver) error

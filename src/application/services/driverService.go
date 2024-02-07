@@ -42,30 +42,37 @@ func (cs DriverService) sendDriverDeletionEmails(driver d.IDriver) error {
 // A Company owner automatically has an driver created for its user, then all
 // other drivers of it's company are created by a manager
 func (ds DriverService) CreateDriver(driver d.IDriver) error {
+
+	if driver.GetLicenseId() != "" && ds.driverRepository.ExistsByLicenseId(driver.GetLicenseId()) {
+		return fmt.Errorf("%w: Invalid License", e.BadRequestError)
+	}
+
+	driverUser := driver.GetUser().SetPassword(
+		"TempPasswordToChangeWhenActivatingAccount" + driver.GetUser().GetEmail(),
+	)
+
+	if err := ds.validator.ValidateStruct(driverUser); err != nil {
+		return err
+	}
+
+	if err := ds.userService.Create(driverUser); err != nil {
+		return fmt.Errorf("Internal Error creating the user: %w", err)
+	}
+
+	driver.SetUser(driverUser)
+
 	if err := ds.validator.ValidateStruct(driver); err != nil {
 		return err
 	}
 
-	if err := ds.validator.ValidateStruct(driver.GetUser()); err != nil {
-		return err
-	}
-
-	driver.GetUser().SetPassword(
-		"TempPasswordToChangeWhenActivatingAccount" + driver.GetUser().GetEmail(),
-	)
-
-	if err := ds.userService.Create(driver.GetUser()); err != nil {
-		return fmt.Errorf("Internal Error creating the user: %w", err)
-	}
-
 	if err := ds.driverRepository.Create(driver); err != nil {
-		return fmt.Errorf("Internal Error creating the driver: %w", err)
+		return fmt.Errorf("%w: creating the driver", err)
 	}
 
 	// Asks the new user to activate it's account and warns the company owner
 	// of the new driver creation
 	if err := ds.sendDriverCreationEmails(driver); err != nil {
-		return fmt.Errorf("Internal Error sending Driver Creation Emails: %w", err)
+		return fmt.Errorf("%w: sending Driver Creation Emails", err)
 	}
 
 	return nil
@@ -73,19 +80,25 @@ func (ds DriverService) CreateDriver(driver d.IDriver) error {
 
 func (ds DriverService) DeleteDriver(ownerId int, driver d.IDriver) error {
 
+	if driver.GetId() == 0 || driver.GetUserId() == 0 || driver.GetCompanyId() == 0 {
+		return fmt.Errorf("%w: Invalid Driver", e.ForbiddenError)
+	}
+
+	if err := ds.driverRepository.FindById(driver); err != nil {
+		return fmt.Errorf("%w: Could not find driver", err)
+	}
+
 	switch {
-	case driver.GetId() == 0 || driver.GetUserId() == 0 || driver.GetCompanyId() == 0:
-		return fmt.Errorf("Invalid Driver: %w", e.ForbiddenError)
 	case ownerId == 0:
-		return fmt.Errorf("Invalid Owner: %w", e.ForbiddenError)
-	case ownerId != driver.GetCompanyId():
-		return fmt.Errorf(
-			"Only the onwer can delete it's drivers: %w",
-			e.ForbiddenError,
-		)
+		return fmt.Errorf("%w: Invalid Owner", e.ForbiddenError)
 	case driver.GetUserId() == driver.GetCompany().GetOwnerId():
 		return fmt.Errorf(
-			"The company owner can't delete it's own driver: %w",
+			"%w: The company owner can't delete their own driver",
+			e.ForbiddenError,
+		)
+	case ownerId != driver.GetCompany().GetOwnerId():
+		return fmt.Errorf(
+			"%w: Only the onwer can delete their drivers",
 			e.ForbiddenError,
 		)
 	}

@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 
 	e "ddgodeliv/common/errors"
 	d "ddgodeliv/domains/driver"
@@ -132,25 +134,41 @@ func (dr DriverRepository) ExistsByCompanyId(id int) (exists bool) {
 }
 
 func (dr DriverRepository) Create(driver d.IDriver) error {
-	var id int
-
-	if err := dr.db.QueryRow(
+	if err := dr.db.Get(
+		driver,
+		// Inserts new driver and grabs the company information
 		`
-			INSERT INTO drivers (user_id, company_id, license_id)
-			VALUES ($1, $2, $3)
-			RETURNING id
+			WITH new_driver AS (
+				INSERT INTO drivers (user_id, company_id, license_id)
+				VALUES ($1, $2, $3)
+				RETURNING id, company_id
+			)
+			SELECT
+				d.id as "id",
+				c.id as "company.id",
+				c.name as "company.name",
+				c.owner_id as "company.owner_id"
+			FROM new_driver d
+			INNER JOIN companies c ON c.id = d.company_id
 		`,
 		driver.GetUserId(),
 		driver.GetCompanyId(),
 		strings.ToLower(driver.GetLicenseId()),
-	).Scan(&id); err != nil {
+	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return e.NotFoundError
 		}
+		if pqErr, ok := err.(*pq.Error); ok {
+			// 23503 => foreign_key_violation
+			// 23505 => unique_violation
+			if slices.Contains[[]pq.ErrorCode](
+				[]pq.ErrorCode{"23503", "23505"}, pqErr.Code,
+			) {
+				return e.BadRequestError
+			}
+		}
 		return err
 	}
-
-	driver.SetId(id)
 
 	return nil
 }
@@ -165,6 +183,11 @@ func (dr DriverRepository) Update(driver d.IDriver) error {
 		strings.ToLower(driver.GetLicenseId()),
 		driver.GetId(),
 	)
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+			return fmt.Errorf("%w: Invalid License Id", e.BadRequestError)
+		}
+	}
 	return err
 }
 
@@ -176,4 +199,13 @@ func (dr DriverRepository) Delete(driver d.IDriver) error {
 	_, err := dr.db.Exec("DELETE FROM drivers WHERE id = $1", driver.GetId())
 
 	return err
+}
+
+func (dr DriverRepository) ExistsByLicenseId(licenseId string) (exists bool) {
+	dr.db.QueryRow(
+		`SELECT EXISTS (SELECT 1 FROM drivers WHERE license_id = $1)`,
+		licenseId,
+	).Scan(&exists)
+
+	return exists
 }
