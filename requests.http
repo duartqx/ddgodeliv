@@ -1,5 +1,7 @@
 @HOST = localhost:8080
-@JWT = {{LoginAPI.response.body.token}}
+@JWT = {{CompanyLoginAPI.response.body.token}}
+
+@JWT_commonuser = {{CommonLoginAPI.response.body.token}}
 
 ###
 # If user with same email exists, responds with 400 Bad Request
@@ -8,9 +10,9 @@ POST http://{{HOST}}/user
 Content-Type: application/json
 
 {
-    "email": "test@test.com",
+    "email": "user@test.com",
     "password": "password",
-    "name": "Teste User"
+    "name": "User User"
 }
 
 ###
@@ -26,12 +28,22 @@ Content-Type: application/json
 }
 
 ###
-# @name LoginAPI
+# @name CompanyLoginAPI
 POST http://{{HOST}}/login
 Content-Type: application/json
 
 {
     "email": "test@test.com",
+    "password": "password"
+}
+
+###
+# @name CommonLoginAPI
+POST http://{{HOST}}/login
+Content-Type: application/json
+
+{
+    "email": "user@test.com",
     "password": "password"
 }
 
@@ -93,10 +105,10 @@ POST http://{{HOST}}/driver/
 Authorization: Bearer {{JWT}}
 
 {
-    "license_id": "9897-6d8978f6fklj5",
+    "license_id": "9897-6d8978f6joip5",
     "user": {
-        "name": "Fifth created driver",
-        "email": "driverfifth@teste.com"
+        "name": "Sixth created driver",
+        "email": "driversixth@teste.com"
     }
 }
 
@@ -122,4 +134,60 @@ Authorization: Bearer {{JWT}}
 ###
 # @name DriverDelete
 DELETE http://{{HOST}}/driver/7
+Authorization: Bearer {{JWT}}
+
+###
+# @name CommonUserCreateDelivery
+POST http://{{HOST}}/delivery
+Authorization: Bearer {{JWT_commonuser}}
+
+{
+    "loadout": "Good stuff 2",
+    "weight": 77,
+    "origin": "A cool place",
+    "destination": "Far away",
+    "deadline": "2024-03-24T15:04:05Z"
+}
+
+###
+# @name CommonUserListDeliveriesBySender
+GET http://{{HOST}}/delivery
+Authorization: Bearer {{JWT_commonuser}}
+
+###
+# @name CommonUserGetDelivery
+GET http://{{HOST}}/delivery/1
+Authorization: Bearer {{JWT_commonuser}}
+
+###
+# @name CompanyAssignDriverDelivery
+PATCH http://{{HOST}}/delivery/5/assign
+Authorization: Bearer {{JWT}}
+
+{
+    "driver_id": 5
+}
+
+###
+# @name CompanyUpdateDeliveryStatus
+PATCH http://{{HOST}}/delivery/5/status
+Authorization: Bearer {{JWT}}
+
+{
+    "status": 2
+}
+
+###
+# @name CompanyDelivery
+GET http://{{HOST}}/delivery/company
+Authorization: Bearer {{JWT}}
+
+###
+# @name PendingDelivery
+GET http://{{HOST}}/delivery/pending
+Authorization: Bearer {{JWT}}
+
+###
+# @name DeleteDelivery
+DELETE http://{{HOST}}/delivery/1
 Authorization: Bearer {{JWT}}

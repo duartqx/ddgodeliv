@@ -176,16 +176,16 @@ func (ro router) deliveryRoutes() *chi.Mux {
 		Get("/", ro.deliveryController.ListAllForSender)
 
 	deliverySubRouter.
-		Get("/{id:[0+9]+}", ro.deliveryController.Get)
+		Get("/{id:[0-9]+}", ro.deliveryController.Get)
 
 	deliverySubRouter.
-		Patch("/{id:[0+9]+}/status", ro.deliveryController.UpdateStatus)
+		Patch("/{id:[0-9]+}/status", ro.deliveryController.UpdateStatus)
 
 	deliverySubRouter.
-		Patch("/{id:[0+9]+}/assign", ro.deliveryController.AssignDriver)
+		Patch("/{id:[0-9]+}/assign", ro.deliveryController.AssignDriver)
 
 	deliverySubRouter.
-		Delete("/{id:[0+9]+}", ro.deliveryController.Delete)
+		Delete("/{id:[0-9]+}", ro.deliveryController.Delete)
 
 	deliverySubRouter.
 		Get("/company", ro.deliveryController.ListByCompany)

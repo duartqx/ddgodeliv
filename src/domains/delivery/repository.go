@@ -26,6 +26,8 @@ type IDeliveryRepository interface {
 	ExistsByCompanyId(id int) bool
 
 	Create(delivery IDelivery) error
-	Update(delivery IDelivery) error
 	Delete(delivery IDelivery) error
+
+	AssignDriver(delivery IDelivery) error
+	UpdateStatus(delivery IDelivery) error
 }

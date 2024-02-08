@@ -82,7 +82,7 @@ func (ds DeliveryService) AssignDriver(delivery de.IDelivery, driver d.IDriver) 
 	}
 
 	delivery.SetDriver(driver).SetStatus(de.StatusChoices.Assigned)
-	if err := ds.deliveryRepository.Update(delivery); err != nil {
+	if err := ds.deliveryRepository.AssignDriver(delivery); err != nil {
 		return err
 	}
 
@@ -91,9 +91,9 @@ func (ds DeliveryService) AssignDriver(delivery de.IDelivery, driver d.IDriver) 
 
 func (ds DeliveryService) UpdateStatus(delivery de.IDelivery) error {
 
-	status := delivery.GetStatus()
+	updatedStatus := delivery.GetStatus()
 
-	if err := ds.validator.ValidateVar(status, "required,gte=0,lte=4"); err != nil {
+	if err := ds.validator.ValidateVar(updatedStatus, "gte=0,lte=4"); err != nil {
 		return err
 	}
 
@@ -102,19 +102,23 @@ func (ds DeliveryService) UpdateStatus(delivery de.IDelivery) error {
 		return fmt.Errorf("%w: Invalid Delivery", err)
 	}
 
-	if !delivery.GetDriver().HasInvalidId() && status == de.StatusChoices.Pending {
+	if !delivery.GetDriver().HasInvalidId() && updatedStatus == de.StatusChoices.Pending {
 		return fmt.Errorf(
 			"%w: Delivery has driver, can't be set to pending",
 			e.BadRequestError,
 		)
-	} else if delivery.GetDriver().HasInvalidId() && status > de.StatusChoices.Pending {
+	} else if delivery.GetDriver().HasInvalidId() && updatedStatus > de.StatusChoices.Pending {
 		return fmt.Errorf(
 			"%w: Delivery has no driver, can only be set to pending",
 			e.BadRequestError,
 		)
 	}
 
-	if err := ds.deliveryRepository.Update(delivery); err != nil {
+	// The status ends overwritten with the one in the db when finding the
+	// delivery by id, so that's why we reupdate with the updatedStatus
+	delivery.SetStatus(updatedStatus)
+
+	if err := ds.deliveryRepository.UpdateStatus(delivery); err != nil {
 		return fmt.Errorf("%w: %s", e.InternalError, err.Error())
 	}
 
@@ -127,7 +131,7 @@ func (ds DeliveryService) FindById(user u.IUser, delivery de.IDelivery) error {
 	}
 
 	if err := ds.deliveryRepository.FindById(delivery); err != nil {
-		return e.NotFoundError
+		return err
 	}
 
 	// The sender can always see their delivery

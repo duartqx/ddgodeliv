@@ -1,6 +1,8 @@
 package postgresql
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -19,10 +21,56 @@ func GetNewDeliveryRepository(db *sqlx.DB) *DeliveryRepository {
 	return &DeliveryRepository{db: db}
 }
 
+func (dr DeliveryRepository) baseJoinedQuery(where string) string {
+	return fmt.Sprintf(
+		`
+			SELECT
+				de.id AS id,
+				de.loadout AS loadout,
+				de.weight AS weight,
+				COALESCE(de.driver_id, 0) AS driver_id,
+				de.sender_id AS sender_id,
+				de.origin AS origin,
+				de.destination AS destination,
+				de.created_at AS created_at,
+				de.deadline AS deadline,
+				de.status AS status,
+
+				su.id AS "sender.id",
+				su.email AS "sender.email",
+				su.name AS "sender.name",
+
+				-- Coalesce will avoid having to use sql.NullString / sql.NullInt
+				COALESCE(dr.id, 0) AS "driver.id",
+				COALESCE(dr.user_id, 0) AS "driver.user_id",
+				COALESCE(dr.company_id, 0) AS "driver.company_id",
+				COALESCE(dr.license_id, '') AS "driver.license_id",
+
+				COALESCE(du.id, 0) AS "driver.user.id",
+				COALESCE(du.name, '') AS "driver.user.name",
+				COALESCE(du.email, '') AS "driver.user.email",
+
+				COALESCE(c.id, 0) AS "driver.company.id",
+				COALESCE(c.owner_id, 0) AS "driver.company.owner_id",
+				COALESCE(c.name, '') AS "driver.company.name"
+			FROM deliveries de
+			LEFT JOIN drivers dr ON de.driver_id = dr.id
+			LEFT JOIN users du ON dr.user_id = du.id
+			LEFT JOIN companies c ON dr.company_id = c.id
+			LEFT JOIN users su ON de.sender_id = su.id
+			WHERE  %s
+		`,
+		where,
+	)
+}
+
 func (dr DeliveryRepository) FindById(delivery d.IDelivery) error {
 	if err := dr.db.Get(
-		delivery, "SELECT * FROM deliveries WHERE id = $1", delivery.GetId(),
+		delivery, dr.baseJoinedQuery("de.id = $1"), delivery.GetId(),
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return e.NotFoundError
+		}
 		return err
 	}
 	return nil
@@ -31,39 +79,7 @@ func (dr DeliveryRepository) FindById(delivery d.IDelivery) error {
 func (dr DeliveryRepository) findMany(where string, args ...interface{}) (*[]d.IDelivery, error) {
 	deliveries := []d.IDelivery{}
 
-	query := fmt.Sprintf(`
-		SELECT
-			de.id AS id,
-			de.loadout AS loadout,
-			de.weight AS weight,
-			de.driver_id AS driver_id,
-			de.sender_id AS sender_id,
-			de.origin AS origin,
-			de.destination AS destination,
-			de.created_at AS created_at,
-			de.deadline AS deadline,
-			de.status AS status,
-
-			dr.id AS "driver.id",
-			dr.user_id AS "driver.user_id",
-			dr.company_id AS "driver.company_id",
-			dr.license_id AS "driver.license_id",
-
-			u.id AS "driver.user.id"
-			u.name AS "driver.user.name"
-			u.email AS "driver.user.email"
-
-			c.id AS "company.id",
-			c.owner_id AS "company.owner_id",
-			c.name AS "company.name"
-		FROM deliveries de
-		INNER JOIN companies c ON de.company_id = c.id
-		INNER JOIN drivers dr ON de.driver_id = dr.id
-		INNER JOIN users u ON dr.user_id = u.id
-		WHERE %s
-	`, where)
-
-	rows, err := dr.db.Queryx(query, args...)
+	rows, err := dr.db.Queryx(dr.baseJoinedQuery(where), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +114,7 @@ func (dr DeliveryRepository) ExistsByDriverId(id int) (exists bool) {
 }
 
 func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]d.IDelivery, error) {
-	return dr.findMany("driver_id = $1 AND status = $2", id, status)
+	return dr.findMany("de.driver_id = $1 AND de.status = $2", id, status)
 }
 
 func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exists bool) {
@@ -158,43 +174,40 @@ func (dr DeliveryRepository) ExistsByCompanyId(id int) (exists bool) {
 	return exists
 }
 
-func (dr DeliveryRepository) getDriverIdToQuery(id int) string {
-	var deliveryDriverId string
-	if id == 0 {
-		deliveryDriverId = "NULL"
-	} else {
-		deliveryDriverId = fmt.Sprint(id)
-	}
-	return deliveryDriverId
-}
-
 func (dr DeliveryRepository) Create(delivery d.IDelivery) error {
-	var id int
-
-	if err := dr.db.QueryRow(
+	if err := dr.db.Get(
+		delivery,
 		`
-			INSERT INTO deliveries (
-				loadout,
-				weight,
-				driver_id,
-				sender_id,
-				origin,
-				destination,
-				deadline,
-				status
+			WITH new_delivery AS (
+				INSERT INTO deliveries (
+					sender_id,
+					loadout,
+					weight,
+					origin,
+					destination,
+					deadline,
+					status
+				)
+				VALUES ($1, $2, $3, $4, $5, $6, $7)
+				RETURNING id, created_at, sender_id
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-			RETURNING id
+			SELECT
+				d.id AS "id",
+				d.created_at AS "created_at",
+				u.id AS "sender.id",
+				u.name AS "sender.name",
+				u.email AS "sender.email"
+			FROM new_delivery d
+			INNER JOIN users u ON u.id = d.sender_id
 		`,
-		dr.getDriverIdToQuery(delivery.GetDriverId()),
+		delivery.GetSenderId(),
 		delivery.GetLoadout(),
 		delivery.GetWeight(),
-		delivery.GetSenderId(),
 		delivery.GetOrigin(),
 		delivery.GetDestination(),
 		delivery.GetDeadline(),
 		delivery.GetStatus(),
-	).Scan(&id); err != nil {
+	); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23503" {
 			// "foreign_key_violation"
 			return fmt.Errorf(
@@ -205,45 +218,74 @@ func (dr DeliveryRepository) Create(delivery d.IDelivery) error {
 		return err
 	}
 
-	delivery.SetId(id)
-
 	return nil
 }
 
-func (dr DeliveryRepository) Update(delivery d.IDelivery) error {
-	_, err := dr.db.Exec(
+func (dr DeliveryRepository) baseUpdateJoinedQuery(setWhere string) string {
+	return fmt.Sprintf(
 		`
-			UPDATE deliveries
-			SET
-				driver_id = $1,
-				sender_id = $2,
-				origin = $3,
-				destination = $4,
-				deadline = $5,
-				status = $6,
-				loadout = $7,
-				wegith = $8
-			WHERE id = $9
+			WITH updated AS (
+				UPDATE deliveries
+		        %s
+				RETURNING id, driver_id
+			)
+			SELECT
+				de.id AS "id",
+				-- Coalesce will avoid having to use sql.NullString / sql.NullInt
+				COALESCE(dr.id, 0) AS "driver.id",
+				COALESCE(dr.user_id, 0) AS "driver.user_id",
+				COALESCE(dr.company_id, 0) AS "driver.company_id",
+				COALESCE(dr.license_id, '') AS "driver.license_id",
+
+				COALESCE(du.id, 0) AS "driver.user.id",
+				COALESCE(du.name, '') AS "driver.user.name",
+				COALESCE(du.email, '') AS "driver.user.email",
+
+				COALESCE(c.id, 0) AS "driver.company.id",
+				COALESCE(c.owner_id, 0) AS "driver.company.owner_id",
+				COALESCE(c.name, '') AS "driver.company.name"
+
+				FROM updated de
+				LEFT JOIN drivers dr ON de.driver_id = dr.id
+				LEFT JOIN users du ON dr.user_id = du.id
+				LEFT JOIN companies c ON dr.company_id = c.id
 		`,
-		dr.getDriverIdToQuery(delivery.GetDriverId()),
-		delivery.GetSenderId(),
-		delivery.GetOrigin(),
-		delivery.GetDestination(),
-		delivery.GetDeadline(),
-		delivery.GetStatus(),
-		delivery.GetLoadout(),
-		delivery.GetWeight(),
-		delivery.GetId(),
+		setWhere,
 	)
-	return err
+}
+
+func (dr DeliveryRepository) AssignDriver(delivery d.IDelivery) error {
+	if err := dr.db.Get(
+		delivery,
+		dr.baseUpdateJoinedQuery(
+			`SET driver_id = $1, status = $2 WHERE id = $3`,
+		),
+		delivery.GetDriverId(), delivery.GetStatus(), delivery.GetId(),
+	); err != nil {
+		return fmt.Errorf("%w: %v", e.InternalError, err.Error())
+	}
+	return nil
+}
+
+func (dr DeliveryRepository) UpdateStatus(delivery d.IDelivery) error {
+	if err := dr.db.Get(
+		delivery,
+		dr.baseUpdateJoinedQuery(`SET status = $1 WHERE id = $2`),
+		delivery.GetStatus(), delivery.GetId(),
+	); err != nil {
+		return fmt.Errorf("%w: %v", e.InternalError, err.Error())
+	}
+	return nil
 }
 
 func (dr DeliveryRepository) Delete(delivery d.IDelivery) error {
-	_, err := dr.db.Exec("DELETE FROM deliveries WHERE id = $1", delivery.GetId())
+	_, err := dr.db.NamedExec("DELETE FROM deliveries WHERE id = :id", delivery)
 
 	return err
 }
 
 func (dr DeliveryRepository) FindPendingWithNoDriver() (*[]d.IDelivery, error) {
-	return dr.findMany("de.status = $1 AND de.driver_id = NULL", d.StatusChoices.Pending)
+	return dr.findMany(
+		"de.status = $1 AND de.driver_id IS NULL", d.StatusChoices.Pending,
+	)
 }

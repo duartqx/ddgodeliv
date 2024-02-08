@@ -46,7 +46,6 @@ func (dc DeliveryController) Create(w http.ResponseWriter, r *http.Request) {
 	body := struct {
 		Loadout     string    `json:"loadout"`
 		Weight      int       `json:"weight"`
-		DriverId    int       `json:"driver_id"`
 		Origin      string    `json:"origin"`
 		Destination string    `json:"destination"`
 		Deadline    time.Time `json:"deadline"`
@@ -58,9 +57,10 @@ func (dc DeliveryController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	delivery := de.GetNewDelivery().
+		SetSenderId(user.GetId()).
+		SetStatus(de.StatusChoices.Pending).
 		SetLoadout(body.Loadout).
 		SetWeight(body.Weight).
-		SetDriverId(body.DriverId).
 		SetOrigin(body.Origin).
 		SetDestination(body.Destination).
 		SetDeadline(body.Deadline)
@@ -185,7 +185,7 @@ func (dc DeliveryController) UpdateStatus(w http.ResponseWriter, r *http.Request
 }
 
 func (dc DeliveryController) Get(w http.ResponseWriter, r *http.Request) {
-	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
+	user := dc.sessionService.GetSessionUser(r.Context())
 	if user == nil {
 		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
 		return
@@ -266,17 +266,9 @@ func (dc DeliveryController) Delete(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, e.BadRequestError):
 			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
 		default:
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(delivery); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

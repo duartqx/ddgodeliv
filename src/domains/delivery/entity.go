@@ -17,7 +17,7 @@ type Delivery struct {
 	Destination string    `db:"destination" json:"destination" validate:"required,min=2"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	Deadline    time.Time `db:"deadline" json:"deadline" validate:"future"`
-	Status      uint8     `db:"status" json:"status" validate:"required,gte=0,lte=4"`
+	Status      uint8     `db:"status" json:"status" validate:"gte=0,lte=4"`
 
 	Driver d.Driver `db:"driver" json:"driver" validate:"-"`
 	Sender u.User   `db:"sender" json:"sender" validate:"-"`
