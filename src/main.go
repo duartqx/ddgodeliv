@@ -12,7 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	"ddgodeliv/api"
+	"ddgodeliv/api/server"
 )
 
 func getDb(conn string) (*sqlx.DB, error) {
@@ -27,10 +27,11 @@ func main() {
 	}
 	defer db.Close()
 
-	mux := api.NewRouterBuilder().
-		SetDb(db).
-		SetSecret([]byte(os.Getenv("SECRET_KEY"))).
-		Build()
+	mux := server.GetNewServer(
+		server.ServerConfig{
+			Db: db, Secret: []byte(os.Getenv("SECRET_KEY")),
+		},
+	).Build()
 
 	var addr string = fmt.Sprintf(
 		"%s:%s", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"),
