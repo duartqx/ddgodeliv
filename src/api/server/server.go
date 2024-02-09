@@ -51,14 +51,15 @@ func (s *server) setupBase() *server {
 	s.userRepository = repository.GetNewUserRepository(s.db)
 	s.driverRepository = repository.GetNewDriverRepository(s.db)
 
+	sessionRepository := repository.GetNewSessionRepository()
 	// Services
 	s.sessionService = auth.GetNewSessionService(
-		s.driverRepository, repository.GetNewSessionRepository(),
+		s.driverRepository, sessionRepository,
 	)
 
 	s.jwtController = controllers.NewJwtController(
 		auth.GetNewJwtAuthService(
-			s.userRepository, repository.GetNewSessionRepository(), s.secret,
+			s.userRepository, sessionRepository, s.secret,
 		),
 	)
 	return s
