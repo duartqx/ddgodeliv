@@ -40,7 +40,13 @@ func (s server) SetupDeliveryRoutes() http.Handler {
 
 	deliverySubRouter.HandleFunc("DELETE /{id}/{$}", deliveryController.Delete)
 
-	deliverySubRouter.HandleFunc("GET /company/{$}", deliveryController.ListByCompany)
+	deliverySubRouter.HandleFunc(
+		"GET /company/{$}", deliveryController.ListByCompany,
+	)
+
+	deliverySubRouter.HandleFunc(
+		"GET /company/{id}/{$}", deliveryController.Get,
+	)
 
 	deliverySubRouter.HandleFunc(
 		"GET /pending/{$}", deliveryController.ListAllPendingsWithoutDriver,
