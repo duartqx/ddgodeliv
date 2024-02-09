@@ -124,9 +124,15 @@ func (d *Delivery) SetDriver(driver d.IDriver) IDelivery {
 		SetUserId(driver.GetUserId()).
 		SetCompanyId(driver.GetCompanyId())
 
-	d.Driver.User.Id = driver.GetUserId()
-	d.Driver.User.Name = driver.GetUser().GetName()
-	d.Driver.User.Email = driver.GetUser().GetEmail()
+	d.Driver.User.
+		SetId(driver.GetUserId()).
+		SetEmail(driver.GetUser().GetEmail()).
+		SetName(driver.GetUser().GetName())
+
+	d.Driver.Company.
+		SetId(driver.GetCompany().GetId()).
+		SetName(driver.GetCompany().GetName()).
+		SetOwnerId(driver.GetCompany().GetOwnerId())
 
 	return d
 }
