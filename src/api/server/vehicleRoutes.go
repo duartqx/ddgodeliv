@@ -3,8 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"ddgodeliv/api/controllers"
 	"ddgodeliv/application/services"
 	repository "ddgodeliv/infrastructure/repository/postgresql"
@@ -21,23 +19,33 @@ func (s server) SetupVehicleRoutes() http.Handler {
 	vehicleModelController := controllers.GetNewVehicleModelController(vehicleModelService)
 
 	// Mux
-	vehiclesSubRouter := chi.NewRouter()
-
-	vehiclesSubRouter.Use(s.jwtController.AuthenticatedMiddleware)
+	vehiclesSubRouter := http.NewServeMux()
 
 	// Vehicle Routes
-	vehiclesSubRouter.Post("/", vehicleController.CreateVehicle)
+	vehiclesSubRouter.HandleFunc(
+		"POST /{$}", vehicleController.CreateVehicle,
+	)
 
-	vehiclesSubRouter.Get("/", vehicleController.GetCompanyVehicles)
+	vehiclesSubRouter.HandleFunc(
+		"GET /{$}", vehicleController.GetCompanyVehicles,
+	)
 
-	vehiclesSubRouter.Get("/{id:[0-9]+}", vehicleController.GetVehicle)
+	vehiclesSubRouter.HandleFunc(
+		"GET /{id}/{$}", vehicleController.GetVehicle,
+	)
 
-	vehiclesSubRouter.Delete("/{id:[0-9]+}", vehicleController.DeleteVehicle)
+	vehiclesSubRouter.HandleFunc(
+		"DELETE /{id}/{$}", vehicleController.DeleteVehicle,
+	)
 
 	// VehicleModel Routes
-	vehiclesSubRouter.Get("/model", vehicleModelController.ListModels)
+	vehiclesSubRouter.HandleFunc(
+		"GET /model/{$}", vehicleModelController.ListModels,
+	)
 
-	vehiclesSubRouter.Post("/model", vehicleModelController.CreateVehicleModel)
+	vehiclesSubRouter.HandleFunc(
+		"POST /model/{$}", vehicleModelController.CreateVehicleModel,
+	)
 
-	return vehiclesSubRouter
+	return s.jwtController.AuthenticatedMiddleware(vehiclesSubRouter)
 }

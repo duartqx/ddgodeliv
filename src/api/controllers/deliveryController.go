@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-
 	s "ddgodeliv/application/services"
 	a "ddgodeliv/application/services/auth"
 	e "ddgodeliv/common/errors"
@@ -96,7 +94,7 @@ func (dc DeliveryController) AssignDriver(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	deliveryId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	deliveryId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
@@ -143,7 +141,7 @@ func (dc DeliveryController) UpdateStatus(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	deliveryId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	deliveryId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
@@ -191,7 +189,7 @@ func (dc DeliveryController) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	deliveryId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	deliveryId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
@@ -254,7 +252,7 @@ func (dc DeliveryController) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	deliveryId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	deliveryId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return

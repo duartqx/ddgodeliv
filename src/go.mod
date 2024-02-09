@@ -1,10 +1,9 @@
 module ddgodeliv
 
-go 1.21.6
+go 1.22.0
 
 require (
-	github.com/duartqx/ddgomiddlewares v0.0.0-20240128001456-db96f1d1ea44
-	github.com/go-chi/chi/v5 v5.0.11
+	github.com/duartqx/ddgomiddlewares v0.0.0-20240209210814-2e4065b0d664
 	github.com/go-playground/validator/v10 v10.17.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/jmoiron/sqlx v1.3.5

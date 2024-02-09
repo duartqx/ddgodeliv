@@ -3,31 +3,27 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"ddgodeliv/api/controllers"
 	"ddgodeliv/application/services"
 )
 
 func (s server) SetupDriverRoutes() http.Handler {
 
-	driverSubRouter := chi.NewRouter()
-
-	driverSubRouter.Use(s.jwtController.AuthenticatedMiddleware)
+	driverSubRouter := http.NewServeMux()
 
 	userService := services.GetNewUserService(s.userRepository)
 	driverService := services.GetNewDriverService(s.driverRepository, userService)
 	driverController := controllers.GetNewDriverController(driverService, s.sessionService)
 
-	driverSubRouter.Get("/", driverController.ListCompanyDrivers)
+	driverSubRouter.HandleFunc("GET /{$}", driverController.ListCompanyDrivers)
 
-	driverSubRouter.Post("/", driverController.Create)
+	driverSubRouter.HandleFunc("POST /{$}", driverController.Create)
 
-	driverSubRouter.Get("/{id:[0-9]+}", driverController.Get)
+	driverSubRouter.HandleFunc("GET /{id}/{$}", driverController.Get)
 
-	driverSubRouter.Patch("/{id:[0-9]+}", driverController.Update)
+	driverSubRouter.HandleFunc("PATCH /{id}/{$}", driverController.Update)
 
-	driverSubRouter.Delete("/{id:[0-9]+}", driverController.Delete)
+	driverSubRouter.HandleFunc("DELETE /{id}/{$}", driverController.Delete)
 
-	return driverSubRouter
+	return s.jwtController.AuthenticatedMiddleware(driverSubRouter)
 }

@@ -3,8 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"ddgodeliv/api/controllers"
 	"ddgodeliv/application/services"
 	repository "ddgodeliv/infrastructure/repository/postgresql"
@@ -12,9 +10,7 @@ import (
 
 func (s server) SetupDeliveryRoutes() http.Handler {
 
-	deliverySubRouter := chi.NewRouter()
-
-	deliverySubRouter.Use(s.jwtController.AuthenticatedMiddleware)
+	deliverySubRouter := http.NewServeMux()
 
 	deliveryRepository := repository.GetNewDeliveryRepository(s.db)
 	deliveryService := services.GetNewDeliveryService(
@@ -24,21 +20,31 @@ func (s server) SetupDeliveryRoutes() http.Handler {
 		deliveryService, s.sessionService,
 	)
 
-	deliverySubRouter.Post("/", deliveryController.Create)
+	deliverySubRouter.HandleFunc(
+		"POST /{$}", deliveryController.Create,
+	)
 
-	deliverySubRouter.Get("/", deliveryController.ListAllForSender)
+	deliverySubRouter.HandleFunc(
+		"GET /{$}", deliveryController.ListAllForSender,
+	)
 
-	deliverySubRouter.Get("/{id:[0-9]+}", deliveryController.Get)
+	deliverySubRouter.HandleFunc("GET /{id}/{$}", deliveryController.Get)
 
-	deliverySubRouter.Patch("/{id:[0-9]+}/status", deliveryController.UpdateStatus)
+	deliverySubRouter.HandleFunc(
+		"PATCH /{id}/status/{$}", deliveryController.UpdateStatus,
+	)
 
-	deliverySubRouter.Patch("/{id:[0-9]+}/assign", deliveryController.AssignDriver)
+	deliverySubRouter.HandleFunc(
+		"PATCH /{id}/assign/{$}", deliveryController.AssignDriver,
+	)
 
-	deliverySubRouter.Delete("/{id:[0-9]+}", deliveryController.Delete)
+	deliverySubRouter.HandleFunc("DELETE /{id}/{$}", deliveryController.Delete)
 
-	deliverySubRouter.Get("/company", deliveryController.ListByCompany)
+	deliverySubRouter.HandleFunc("GET /company/{$}", deliveryController.ListByCompany)
 
-	deliverySubRouter.Get("/pending", deliveryController.ListAllPendingsWithoutDriver)
+	deliverySubRouter.HandleFunc(
+		"GET /pending/{$}", deliveryController.ListAllPendingsWithoutDriver,
+	)
 
-	return deliverySubRouter
+	return s.jwtController.AuthenticatedMiddleware(deliverySubRouter)
 }

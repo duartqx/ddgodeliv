@@ -66,7 +66,7 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 
 func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 
-	user := uc.sessionService.GetSessionUser(r.Context())
+	user := uc.sessionService.GetSessionUserWithCompany(r.Context())
 	if user == nil {
 		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
 		return

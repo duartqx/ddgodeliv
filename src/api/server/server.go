@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 
 	"ddgodeliv/api/controllers"
@@ -14,6 +13,7 @@ import (
 
 	lm "github.com/duartqx/ddgomiddlewares/logger"
 	rm "github.com/duartqx/ddgomiddlewares/recovery"
+	tm "github.com/duartqx/ddgomiddlewares/trailling"
 )
 
 var s *server
@@ -65,21 +65,26 @@ func (s *server) setupBase() *server {
 	return s
 }
 
-func (s *server) BuildBaseServer() *chi.Mux {
-	mux := chi.NewRouter()
+func (s *server) BuildBaseServer() *http.ServeMux {
 
-	mux.Use(rm.RecoveryMiddleware, lm.LoggerMiddleware)
+	mux := http.NewServeMux()
 
 	// Auth Routes
 	// POST: User Login
-	mux.
-		With(s.jwtController.UnauthenticatedMiddleware).
-		Post("/login", s.jwtController.Login)
+	mux.Handle(
+		"POST /login/{$}",
+		s.jwtController.UnauthenticatedMiddleware(
+			http.HandlerFunc(s.jwtController.Login),
+		),
+	)
 
 	// DELETE: User Logout
-	mux.
-		With(s.jwtController.AuthenticatedMiddleware).
-		Delete("/logout", s.jwtController.Logout)
+	mux.Handle(
+		"DELETE /logout/{$}",
+		s.jwtController.AuthenticatedMiddleware(
+			http.HandlerFunc(s.jwtController.Logout),
+		),
+	)
 
 	return mux
 }
@@ -89,19 +94,22 @@ func (s *server) Build() http.Handler {
 	mux := s.BuildBaseServer()
 
 	// User Routes
-	mux.Mount("/user", s.SetupUserRoutes())
+	mux.Handle("/user/", http.StripPrefix("/user", s.SetupUserRoutes()))
 
 	// Vehicle Routes
-	mux.Mount("/vehicle", s.SetupVehicleRoutes())
+	mux.Handle("/vehicle/", http.StripPrefix("/vehicle", s.SetupVehicleRoutes()))
 
 	// Company Routes
-	mux.Mount("/company", s.SetupCompanyRoutes())
+	mux.Handle("/company/", http.StripPrefix("/company", s.SetupCompanyRoutes()))
 
 	// Driver Routes
-	mux.Mount("/driver", s.SetupDriverRoutes())
+	mux.Handle("/driver/", http.StripPrefix("/driver", s.SetupDriverRoutes()))
 
 	// Delivery Routes
-	mux.Mount("/delivery", s.SetupDeliveryRoutes())
+	mux.Handle("/delivery/", http.StripPrefix("/delivery", s.SetupDeliveryRoutes()))
 
-	return mux
+	// Recovery and Logger middleware
+	wrapped := tm.TrailingSlashMiddleware(rm.RecoveryMiddleware(lm.LoggerMiddleware(mux)))
+
+	return wrapped
 }

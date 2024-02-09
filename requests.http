@@ -6,7 +6,7 @@
 ###
 # If user with same email exists, responds with 400 Bad Request
 # @name CreateUser
-POST http://{{HOST}}/user
+POST http://{{HOST}}/user/
 Content-Type: application/json
 
 {
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 ###
 # @name CompanyLoginAPI
-POST http://{{HOST}}/login
+POST http://{{HOST}}/login/
 Content-Type: application/json
 
 {
@@ -39,7 +39,7 @@ Content-Type: application/json
 
 ###
 # @name CommonLoginAPI
-POST http://{{HOST}}/login
+POST http://{{HOST}}/login/
 Content-Type: application/json
 
 {
@@ -49,17 +49,22 @@ Content-Type: application/json
 
 ###
 # @name SessionUserInfo
-GET http://{{HOST}}/user
+GET http://{{HOST}}/user/
 Authorization: Bearer {{JWT}}
 
 ###
 # @name VehicleListByCompany
-GET http://{{HOST}}/vehicle
+GET http://{{HOST}}/vehicle/
+Authorization: Bearer {{JWT}}
+
+###
+# @name VehicleListByCompany
+GET http://{{HOST}}/vehicle/
 Authorization: Bearer {{JWT}}
 
 ###
 # @name VehicleCreateByCompany
-POST http://{{HOST}}/vehicle
+POST http://{{HOST}}/vehicle/
 Authorization: Bearer {{JWT}}
 
 {
@@ -69,12 +74,12 @@ Authorization: Bearer {{JWT}}
 
 ###
 # @name VehicleModelList
-GET http://{{HOST}}/vehicle/model
+GET http://{{HOST}}/vehicle/model/
 Authorization: Bearer {{JWT}}
 
 ###
 # @name VehicleModelCreate
-POST http://{{HOST}}/vehicle/model
+POST http://{{HOST}}/vehicle/model/
 Authorization: Bearer {{JWT}}
 
 {
@@ -86,7 +91,7 @@ Authorization: Bearer {{JWT}}
 
 ###
 # @name CompanyCreate
-POST http://{{HOST}}/company
+POST http://{{HOST}}/company/
 Authorization: Bearer {{JWT}}
 
 {
@@ -96,7 +101,7 @@ Authorization: Bearer {{JWT}}
 
 ###
 # @name CompanyDelete
-DELETE http://{{HOST}}/company
+DELETE http://{{HOST}}/company/
 Authorization: Bearer {{JWT}}
 
 ###
@@ -119,12 +124,12 @@ Authorization: Bearer {{JWT}}
 
 ###
 # @name DriverGetOne
-GET http://{{HOST}}/driver/4
+GET http://{{HOST}}/driver/4/
 Authorization: Bearer {{JWT}}
 
 ###
 # @name DriverUpdateLicense
-PATCH http://{{HOST}}/driver/2
+PATCH http://{{HOST}}/driver/2/
 Authorization: Bearer {{JWT}}
 
 {
@@ -133,12 +138,12 @@ Authorization: Bearer {{JWT}}
 
 ###
 # @name DriverDelete
-DELETE http://{{HOST}}/driver/7
+DELETE http://{{HOST}}/driver/7/
 Authorization: Bearer {{JWT}}
 
 ###
 # @name CommonUserCreateDelivery
-POST http://{{HOST}}/delivery
+POST http://{{HOST}}/delivery/
 Authorization: Bearer {{JWT_commonuser}}
 
 {
@@ -151,17 +156,17 @@ Authorization: Bearer {{JWT_commonuser}}
 
 ###
 # @name CommonUserListDeliveriesBySender
-GET http://{{HOST}}/delivery
+GET http://{{HOST}}/delivery/
 Authorization: Bearer {{JWT_commonuser}}
 
 ###
 # @name CommonUserGetDelivery
-GET http://{{HOST}}/delivery/1
+GET http://{{HOST}}/delivery/1/
 Authorization: Bearer {{JWT_commonuser}}
 
 ###
 # @name CompanyAssignDriverDelivery
-PATCH http://{{HOST}}/delivery/5/assign
+PATCH http://{{HOST}}/delivery/5/assign/
 Authorization: Bearer {{JWT}}
 
 {
@@ -170,7 +175,7 @@ Authorization: Bearer {{JWT}}
 
 ###
 # @name CompanyUpdateDeliveryStatus
-PATCH http://{{HOST}}/delivery/5/status
+PATCH http://{{HOST}}/delivery/5/status/
 Authorization: Bearer {{JWT}}
 
 {
@@ -179,15 +184,15 @@ Authorization: Bearer {{JWT}}
 
 ###
 # @name CompanyDelivery
-GET http://{{HOST}}/delivery/company
+GET http://{{HOST}}/delivery/company/5
 Authorization: Bearer {{JWT}}
 
 ###
 # @name PendingDelivery
-GET http://{{HOST}}/delivery/pending
+GET http://{{HOST}}/delivery/pending/
 Authorization: Bearer {{JWT}}
 
 ###
 # @name DeleteDelivery
-DELETE http://{{HOST}}/delivery/1
+DELETE http://{{HOST}}/delivery/1/
 Authorization: Bearer {{JWT}}

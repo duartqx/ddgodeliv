@@ -10,8 +10,6 @@ import (
 	as "ddgodeliv/application/services/auth"
 	e "ddgodeliv/common/errors"
 	v "ddgodeliv/domains/vehicle"
-
-	"github.com/go-chi/chi/v5"
 )
 
 type VehicleController struct {
@@ -104,7 +102,7 @@ func (vc VehicleController) GetVehicle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vehicleId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	vehicleId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
@@ -137,7 +135,7 @@ func (vc VehicleController) DeleteVehicle(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	vehicleId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	vehicleId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return

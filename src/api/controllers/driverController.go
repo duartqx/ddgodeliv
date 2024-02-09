@@ -11,8 +11,6 @@ import (
 	e "ddgodeliv/common/errors"
 	d "ddgodeliv/domains/driver"
 	u "ddgodeliv/domains/user"
-
-	"github.com/go-chi/chi/v5"
 )
 
 type DriverController struct {
@@ -92,7 +90,7 @@ func (dc DriverController) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driverId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	driverId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
@@ -123,7 +121,7 @@ func (dc DriverController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driverId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	driverId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return
@@ -203,7 +201,7 @@ func (dc DriverController) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driverId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	driverId, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
 		return

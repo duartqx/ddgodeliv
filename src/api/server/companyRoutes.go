@@ -3,8 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"ddgodeliv/api/controllers"
 	"ddgodeliv/application/services"
 	repository "ddgodeliv/infrastructure/repository/postgresql"
@@ -18,15 +16,13 @@ func (s *server) SetupCompanyRoutes() http.Handler {
 		companyService, s.sessionService,
 	)
 
-	companySubRouter := chi.NewRouter()
-
-	companySubRouter.Use(s.jwtController.AuthenticatedMiddleware)
+	companySubRouter := http.NewServeMux()
 
 	// POST: Create company
-	companySubRouter.Post("/", companyController.Create)
+	companySubRouter.HandleFunc("POST /{$}", companyController.Create)
 
 	// DELETE: Owner can delete it's company
-	companySubRouter.Delete("/", companyController.Delete)
+	companySubRouter.HandleFunc("DELETE /{$}", companyController.Delete)
 
-	return companySubRouter
+	return s.jwtController.AuthenticatedMiddleware(companySubRouter)
 }
