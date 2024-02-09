@@ -1,12 +1,13 @@
 package server
 
 import (
-	"ddgodeliv/api/controllers"
-	"ddgodeliv/application/services"
-	repository "ddgodeliv/infrastructure/repository/postgresql"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+
+	"ddgodeliv/api/controllers"
+	"ddgodeliv/application/services"
+	repository "ddgodeliv/infrastructure/repository/postgresql"
 )
 
 func (s server) SetupVehicleRoutes() http.Handler {

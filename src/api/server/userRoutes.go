@@ -1,11 +1,12 @@
 package server
 
 import (
-	"ddgodeliv/api/controllers"
-	"ddgodeliv/application/services"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+
+	"ddgodeliv/api/controllers"
+	"ddgodeliv/application/services"
 )
 
 func (s server) SetupUserRoutes() http.Handler {
