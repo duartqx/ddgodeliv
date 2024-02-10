@@ -11,6 +11,7 @@ import (
 	"ddgodeliv/domains/user"
 	repository "ddgodeliv/infrastructure/repository/postgresql"
 
+	cm "github.com/duartqx/ddgomiddlewares/cors"
 	lm "github.com/duartqx/ddgomiddlewares/logger"
 	rm "github.com/duartqx/ddgomiddlewares/recovery"
 	tm "github.com/duartqx/ddgomiddlewares/trailling"
@@ -89,6 +90,15 @@ func (s *server) BuildBaseServer() *http.ServeMux {
 	return mux
 }
 
+func (s *server) Use(
+	mux http.Handler, middlewares ...func(http.Handler) http.Handler,
+) http.Handler {
+	for _, m := range middlewares {
+		mux = m(mux)
+	}
+	return mux
+}
+
 func (s *server) Build() http.Handler {
 
 	mux := s.BuildBaseServer()
@@ -108,8 +118,11 @@ func (s *server) Build() http.Handler {
 	// Delivery Routes
 	mux.Handle("/delivery/", http.StripPrefix("/delivery", s.SetupDeliveryRoutes()))
 
-	// Recovery and Logger middleware
-	wrapped := tm.TrailingSlashMiddleware(rm.RecoveryMiddleware(lm.LoggerMiddleware(mux)))
-
-	return wrapped
+	return s.Use(
+		mux,
+		cm.CorsMiddleware,
+		tm.TrailingSlashMiddleware,
+		rm.RecoveryMiddleware,
+		lm.LoggerMiddleware,
+	)
 }

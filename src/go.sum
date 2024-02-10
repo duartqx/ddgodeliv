@@ -1,8 +1,8 @@
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/duartqx/ddgomiddlewares v0.0.0-20240209210814-2e4065b0d664 h1:bMAoq+og4pgevR0VsUuPXchZxMkxiQYSIuyAr9rHg9A=
-github.com/duartqx/ddgomiddlewares v0.0.0-20240209210814-2e4065b0d664/go.mod h1:09JCf6pUSUvD7mrJi3qSsaLvEznL9beWh3CR8M/hXEE=
+github.com/duartqx/ddgomiddlewares v0.0.0-20240210010040-f5396b56256e h1:Zlcw84r/HaKTSs1RGqL7g4ndqMXwfNN98r/A8mHqEcY=
+github.com/duartqx/ddgomiddlewares v0.0.0-20240210010040-f5396b56256e/go.mod h1:09JCf6pUSUvD7mrJi3qSsaLvEznL9beWh3CR8M/hXEE=
 github.com/gabriel-vasile/mimetype v1.4.2 h1:w5qFW6JKBz9Y393Y4q372O9A7cUSequkh1Q7OhCmWKU=
 github.com/gabriel-vasile/mimetype v1.4.2/go.mod h1:zApsH/mKG4w07erKIaJPFiX0Tsq9BFQgN3qGY5GnNgA=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=
