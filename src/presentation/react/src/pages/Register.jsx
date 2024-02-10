@@ -60,7 +60,7 @@ export default function Register() {
                 linkLabel="Sign In Instead"
               />
             </form>
-            {error ? <Error err={error} /> : ""}
+            {error && <Error err={error} />}
           </div>
         </div>
       </div>

@@ -61,7 +61,7 @@ export default function Login() {
                 linkLabel="Sign up Instead"
               />
             </form>
-            {error ? <Error err={error} /> : ""}
+            {error && <Error err={error} />}
           </div>
         </div>
       </div>

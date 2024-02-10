@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../middlewares/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React from "react";
 
 export default function Logout() {
@@ -13,8 +13,8 @@ export default function Logout() {
   };
 
   return (
-    <button className="ms-auto btn btn-danger" onClick={handleClick}>
-      Logout
-    </button>
+    <Link to="#" className="text-danger" onClick={handleClick}>
+      <i className="bi bi-box-arrow-right"></i>
+    </Link>
   );
 }
