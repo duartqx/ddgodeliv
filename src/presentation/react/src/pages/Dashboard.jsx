@@ -1,5 +1,13 @@
 import React from "react";
+import Logout from "../components/Logout";
 
 export default function Dashboard() {
-  return <h1>Dashboard page</h1>;
+  return (
+    <>
+      <nav>
+        <Logout />
+      </nav>
+      <h1>Dashboard</h1>
+    </>
+  );
 }

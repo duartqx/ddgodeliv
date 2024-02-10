@@ -1,27 +1,36 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import LoggedInRouter from "./middlewares/LoggedInRouter";
+import NotSignedInRouter from "./middlewares/NotSignedInRouter";
 import PrivateRouter from "./middlewares/PrivateRouter";
+import AuthProvider from "./middlewares/AuthProvider";
 
 function App() {
   const router = createBrowserRouter([
     {
+      path: "/",
+      element: <Navigate to="/dashboard" replace />,
+    },
+    {
       path: "/login",
       element: (
-        <LoggedInRouter>
+        <NotSignedInRouter>
           <Login />
-        </LoggedInRouter>
+        </NotSignedInRouter>
       ),
     },
     {
       path: "/register",
       element: (
-        <LoggedInRouter>
+        <NotSignedInRouter>
           <Register />
-        </LoggedInRouter>
+        </NotSignedInRouter>
       ),
     },
     {
@@ -34,7 +43,11 @@ function App() {
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;

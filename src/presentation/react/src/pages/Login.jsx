@@ -1,7 +1,11 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { login } from "../services/auth";
-import useAuth from "../hooks/useAuth";
+import React, { useContext, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import EmailInput from "../components/EmailInput";
+import PasswordInput from "../components/PasswordInput";
+import SubmitAndLinkButton from "../components/SubmitAndLinkButton";
+import Error from "../components/Error";
+import { AuthContext } from "../middlewares/AuthContext";
+import * as Types from "../middlewares/authTypes";
 
 /**
  * @typedef {{
@@ -16,7 +20,7 @@ export default function Login() {
   const location = useLocation();
   const { from } = location.state || { from: { pathname: "/dashboard" } };
 
-  const { setAuth } = useAuth();
+  const { login } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,9 +28,8 @@ export default function Login() {
   const handleLogin = async (/** @type {React.FormEvent} */ e) => {
     e.preventDefault();
     try {
-      /** @type {AuthData} */
+      /** @type {Types.AuthData} */
       const authData = await login({ email, password });
-      setAuth(authData);
       if (authData?.status) {
         navigate(from);
       } else {
@@ -45,49 +48,22 @@ export default function Login() {
             className="col-md-6"
             style={{ maxWidth: "24rem", paddingTop: "14rem" }}
           >
+            <h2 className="mb-3">Sign In</h2>
             <form
               onSubmit={handleLogin}
               method="post"
               className="flex flex-column align-items-center"
               style={{ height: "100%" }}
             >
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="example@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="**********"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="mt-3 d-flex col-md-12">
-                <button type="submit" className="col-md-5 btn btn-primary">
-                  Login
-                </button>
-                <Link
-                  to="/register"
-                  className="col-md-5 ms-auto btn btn-outline-primary"
-                >
-                  Create Account
-                </Link>
-              </div>
+              <EmailInput email={email} setEmail={setEmail} />
+              <PasswordInput password={password} setPassword={setPassword} />
+              <SubmitAndLinkButton
+                submitLabel="Submit"
+                linkTo="/register"
+                linkLabel="Sign up Instead"
+              />
             </form>
-            {error ? (
-              <div className="my-3 py-2 alert alert-danger">{error}</div>
-            ) : (
-              ""
-            )}
+            {error ? <Error err={error} /> : ""}
           </div>
         </div>
       </div>
