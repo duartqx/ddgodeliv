@@ -1,4 +1,4 @@
-import { req } from "./axios";
+import httpClient from "./client";
 
 /**
  * @typedef {{
@@ -20,7 +20,7 @@ import { req } from "./axios";
 /** @returns {Promise<AuthResponse>} */
 async function login({ email, password }) {
   try {
-    const res = await req.post("/login", {
+    const res = await httpClient().post("/login", {
       email,
       password,
     });
@@ -31,7 +31,7 @@ async function login({ email, password }) {
     console.log(data);
 
     if (data && data.token) {
-      sessionStorage.setItem("auth", JSON.stringify(res.data));
+      localStorage.setItem("auth", JSON.stringify(res.data));
     }
     return data;
   } catch (e) {

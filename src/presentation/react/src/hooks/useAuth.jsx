@@ -19,7 +19,7 @@ import { useState } from "react";
 
 export default function useAuth() {
   const getAuth = () => {
-    return JSON.parse(sessionStorage.getItem("auth") || "{}");
+    return JSON.parse(localStorage.getItem("auth") || "{}");
   };
 
   const [auth, setAuth] = useState(/** @type {AuthData} */ (getAuth()));
