@@ -3,10 +3,10 @@ import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 export default function PrivateRouter({ children }) {
-  const [auth, _] = useAuth();
+  const { authData } = useAuth();
   const location = useLocation();
 
-  return auth?.status ? (
+  return authData?.status ? (
     children
   ) : (
     <Navigate

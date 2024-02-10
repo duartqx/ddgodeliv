@@ -8,15 +8,6 @@ import useAuth from "../hooks/useAuth";
  *  token: ?string
  *  expiresAt: ?string
  *  status: ?string
- *  user: ?{
- *    id: number
- *    email: string
- *    name: string
- *    driver: {
- *      driver_id: number
- *      company_id: number
- *    }
- *  }
  * }} AuthData
  */
 
@@ -25,7 +16,7 @@ export default function Login() {
   const location = useLocation();
   const { from } = location.state || { from: { pathname: "/dashboard" } };
 
-  const [_, setAuthData] = useAuth();
+  const { setAuth } = useAuth();
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,8 +26,8 @@ export default function Login() {
     try {
       /** @type {AuthData} */
       const authData = await login({ email, password });
-      setAuthData(authData);
-      if (authData?.token) {
+      setAuth(authData);
+      if (authData?.status) {
         navigate(from);
       } else {
         setError("Login Error");
@@ -93,7 +84,7 @@ export default function Login() {
               </div>
             </form>
             {error ? (
-              <div className="py-2 alert alert-danger">{error}</div>
+              <div className="my-3 py-2 alert alert-danger">{error}</div>
             ) : (
               ""
             )}

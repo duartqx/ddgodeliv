@@ -5,15 +5,6 @@ import httpClient from "./client";
  *  token: ?string
  *  expiresAt: ?string
  *  status: ?string
- *  user: ?{
- *    id: number
- *    email: string
- *    name: string
- *    driver: {
- *      driver_id: number
- *      company_id: number
- *    }
- *  }
  * }} AuthResponse
  */
 
@@ -27,8 +18,6 @@ async function login({ email, password }) {
 
     /** @type {AuthResponse} */
     const data = res.data;
-
-    console.log(data);
 
     if (data && data.token) {
       localStorage.setItem("auth", JSON.stringify(res.data));
