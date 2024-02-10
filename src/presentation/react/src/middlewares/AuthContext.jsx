@@ -2,8 +2,11 @@ import React from "react";
 import * as Types from "./authTypes";
 
 export const AuthContext = React.createContext({
-  user: /** {Types.User} */ {},
-  authData: /** {Types.AuthData} */ {},
+  /** @returns {Promise<Types.User>} */
+  getUser: async () => {
+    return /** @type {Types.User} */ ({});
+  },
+
   /** @returns {Promise<Types.AuthData>} */
   login: async ({ email, password }) => {
     return /** @type {Promise<Types.AuthData>} */ ({});
@@ -15,4 +18,7 @@ export const AuthContext = React.createContext({
   register: async ({ name, email, password }) => {
     return false;
   },
+
+  /** @returns {boolean} */
+  isLoggedIn: () => false,
 });

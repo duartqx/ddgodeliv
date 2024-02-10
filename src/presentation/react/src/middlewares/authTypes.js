@@ -2,7 +2,7 @@
  * @typedef {{
  *  token: ?string
  *  expiresAt: ?string
- *  status: ?string
+ *  status: ?boolean
  * }} AuthData
  */
 

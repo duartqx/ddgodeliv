@@ -4,14 +4,19 @@ import { AuthContext } from "./AuthContext";
 import * as Types from "./authTypes";
 
 export default function AuthProvider({ children }) {
-  const getAuth = () => {
-    return JSON.parse(localStorage.getItem("auth") || "{}");
-  };
-
   const [authData, setAuth] = useState(
-    /** @type {Types.AuthData} */ (getAuth()),
+    /** @type {Types.AuthData} */ (authService.getAuth()),
   );
   const [user, setUser] = useState(/** @type {Types.User} */ ({}));
+
+  const getUser = async () => {
+    if (!user?.id) {
+      const u = await authService.getUser();
+      setUser(u);
+      return u;
+    }
+    return user;
+  };
 
   /** @returns {Promise<Types.AuthData>} */
   const login = async ({ email, password }) => {
@@ -32,8 +37,12 @@ export default function AuthProvider({ children }) {
     return signUpUser?.id ? true : false;
   };
 
+  const isLoggedIn = () => Boolean(authData?.status);
+
   return (
-    <AuthContext.Provider value={{ user, authData, login, logout, register }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, getUser, login, logout, register }}
+    >
       {children}
     </AuthContext.Provider>
   );

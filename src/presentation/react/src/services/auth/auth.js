@@ -24,7 +24,7 @@ import httpClient from "../client";
  * @typedef {{
  *  token: ?string
  *  expiresAt: ?string
- *  status: ?string
+ *  status: ?boolean
  * }} AuthResponse
  */
 
@@ -94,4 +94,10 @@ async function getUser() {
 
   return user;
 }
-export { login, logout, getUser, register };
+
+/** @returns {AuthResponse} */
+function getAuth() {
+  return JSON.parse(localStorage.getItem("auth") || "{}");
+}
+
+export { login, logout, register, getUser, getAuth };

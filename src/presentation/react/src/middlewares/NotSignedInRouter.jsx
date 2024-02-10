@@ -3,6 +3,6 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
 export default function NotSignedInRouter({ children }) {
-  const { authData } = useContext(AuthContext);
-  return authData?.status ? <Navigate replace to="/dashboard" /> : children;
+  const { isLoggedIn } = useContext(AuthContext);
+  return isLoggedIn() ? <Navigate replace to="/dashboard" /> : children;
 }
