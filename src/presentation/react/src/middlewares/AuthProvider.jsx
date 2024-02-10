@@ -4,31 +4,19 @@ import { AuthContext } from "./AuthContext";
 import * as Types from "./authTypes";
 
 export default function AuthProvider({ children }) {
-  const [authData, setAuth] = useState(
-    /** @type {Types.AuthData} */ (authService.getAuth()),
-  );
-  const [user, setUser] = useState(/** @type {Types.User} */ ({}));
+  const emptyUser = /** @type {Types.User} */ ({});
 
-  const getUser = async () => {
-    if (!user?.id) {
-      const u = await authService.getUser();
-      setUser(u);
-      return u;
-    }
-    return user;
-  };
+  const [user, setUser] = useState(emptyUser);
 
-  /** @returns {Promise<Types.AuthData>} */
+  /** @returns {Promise<boolean>} */
   const login = async ({ email, password }) => {
     const data = await authService.login({ email, password });
-    setAuth(data);
-    return data;
+    return Boolean(data.status);
   };
 
   const logout = async () => {
     await authService.logout();
-    setAuth(/** @type {Types.AuthData} */ ({}));
-    setUser(/** @type {Types.User} */ ({}));
+    setUser(emptyUser);
   };
 
   /** @returns {Promise<boolean>} */
@@ -37,7 +25,24 @@ export default function AuthProvider({ children }) {
     return signUpUser?.id ? true : false;
   };
 
-  const isLoggedIn = () => Boolean(authData?.status);
+  const getUser = async () => {
+    if (!authService.getAuth()?.status) {
+      logout();
+      return emptyUser;
+    }
+
+    if (!user?.id) {
+      const authUser = await authService.getUser();
+      if (!authUser?.id) {
+        logout();
+      } else {
+        setUser(authUser);
+      }
+    }
+    return user;
+  };
+
+  const isLoggedIn = () => Boolean(authService.getAuth()?.status);
 
   return (
     <AuthContext.Provider

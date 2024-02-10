@@ -7,10 +7,8 @@ export const AuthContext = React.createContext({
     return /** @type {Types.User} */ ({});
   },
 
-  /** @returns {Promise<Types.AuthData>} */
-  login: async ({ email, password }) => {
-    return /** @type {Promise<Types.AuthData>} */ ({});
-  },
+  /** @returns {Promise<boolean>} */
+  login: async ({ email, password }) => false,
 
   logout: async () => {},
 
