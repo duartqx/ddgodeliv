@@ -88,8 +88,15 @@ async function getUser() {
   var user = JSON.parse(localStorage.getItem("user") || "{}");
 
   if (!user?.id) {
-    user = await httpClient().get("/user");
-    localStorage.setItem("user", JSON.stringify(user));
+    try {
+      const res = await httpClient().get("/user");
+      if (res.data?.id) {
+        user = res.data;
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return user;

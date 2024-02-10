@@ -28,9 +28,7 @@ export default function Login() {
   const handleLogin = async (/** @type {React.FormEvent} */ e) => {
     e.preventDefault();
     try {
-      /** @type {Types.AuthData} */
-      const authData = await login({ email, password });
-      if (authData?.status) {
+      if (await login({ email, password })) {
         navigate(from);
       } else {
         setError("Login Error");
