@@ -54,7 +54,7 @@ func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(h.LoginResponse{
 		Token:     token,
 		ExpiresAt: expiresAt,
-		Status:    "Valid",
+		Status:    true,
 	}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -72,7 +72,6 @@ func (jc JwtController) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, h.GetInvalidCookie())
-	w.WriteHeader(http.StatusUnauthorized)
 }
 
 func (jc JwtController) AuthenticatedMiddleware(next http.Handler) http.Handler {

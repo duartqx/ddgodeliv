@@ -15,5 +15,5 @@ type Response struct {
 type LoginResponse struct {
 	Token     string    `json:"token"`
 	ExpiresAt time.Time `json:"expiresAt"`
-	Status    string    `json:"status"`
+	Status    bool      `json:"status"`
 }

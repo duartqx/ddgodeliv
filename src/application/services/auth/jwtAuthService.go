@@ -122,7 +122,7 @@ func (jas JwtAuthService) Logout(authorization string, cookie *http.Cookie) erro
 
 	claims := a.GetNewClaims()
 
-	if _, err := jwt.ParseWithClaims(unparsedToken, claims, jas.keyFunc); err != nil {
+	if _, err := jwt.ParseWithClaims(unparsedToken, claims, jas.keyFunc); err == nil {
 		go jas.sessionRepository.Delete(&claims.SessionUser)
 	}
 
