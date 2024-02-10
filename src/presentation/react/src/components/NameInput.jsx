@@ -10,7 +10,7 @@ export default function NameInput({ name, setName }) {
   return (
     <div className="form-group">
       <div className="input-group mb-3">
-        <label className="input-group-text" style={{ minWidth: "6rem" }}>
+        <label className="input-group-text" style={{ minWidth: "8rem" }}>
           Name
         </label>
         <input
