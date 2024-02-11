@@ -45,6 +45,7 @@ func (vr VehicleRepository) FindByCompanyId(id int) (*[]v.IVehicle, error) {
 			v.license_id AS license_id,
 
 			m.id AS "model.id",
+			m.name AS "model.name",
 			m.manufacturer AS "model.manufacturer",
 			m.year AS "model.year",
 			m.max_load AS "model.max_load",
