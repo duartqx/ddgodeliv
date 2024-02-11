@@ -1,24 +1,30 @@
 import React from "react";
 
-export default function CreateNewButton({ label, onClickHandler }) {
+export default function CreateNewButton({ label, height, onClickHandler }) {
   return (
-    <div
-      className="p-3 d-flex align-items-center"
-      style={{
-        background: "linear-gradient(transparent 0%, #f8f0fa 60%)",
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        height: "7rem",
-      }}
-    >
-      <button
-        className="btn mx-auto align-self-end text-white p-3 shadow"
-        style={{ backgroundColor: "#000", width: "90%" }}
-        onClick={onClickHandler}
+    <>
+      <div
+        className="p-3 d-flex justify-content-center"
+        style={{
+          background: "linear-gradient(transparent 0%, #f8f0fa 50%)",
+          position: "absolute",
+          bottom: 0,
+          width: "19rem",
+          height: `${height}`,
+        }}
       >
-        {label}
-      </button>
-    </div>
+        <button
+          className="btn align-self-end text-white p-3 shadow"
+          style={{
+            backgroundColor: "#000",
+            width: "90%",
+            marginLeft: "-1rem",
+          }}
+          onClick={onClickHandler}
+        >
+          {label}
+        </button>
+      </div>
+    </>
   );
 }
