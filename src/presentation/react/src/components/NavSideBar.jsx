@@ -2,7 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
 
-export default function NavSideBar({ onClickDrivers, onClickVehicles }) {
+/** @param {{
+ *  sidebar: import("../pages/Dashboard").SideBar,
+ *  onClickDrivers: Function,
+ *  onClickVehicles: Function
+ * }} props */
+export default function NavSideBar({
+  sidebar,
+  onClickDrivers,
+  onClickVehicles,
+}) {
   return (
     <nav
       className="d-flex flex-column flex-shrink-0"
@@ -17,20 +26,28 @@ export default function NavSideBar({ onClickDrivers, onClickVehicles }) {
       </Link>
       <ul className="nav nav-pills nav-flush flex-column mb-auto text-center">
         <li className="nav-link">
-          <Link to="/dashboard">
-            <i className="bi bi-bell"></i>
+          <Link to="#">
+            <i className="bi bi-bell text-white"></i>
           </Link>
         </li>
 
         <li className="nav-link">
           <Link to="#" onClick={onClickDrivers}>
-            <i className="bi bi-person"></i>
+            <i
+              className={`bi bi-person ${
+                sidebar.isSelected("drivers") ? "" : "text-white"
+              }`}
+            ></i>
           </Link>
         </li>
 
         <li className="nav-link">
           <Link to="#" onClick={onClickVehicles}>
-            <i className="bi bi-truck"></i>
+            <i
+              className={`bi bi-truck ${
+                sidebar.isSelected("vehicles") ? "" : "text-white"
+              }`}
+            ></i>
           </Link>
         </li>
       </ul>
