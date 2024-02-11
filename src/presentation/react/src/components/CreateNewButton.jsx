@@ -13,7 +13,7 @@ export default function CreateNewButton({ label, onClickHandler }) {
       }}
     >
       <button
-        className="btn mx-auto align-self-end text-white p-3 drop-shadow"
+        className="btn mx-auto align-self-end text-white p-3 shadow"
         style={{ backgroundColor: "#000", width: "90%" }}
         onClick={onClickHandler}
       >

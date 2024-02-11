@@ -1,10 +1,10 @@
 import React from "react";
 
-/** @param {{ label: string, value: any }} props */
-function CardPart({ label, value }) {
+/** @param {{ label: string, value: any, border: boolean }} props */
+function CardPart({ label, value, border }) {
   return (
     <div
-      className="border-bottom"
+      className={border ? "border-bottom" : ""}
       style={{ paddingBottom: "0.3rem", marginTop: "0.3rem" }}
     >
       <span className="text-body-secondary fw-light">{label}</span> {value}
@@ -12,7 +12,7 @@ function CardPart({ label, value }) {
   );
 }
 
-/** @param {{ title: string, parts: {label: string, value: any }[]}} props */
+/** @param {{ title: string, parts: {label: string, value: any, border: boolean }[]}} props */
 export default function Card({ title, parts }) {
   return (
     <div className="card m-3">
@@ -29,10 +29,11 @@ export default function Card({ title, parts }) {
         <strong className="text-center mx-auto">{title}</strong>
       </div>
       <div className="card-body px-3">
-        {parts.map(({ label, value }) => (
+        {parts.map(({ label, value, border }) => (
           <CardPart
             label={label}
             value={value}
+            border={border}
             key={`cardPart__${label}__${value}`}
           />
         ))}
