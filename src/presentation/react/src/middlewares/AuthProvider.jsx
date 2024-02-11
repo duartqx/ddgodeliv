@@ -26,7 +26,12 @@ export default function AuthProvider({ children }) {
   };
 
   const getUser = async () => {
-    if (!authService.getAuth()?.status) {
+    const exp = authService.getAuth()?.expiresAt
+    if (!exp) {
+      return emptyUser
+    }
+
+    if ((new Date(exp)) < (new Date())) {
       logout();
       return emptyUser;
     }
@@ -42,7 +47,13 @@ export default function AuthProvider({ children }) {
     return user;
   };
 
-  const isLoggedIn = () => Boolean(authService.getAuth()?.status);
+  const isLoggedIn = () => {
+    const exp = authService.getAuth()?.expiresAt;
+    if (!exp) {
+      return false
+    }
+    return Boolean((new Date(exp)) > (new Date()))
+  };
 
   return (
     <AuthContext.Provider
