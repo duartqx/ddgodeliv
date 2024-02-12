@@ -11,7 +11,7 @@ export default function VehicleCard({ deleteHandler, vehicle }) {
     { label: "Transmission:", value: vehicle.model.transmission, border: true },
     { label: "Type:", value: vehicle.model.type, border: true },
     { label: "Manufacturer:", value: vehicle.model.manufacturer, border: true },
-    { label: "License Number:", value: vehicle.license_id, border: false },
+    { label: "License:", value: vehicle.license_id, border: false },
   ];
   return (
     <Card

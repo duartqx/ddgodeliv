@@ -39,8 +39,8 @@ export default function Card({ title, parts, deleteHandler }) {
         </div>
         {deleteHandler && (
           <i
-            className="btn bi bi-trash-fill align-self-middle ms-auto text-danger"
-            style={{ opacity: "70%" }}
+            className="btn bi bi-trash-fill align-self-middle ms-auto"
+            style={{ color: "#6ea8fe" }}
             onClick={deleteHandler}
           ></i>
         )}

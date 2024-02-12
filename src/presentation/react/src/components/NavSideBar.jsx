@@ -31,6 +31,8 @@ export default function NavSideBar({
           </Link>
         </li>
 
+        <hr className="mx-2 text-white"/>
+
         <li className="nav-link">
           <Link to="#" onClick={onClickDrivers}>
             <i
@@ -51,6 +53,7 @@ export default function NavSideBar({
           </Link>
         </li>
       </ul>
+      <hr className="mx-2 text-white"/>
       <div className="d-flex align-items-center justify-content-center p-3">
         <Logout />
       </div>
