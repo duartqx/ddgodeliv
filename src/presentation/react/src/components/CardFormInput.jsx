@@ -6,6 +6,7 @@ import React from "react";
  *  placeholder: string
  *  value: string
  *  onChangeHandler: Function
+ *  required?: boolean
  * }} CardFormInputObject
  */
 
@@ -16,6 +17,7 @@ export default function CardFormInput({
   placeholder,
   value,
   onChangeHandler,
+  required = true,
 }) {
   return (
     <div className="form-group mb-3">
@@ -26,6 +28,7 @@ export default function CardFormInput({
         placeholder={placeholder}
         value={value}
         onChange={onChangeHandler}
+        required={required}
       />
     </div>
   );
