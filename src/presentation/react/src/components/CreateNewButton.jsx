@@ -7,8 +7,6 @@ export default function CreateNewButton({ label, height, onClickHandler }) {
         className="p-3 d-flex justify-content-center"
         style={{
           background: "linear-gradient(transparent 0%, #f8f0fa 50%)",
-          position: "absolute",
-          bottom: 0,
           width: "19rem",
           height: `${height}`,
         }}
