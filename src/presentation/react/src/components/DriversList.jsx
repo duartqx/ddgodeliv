@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import DriverCard from "./DriverCard";
 import SideBarListings from "./SideBarListings";
 import CreateNewButton from "./CreateNewButton";
-import { companyDrivers } from "../services/driver/driver";
+import * as driverService from "../services/driver/driver";
 import DriverCardForm from "./DriverCardForm";
 
 export default function DriversList() {
@@ -12,17 +12,32 @@ export default function DriversList() {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    companyDrivers().then((drivers) => setDrivers(drivers));
+    driverService.companyDrivers().then((drivers) => setDrivers(drivers));
   }, []);
 
+  const deleteClickHandler = async (/** @type {number} */ id) => {
+    if (await driverService.deleteDriver({ id })) {
+      setDrivers(drivers.filter((d) => d.id !== id));
+    }
+  };
+
   const driversCards = drivers.map((d) => (
-    <DriverCard driver={d} key={`driver__${d.id}__${d.user.email}`} />
+    <DriverCard
+      deleteHandler={() => deleteClickHandler(d.id)}
+      driver={d}
+      key={`driver__${d.id}__${d.user.email}`}
+    />
   ));
 
   return (
     <>
       <div style={{ width: "19rem", height: "100vh" }}>
-        {showForm && <DriverCardForm />}
+        {showForm && (
+          <DriverCardForm
+            closeForm={() => setShowForm(false)}
+            appendDriver={(driver) => setDrivers(drivers.concat(driver))}
+          />
+        )}
 
         <SideBarListings listing={driversCards} />
 
