@@ -1,18 +1,34 @@
 import React, { useState } from "react";
 import CardForm from "./CardForm";
+import { createDriver } from "../services/driver/driver";
 
-export default function DriverCardForm() {
+/** @param {{ appendDriver: Function, closeForm: Function }} props */
+export default function DriverCardForm({ appendDriver, closeForm }) {
   const [driverName, setDriverName] = useState("");
   const [driverEmail, setDriverEmail] = useState("");
   const [driverLicense, setDriverLicense] = useState("");
+  const [error, setError] = useState("")
 
-  const handleSubmit = (/** @type {React.FormEvent} */ e) => {
+  const handleSubmit = async (/** @type {React.FormEvent} */ e) => {
     e.preventDefault();
-    alert(`Create Driver Form Submit: ${driverName} / ${driverEmail} / ${driverLicense}`);
+    const driver = await createDriver({
+      name: driverName,
+      email: driverEmail,
+      license: driverLicense,
+    });
+
+    if (driver?.id) {
+      appendDriver(driver)
+      closeForm()
+    } else {
+      setError(`Could not create driver ${driverEmail}`)
+      setTimeout(() => setError(""), 5000)
+    }
   };
 
   return (
     <CardForm
+      error={error}
       handleSubmit={handleSubmit}
       title="Create New Driver"
       inputs={[
