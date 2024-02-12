@@ -55,8 +55,7 @@ async function logout() {
     const res = await httpClient().delete("/logout");
 
     if (res.status >= 200 && res.status <= 299) {
-      localStorage.removeItem("auth");
-      localStorage.removeItem("user");
+      localStorage.clear();
     }
   } catch (e) {
     console.log(e);

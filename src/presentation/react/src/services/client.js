@@ -27,8 +27,7 @@ export default function httpClient() {
     (res) => res,
     (error) => {
       if (error.response && error.response.status === 401) {
-        localStorage.removeItem("auth");
-        localStorage.removeItem("user");
+        localStorage.clear();
       }
       return Promise.reject(error);
     },

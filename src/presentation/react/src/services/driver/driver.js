@@ -1,4 +1,5 @@
 import httpClient from "../client";
+import * as cache from "../cache";
 
 /**
  * @typedef {{
@@ -18,41 +19,15 @@ import httpClient from "../client";
  */
 
 /** @returns {string} */
-function getCacheKey() {
+function getDriverCacheKey() {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
   return `cachedDriver__${authData?.token}`;
-}
-
-async function invalidateCache() {
-  localStorage.removeItem(getCacheKey())
-}
-
-/** @returns {Promise<Driver[] | null>} */
-async function getFromCache() {
-  const cachedDrivers = JSON.parse(localStorage.getItem(getCacheKey()) || "{}");
-
-  if (
-    cachedDrivers?.expiresAt &&
-    new Date(cachedDrivers?.expiresAt) > new Date()
-  ) {
-    return cachedDrivers.drivers;
-  }
-  return null;
-}
-
-/** @param {Driver[]} drivers */
-async function setToCache(drivers) {
-  const newCachedDrivers = {
-    drivers: drivers,
-    expiresAt: new Date().setMinutes(new Date().getMinutes() + 5),
-  };
-  localStorage.setItem(getCacheKey(), JSON.stringify(newCachedDrivers));
 }
 
 /** @returns {Promise<Driver[]>} */
 async function companyDrivers() {
   try {
-    const cachedDrivers = await getFromCache();
+    const cachedDrivers = await cache.getFromCache(getDriverCacheKey());
     if (cachedDrivers?.length) {
       return cachedDrivers;
     }
@@ -60,7 +35,7 @@ async function companyDrivers() {
     const res = await httpClient().get("/driver");
 
     if (res.data) {
-      setToCache(res.data);
+      cache.setToCache(getDriverCacheKey(), res.data);
     }
 
     return res.data || [];
@@ -82,7 +57,7 @@ async function createDriver({ name, email, license }) {
     });
 
     if (res.data) {
-      invalidateCache();
+      cache.invalidateCache(getDriverCacheKey());
       return res.data;
     }
   } catch (e) {
@@ -98,7 +73,7 @@ async function createDriver({ name, email, license }) {
 async function deleteDriver({id}) {
   try {
     await httpClient().delete(`/driver/${id}`)
-    invalidateCache()
+    cache.invalidateCache(getDriverCacheKey())
     return true
   } catch (e) {
     console.log(e)

@@ -1,16 +1,11 @@
 import httpClient from "../client";
+import * as cache from "../cache";
 
 /**
  * @typedef {{
  *   id: number
  *   license_id: string
- *   model: {
- *     id: number
- *     name: string
- *     manufacturer: string
- *     year: number
- *     max_load: number
- *   }
+ *   model: import("./vehicleModels").VehicleModel
  *   company: {
  *     id: number
  *     owner_id: number
@@ -19,31 +14,25 @@ import httpClient from "../client";
  * }} Vehicle
  */
 
+/** @returns {string} */
+function getVehiclesCacheKey() {
+  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+  return `cachedVehicles__${authData?.token}`;
+}
+
 /** @returns {Promise<Vehicle[]>} */
 async function companyVehicles() {
+  const cacheKey = getVehiclesCacheKey()
   try {
-    const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-    const cacheVehicleKey = `cachedVehicles__${authData?.token}`;
-
-    const cachedVehicles = JSON.parse(
-      localStorage.getItem(cacheVehicleKey) || "{}"
-    );
-
-    if (
-      cachedVehicles?.expiresAt &&
-      (new Date(cachedVehicles?.expiresAt) > new Date())
-    ) {
-      return cachedVehicles.vehicles;
+    const cachedVehicles = await cache.getFromCache(cacheKey)
+    if (cachedVehicles?.length) {
+      return cachedVehicles;
     }
 
     const res = await httpClient().get("/vehicle");
 
     if (res.data) {
-      const newCachedVehicles = {
-        vehicles: res.data,
-        expiresAt: new Date().setMinutes(new Date().getMinutes() + 5),
-      };
-      localStorage.setItem(cacheVehicleKey, JSON.stringify(newCachedVehicles));
+      cache.setToCache(cacheKey, res.data)
     }
 
     return res.data || [];
@@ -53,4 +42,40 @@ async function companyVehicles() {
   }
 }
 
-export { companyVehicles };
+/**
+ * @param {{ license: string, model: number }}
+ * @returns {Promise<Vehicle>}
+ */
+async function createVehicle({ license, model }) {
+  try {
+    const res = await httpClient().post("/vehicle", {
+      license_id: license,
+      model_id: model,
+    });
+
+    if (res.data) {
+      cache.invalidateCache(getVehiclesCacheKey());
+      return res.data;
+    }
+  } catch (e) {
+    console.log(e);
+    return {};
+  }
+}
+
+/**
+ * @param {number} id
+ * @returns {Promise<boolean>}
+ */
+async function deleteVehicle({id}) {
+  try {
+    await httpClient().delete(`/vehicle/${id}`)
+    cache.invalidateCache(getVehiclesCacheKey())
+    return true
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
+export { companyVehicles, createVehicle, deleteVehicle };
