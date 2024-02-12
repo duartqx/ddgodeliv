@@ -12,13 +12,21 @@ function CardPart({ label, value, border }) {
   );
 }
 
-/** @param {{ title: string, parts: {label: string, value: any, border: boolean }[]}} props */
-export default function Card({ title, parts }) {
+/** @param {{
+ * title: string
+ * parts: {
+ *   label: string
+ *   value: any
+ *   border: boolean
+ *  }[]
+ * deleteHandler: Function
+ * }} props */
+export default function Card({ title, parts, deleteHandler }) {
   return (
     <div className="card m-3">
       <div className="card-header px-2 d-flex align-items-center text-center">
         <div
-          className="rounded-circle img-thumbnail"
+          className="rounded-circle img-thumbnail mx-2"
           style={{
             backgroundColor: "#000",
             width: "2.2rem",
@@ -26,7 +34,16 @@ export default function Card({ title, parts }) {
             minWidth: "2.2rem",
           }}
         ></div>
-        <strong className="text-center mx-auto">{title}</strong>
+        <div className="pl-4 fw-semibold" style={{ width: "100%" }}>
+          {title}
+        </div>
+        {deleteHandler && (
+          <i
+            className="btn bi bi-trash-fill align-self-middle ms-auto text-danger"
+            style={{ opacity: "70%" }}
+            onClick={deleteHandler}
+          ></i>
+        )}
       </div>
       <div className="card-body px-3">
         {parts.map(({ label, value, border }) => (
