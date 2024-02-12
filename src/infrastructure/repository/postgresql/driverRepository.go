@@ -196,7 +196,12 @@ func (dr DriverRepository) Delete(driver d.IDriver) error {
 		return fmt.Errorf("Invalid Driver Id")
 	}
 
-	_, err := dr.db.Exec("DELETE FROM drivers WHERE id = $1", driver.GetId())
+	_, err := dr.db.Exec(
+		`DELETE FROM users WHERE id IN (
+			SELECT user_id FROM drivers WHERE id = $1
+		)`,
+		driver.GetId(),
+	)
 
 	return err
 }
