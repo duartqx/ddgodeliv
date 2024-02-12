@@ -1,28 +1,40 @@
 import React, { useEffect, useState } from "react";
 import VehicleCard from "./VehicleCard";
 import SideBarListings from "./SideBarListings";
-import CreateNewButton from "./CreateNewButton";
-import { companyVehicles } from "../services/vehicles/vehicles";
+import * as vehicleService from "../services/vehicles/vehicles";
+import VehicleCardForm from "./VehicleCardForm";
 
 export default function VehiclesList() {
   const [vehicles, setVehicles] = useState(
-    /** @type {import("../services/vehicles/vehicles").Vehicle[]} */ ([]),
+    /** @type {import("../services/vehicles/vehicles").Vehicle[]} */ ([])
   );
 
   useEffect(() => {
-    companyVehicles().then((vehicles) => setVehicles(vehicles));
+    vehicleService.companyVehicles().then((vehicles) => setVehicles(vehicles));
   }, []);
 
-  const vehicleCards = vehicles.map((d) => (
-    <VehicleCard vehicle={d} key={`vehicle__${d.id}__${d.model.name}`} />
+  const deleteClickHandler = async (/** @type {number} */ id) => {
+    if (await vehicleService.deleteVehicle({ id })) {
+      setVehicles(vehicles.filter((v) => v.id !== id));
+    }
+  };
+
+  const vehicleCards = vehicles.map((v) => (
+    <VehicleCard
+      vehicle={v}
+      key={`vehicle__${v.id}__${v.model.name}`}
+      deleteHandler={() => deleteClickHandler(v.id)}
+    />
   ));
 
   return (
-    <SideBarListings
-      listing={vehicleCards}
-      createButton={
-        <CreateNewButton label="Create New Vehicle" onClickHandler={() => {}} />
-      }
-    />
+    <>
+      <div style={{ width: "19rem", height: "100vh" }}>
+        <VehicleCardForm
+          appendVehicle={(vehicle) => setVehicles(vehicles.concat(vehicle))}
+        />
+        <SideBarListings listing={vehicleCards} />
+      </div>
+    </>
   );
 }
