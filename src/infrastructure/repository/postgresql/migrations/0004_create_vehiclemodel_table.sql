@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS VehicleModels (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(55) NOT NULL,
     manufacturer VARCHAR(255) NOT NULL,
     year INT NOT NULL,
-    max_load INT NOT NULL
+    name VARCHAR(30) NOT NULL,
+    transmission VARCHAR(30) NOT NULL,
+    type VARCHAR(30) NOT NULL
 );

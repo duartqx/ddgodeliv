@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -84,6 +85,7 @@ func (vc VehicleController) GetCompanyVehicles(w http.ResponseWriter, r *http.Re
 
 	vehicles, err := vc.vehicleService.FindByCompanyId(user.GetCompanyId())
 	if err != nil {
+		log.Println(vehicles, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

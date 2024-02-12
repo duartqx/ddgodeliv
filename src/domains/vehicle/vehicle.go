@@ -63,7 +63,8 @@ func (v *Vehicle) SetModel(model IVehicleModel) IVehicle {
 	v.Model.
 		SetId(model.GetId()).
 		SetYear(model.GetYear()).
-		SetMaxLoad(model.GetMaxLoad()).
+		SetTransmission(model.GetTransmission()).
+		SetType(model.GetType()).
 		SetManufacturer(model.GetManufacturer())
 	return v
 }

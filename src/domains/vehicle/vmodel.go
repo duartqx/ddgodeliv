@@ -5,7 +5,8 @@ type VehicleModel struct {
 	Name         string `db:"name" json:"name" validate:"required,min=3"`
 	Manufacturer string `db:"manufacturer" json:"manufacturer" validate:"required,min=3"`
 	Year         int    `db:"year" json:"year" validate:"gt=1900,lt=9999"`
-	MaxLoad      int    `db:"max_load" json:"max_load" validate:"required"`
+	Transmission string `db:"transmission" json:"transmission" validate:"required"`
+	Type         string `db:"type" json:"type" validate:"required"`
 }
 
 func GetNewVehicleModel() *VehicleModel {
@@ -50,11 +51,20 @@ func (m *VehicleModel) SetYear(year int) IVehicleModel {
 	return m
 }
 
-func (m VehicleModel) GetMaxLoad() int {
-	return m.MaxLoad
+func (m VehicleModel) GetTransmission() string {
+	return m.Transmission
 }
 
-func (m *VehicleModel) SetMaxLoad(maxLoad int) IVehicleModel {
-	m.MaxLoad = maxLoad
+func (m *VehicleModel) SetTransmission(transmission string) IVehicleModel {
+	m.Transmission = transmission
+	return m
+}
+
+func (m VehicleModel) GetType() string {
+	return m.Type
+}
+
+func (m *VehicleModel) SetType(modelType string) IVehicleModel {
+	m.Type = modelType
 	return m
 }

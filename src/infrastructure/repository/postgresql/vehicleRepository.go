@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -48,7 +49,8 @@ func (vr VehicleRepository) FindByCompanyId(id int) (*[]v.IVehicle, error) {
 			m.name AS "model.name",
 			m.manufacturer AS "model.manufacturer",
 			m.year AS "model.year",
-			m.max_load AS "model.max_load",
+			m.transmission AS "model.transmission",
+			m.type AS "model.type",
 
 			c.id AS "company.id",
 			c.owner_id AS "company.owner_id",
@@ -99,22 +101,33 @@ func (vr VehicleRepository) ModelExists(id int) (exists bool) {
 }
 
 func (vr VehicleRepository) Create(vehicle v.IVehicle) error {
-	var id int
-
-	if err := vr.db.QueryRow(
+	if err := vr.db.Get(
+		vehicle,
 		`
-			INSERT INTO vehicles (model_id, company_id, license_id)
-			VALUES ($1, $2, $3)
-			RETURNING id
+			WITH new_vehicle AS (
+				INSERT INTO vehicles (model_id, company_id, license_id)
+				VALUES ($1, $2, $3)
+				RETURNING id, model_id
+			)
+			SELECT 
+				v.id AS "id",
+
+				m.id AS "model.id",
+				m.name AS "model.name",
+				m.manufacturer AS "model.manufacturer",
+				m.year AS "model.year",
+				m.transmission AS "model.transmission",
+				m.type AS "model.type"
+			FROM new_vehicle v
+			INNER JOIN vehiclemodels m ON m.id = v.model_id
 		`,
 		vehicle.GetModelId(),
 		vehicle.GetCompanyId(),
 		strings.ToLower(vehicle.GetLicenseId()),
-	).Scan(&id); err != nil {
+	); err != nil {
+		log.Println(err)
 		return err
 	}
-
-	vehicle.SetId(id)
 
 	return nil
 }

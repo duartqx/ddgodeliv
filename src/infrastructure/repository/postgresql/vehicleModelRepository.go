@@ -60,14 +60,15 @@ func (vmr VehicleModelRepository) Create(model v.IVehicleModel) error {
 
 	if err := vmr.db.QueryRow(
 		`
-			INSERT INTO vehiclemodels (name, manufacturer, year, max_load)
-			VALUES ($1, $2, $3, $4)
+			INSERT INTO vehiclemodels (name, manufacturer, year, transmission, type)
+			VALUES ($1, $2, $3, $4, $5)
 			RETURNING id
 		`,
 		model.GetName(),
 		model.GetManufacturer(),
 		model.GetYear(),
-		model.GetMaxLoad(),
+		model.GetTransmission(),
+		model.GetType(),
 	).Scan(&id); err != nil {
 		return err
 	}
@@ -81,13 +82,14 @@ func (vmr VehicleModelRepository) Update(model v.IVehicleModel) error {
 	_, err := vmr.db.Exec(
 		`
 			UPDATE vehiclemodels
-			SET name = $1, manufacturer = $2, year = $3, max_load = $4
+			SET name = $1, manufacturer = $2, year = $3, transmission = $4, type = $5
 			WHERE id = $2
 		`,
 		model.GetName(),
 		model.GetManufacturer(),
 		model.GetYear(),
-		model.GetMaxLoad(),
+		model.GetTransmission(),
+		model.GetType(),
 	)
 
 	return err

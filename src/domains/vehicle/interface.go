@@ -35,6 +35,9 @@ type IVehicleModel interface {
 	GetYear() int
 	SetYear(year int) IVehicleModel
 
-	GetMaxLoad() int
-	SetMaxLoad(maxLoad int) IVehicleModel
+	GetTransmission() string
+	SetTransmission(transmission string) IVehicleModel
+
+	GetType() string
+	SetType(modelType string) IVehicleModel
 }
