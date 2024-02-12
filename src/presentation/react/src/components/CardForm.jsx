@@ -1,13 +1,15 @@
 import React from "react";
 import CardFormInput from "./CardFormInput";
+import Error from "./Error"
 
 /** @param {{
  *  title: string
+ *  error: string
  *  handleSubmit: Function
  *  inputs: import("./CardFormInput").CardFormInputObject[]
  * }} props
  */
-export default function CardForm({ title, handleSubmit, inputs }) {
+export default function CardForm({ title, error, handleSubmit, inputs }) {
   return (
     <div
       className="card mx-auto"
@@ -20,13 +22,13 @@ export default function CardForm({ title, handleSubmit, inputs }) {
       }}
     >
       <div
-        className="card-header text-white text-center"
+        className="card-header text-white text-center p-3 fw-semibold"
         style={{ backgroundColor: "#000" }}
       >
         {title}
       </div>
       <div className="card-body shadow">
-        <div className="p-4"></div>
+        <div className="py-4">{error && <Error err={error} noPadding={true} />}</div>
         <form action="post" onSubmit={handleSubmit}>
 
           {inputs.map((props) => <CardFormInput {...props} />)}
