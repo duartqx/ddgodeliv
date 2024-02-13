@@ -3,11 +3,14 @@ import DriverCard from "./DriverCard";
 import SideBarListings from "./SideBarListings";
 import * as driverService from "../services/driver/driver";
 import DriverCardForm from "./DriverCardForm";
+import DriverMain from "./DriverMain";
 
 export default function DriversList() {
   const [drivers, setDrivers] = useState(
     /** @type {import("../services/driver/driver").Driver[]} */ ([])
   );
+  const [filterDriver, setFilterDriver] = useState("");
+  const [selectedDriver, setSelectedDriver] = useState(0);
 
   useEffect(() => {
     driverService.companyDrivers().then((drivers) => setDrivers(drivers));
@@ -19,9 +22,14 @@ export default function DriversList() {
     }
   };
 
-  const driversCards = drivers.map((d) => (
+  const filteredDrivers = filterDriver
+    ? drivers.filter((d) => d.user.name.includes(filterDriver))
+    : drivers;
+
+  const driversCards = filteredDrivers.map((d, idx) => (
     <DriverCard
-      deleteHandler={() => deleteClickHandler(d.id)}
+      onClickHandler={() => setSelectedDriver(idx)}
+      selected={selectedDriver === idx}
       driver={d}
       key={`driver__${d.id}__${d.user.email}`}
     />
@@ -29,12 +37,20 @@ export default function DriversList() {
 
   return (
     <>
-      <div style={{ width: "19rem", height: "100vh" }}>
-        <DriverCardForm
-          appendDriver={(driver) => setDrivers(drivers.concat(driver))}
-        />
-
-        <SideBarListings listing={driversCards} />
+      <div className="d-flex" style={{ width: "76.5rem" }}>
+        <div style={{ minWidth: "19rem", height: "100vh" }}>
+          <DriverCardForm
+            appendDriver={(driver) => setDrivers(drivers.concat(driver))}
+          />
+          <SideBarListings
+            listing={driversCards}
+            filterValue={filterDriver}
+            filterOnChangeHandler={(e) => setFilterDriver(e.target.value)}
+          />
+        </div>
+        {filteredDrivers[selectedDriver] && (
+          <DriverMain driver={filteredDrivers[selectedDriver]} />
+        )}
       </div>
     </>
   );
