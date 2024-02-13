@@ -3,14 +3,18 @@ import { Link } from "react-router-dom";
 import Logout from "./Logout";
 
 /** @param {{
- *  sidebar: import("../pages/Dashboard").SideBar,
- *  onClickDrivers: Function,
- *  onClickVehicles: Function
+ *  sidebar: import("../pages/Dashboard").SideBar
+ *  onClickDrivers: () => void
+ *  onClickVehicles: () => void
+ *  onClickPending: () => void
+ *  onClickTaken: () => void
  * }} props */
 export default function NavSideBar({
   sidebar,
   onClickDrivers,
   onClickVehicles,
+  onClickPending,
+  onClickTaken,
 }) {
   return (
     <nav
@@ -52,6 +56,29 @@ export default function NavSideBar({
             ></i>
           </Link>
         </li>
+
+        <hr className="mx-2 text-white"/>
+
+        <li className="nav-link">
+          <Link to="#" onClick={onClickPending}>
+            <i
+              className={`bi bi-hourglass ${
+                sidebar.isSelected("pending") ? "" : "text-white"
+              }`}
+            ></i>
+          </Link>
+        </li>
+
+        <li className="nav-link">
+          <Link to="#" onClick={onClickTaken}>
+            <i
+              className={`bi bi-tags-fill ${
+                sidebar.isSelected("taken") ? "" : "text-white"
+              }`}
+            ></i>
+          </Link>
+        </li>
+
       </ul>
       <hr className="mx-2 text-white"/>
       <div className="d-flex align-items-center justify-content-center p-3">

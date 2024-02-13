@@ -5,7 +5,7 @@ import NavSideBar from "../components/NavSideBar";
 
 /**
  * @typedef {{
- *  selected: "drivers"|"vehicles"
+ *  selected: "drivers"|"vehicles"|"pending"|"taken"
  *  isSelected: (field: string) => boolean
  * }} SideBar
  */
@@ -26,6 +26,8 @@ export default function Dashboard() {
         sidebar={sidebar}
         onClickDrivers={() => setSidebar({ ...sidebar, selected: "drivers" })}
         onClickVehicles={() => setSidebar({ ...sidebar, selected: "vehicles" })}
+        onClickPending={() => setSidebar({ ...sidebar, selected: "pending" })}
+        onClickTaken={() => setSidebar({ ...sidebar, selected: "taken" })}
       />
       {sidebar.isSelected("drivers") && <DriversList />}
       {sidebar.isSelected("vehicles") && <VehiclesList />}
