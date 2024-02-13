@@ -5,6 +5,7 @@ import * as cache from "../cache";
  * @typedef {{
  *   id: number
  *   license_id: string
+ *   status: number
  *   user: {
  *     id: number
  *     email: string
