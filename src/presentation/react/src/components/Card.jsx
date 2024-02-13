@@ -3,10 +3,7 @@ import React from "react";
 /** @param {{ label: string, value: any, border: boolean }} props */
 function CardPart({ label, value, border }) {
   return (
-    <div
-      className={border ? "border-bottom" : ""}
-      style={{ paddingBottom: "0.3rem", marginTop: "0.3rem" }}
-    >
+    <div className={border ? "border-bottom" : ""}>
       <span className="text-body-secondary fw-light">{label}</span> {value}
     </div>
   );
@@ -19,31 +16,32 @@ function CardPart({ label, value, border }) {
  *   value: any
  *   border: boolean
  *  }[]
- * deleteHandler: Function
+ *  onClickHandler: () => void
  * }} props */
-export default function Card({ title, parts, deleteHandler }) {
+export default function Card({ title, parts, onClickHandler, selected }) {
   return (
     <div className="card m-3">
-      <div className="card-header px-2 d-flex align-items-center text-center">
-        <div
+      <div
+        className="card-header px-2 d-flex align-items-center text-center"
+        onClick={onClickHandler}
+        style={{
+          cursor: "pointer",
+          backgroundColor: selected && "#f8f0fa",
+        }}
+      >
+        <img
+          src="https://images.assetsdelivery.com/compings_v2/tanyadanuta/tanyadanuta1910/tanyadanuta191000003.jpg"
           className="rounded-circle img-thumbnail mx-2"
           style={{
-            backgroundColor: "#000",
+            objectFit: "cover",
             width: "2.2rem",
             height: "2.2rem",
             minWidth: "2.2rem",
           }}
-        ></div>
+        />
         <div className="pl-4 fw-semibold" style={{ width: "100%" }}>
           {title}
         </div>
-        {deleteHandler && (
-          <i
-            className="btn bi bi-trash-fill align-self-middle ms-auto"
-            style={{ color: "#6ea8fe" }}
-            onClick={deleteHandler}
-          ></i>
-        )}
       </div>
       <div className="card-body px-3">
         {parts.map(({ label, value, border }) => (
