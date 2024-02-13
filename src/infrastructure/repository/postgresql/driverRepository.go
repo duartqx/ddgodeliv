@@ -30,6 +30,7 @@ func (dr DriverRepository) baseJoinedQuery(where string) string {
 				d.user_id AS "user_id",
 				d.company_id AS "company_id",
 				d.license_id AS "license_id",
+				COALESCE(de.status, 0) AS "status",
 
 				u.id AS "user.id",
 				u.name AS "user.name",
@@ -41,6 +42,12 @@ func (dr DriverRepository) baseJoinedQuery(where string) string {
 			FROM drivers d
 			INNER JOIN users u ON d.user_id = u.id
 			INNER JOIN companies c ON d.company_id = c.id
+			LEFT JOIN LATERAL (
+				SELECT status, driver_id
+				FROM deliveries
+				WHERE driver_id = d.id AND status != 0
+				ORDER BY created_at DESC LIMIT 1
+			) de ON d.id = de.driver_id
 			WHERE %s
 		`,
 		where,

@@ -113,32 +113,46 @@ func (dr DeliveryRepository) ExistsByDriverId(id int) (exists bool) {
 	return exists
 }
 
-func (dr DeliveryRepository) FindByStatusByDriverId(id int, status uint8) (*[]d.IDelivery, error) {
+func (dr DeliveryRepository) FindByStatusByDriverId(
+	id int, status uint8,
+) (*[]d.IDelivery, error) {
 	return dr.findMany("de.driver_id = $1 AND de.status = $2", id, status)
 }
 
-func (dr DeliveryRepository) ExistsByStatusByDriverId(id int, status uint8) (exists bool) {
+func (dr DeliveryRepository) ExistsByStatusByDriverId(
+	id int, status uint8,
+) (exists bool) {
 	dr.db.QueryRow(
-		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE driver_id = $1 AND status = $2)",
+		`SELECT EXISTS (
+			SELECT 1 FROM deliveries WHERE driver_id = $1 AND status = $2
+		)`,
 		id, status,
 	).Scan(&exists)
 
 	return exists
 }
 
-func (dr DeliveryRepository) FindByDeadlineDateRange(start, end time.Time) (*[]d.IDelivery, error) {
+func (dr DeliveryRepository) FindByDeadlineDateRange(
+	start, end time.Time,
+) (*[]d.IDelivery, error) {
 	return dr.findMany("de.deadline BETWEEN $1 AND $2", start, end)
 }
 
-func (dr DeliveryRepository) FindByCreatedAtDate(createdAt time.Time) (*[]d.IDelivery, error) {
+func (dr DeliveryRepository) FindByCreatedAtDate(
+	createdAt time.Time,
+) (*[]d.IDelivery, error) {
 	return dr.findMany("de.created_at::date = $1", createdAt.Format("2006-01-02"))
 }
 
-func (dr DeliveryRepository) FindByDeadlineDate(deadline time.Time) (*[]d.IDelivery, error) {
+func (dr DeliveryRepository) FindByDeadlineDate(
+	deadline time.Time,
+) (*[]d.IDelivery, error) {
 	return dr.findMany("de.deadline::date = $1", deadline.Format("2006-01-02"))
 }
 
-func (dr DeliveryRepository) ExistsByDeadlineDate(deadline time.Time) (exists bool) {
+func (dr DeliveryRepository) ExistsByDeadlineDate(
+	deadline time.Time,
+) (exists bool) {
 
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE deadline::date = $1)",
