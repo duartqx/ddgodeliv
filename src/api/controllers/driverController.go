@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
+	h "ddgodeliv/api/http"
 	s "ddgodeliv/application/services"
 	as "ddgodeliv/application/services/auth"
 	e "ddgodeliv/common/errors"
@@ -58,28 +58,11 @@ func (dc DriverController) Create(w http.ResponseWriter, r *http.Request) {
 		SetCompanyId(user.GetCompanyId())
 
 	if err := dc.driverService.CreateDriver(driver); err != nil {
-		var valError *e.ValidationError
-		switch {
-		case errors.As(err, &valError):
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(valError.Decode())
-		case errors.Is(err, e.ForbiddenError):
-			http.Error(w, err.Error(), http.StatusForbidden)
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(driver); err != nil {
-		http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusCreated, driver)
 }
 
 func (dc DriverController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -104,12 +87,7 @@ func (dc DriverController) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := dc.driverService.DeleteDriver(user.GetId(), driver); err != nil {
-		switch {
-		case errors.Is(err, e.ForbiddenError):
-			http.Error(w, err.Error(), http.StatusForbidden)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 }
@@ -130,12 +108,7 @@ func (dc DriverController) Update(w http.ResponseWriter, r *http.Request) {
 	driver := d.GetNewDriver().SetId(driverId).SetCompanyId(user.GetCompanyId())
 
 	if err := dc.driverService.FindById(driver); err != nil {
-		switch {
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
@@ -151,27 +124,11 @@ func (dc DriverController) Update(w http.ResponseWriter, r *http.Request) {
 	if err := dc.driverService.UpdateDriverLicense(
 		user.GetId(), driver.SetLicenseId(body.LicenseId),
 	); err != nil {
-		var valError *e.ValidationError
-		switch {
-		case errors.As(err, &valError):
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(valError.Decode())
-		case errors.Is(err, e.ForbiddenError):
-			http.Error(w, err.Error(), http.StatusForbidden)
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(driver); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, driver)
 }
 
 func (dc DriverController) ListCompanyDrivers(w http.ResponseWriter, r *http.Request) {
@@ -187,11 +144,7 @@ func (dc DriverController) ListCompanyDrivers(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(drivers); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, drivers)
 }
 
 func (dc DriverController) Get(w http.ResponseWriter, r *http.Request) {
@@ -210,18 +163,9 @@ func (dc DriverController) Get(w http.ResponseWriter, r *http.Request) {
 	driver := d.GetNewDriver().SetId(driverId).SetCompanyId(user.GetCompanyId())
 
 	if err := dc.driverService.FindById(driver); err != nil {
-		switch {
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, e.NotFoundError.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(driver); err != nil {
-		http.Error(w, e.InternalError.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, driver)
 }

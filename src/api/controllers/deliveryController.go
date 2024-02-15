@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
+	h "ddgodeliv/api/http"
 	s "ddgodeliv/application/services"
 	a "ddgodeliv/application/services/auth"
 	e "ddgodeliv/common/errors"
@@ -64,27 +64,11 @@ func (dc DeliveryController) Create(w http.ResponseWriter, r *http.Request) {
 		SetDeadline(body.Deadline)
 
 	if err := dc.deliveryService.Create(delivery); err != nil {
-		var valError *e.ValidationError
-		switch {
-		case errors.As(err, &valError):
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(valError.Decode())
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(delivery); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusCreated, delivery)
 }
 
 func (dc DeliveryController) AssignDriver(w http.ResponseWriter, r *http.Request) {
@@ -116,22 +100,11 @@ func (dc DeliveryController) AssignDriver(w http.ResponseWriter, r *http.Request
 	delivery := de.GetNewDelivery().SetId(deliveryId)
 
 	if err := dc.deliveryService.AssignDriver(delivery, driver); err != nil {
-		switch {
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(delivery); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, delivery)
 }
 
 func (dc DeliveryController) UpdateStatus(w http.ResponseWriter, r *http.Request) {
@@ -159,27 +132,11 @@ func (dc DeliveryController) UpdateStatus(w http.ResponseWriter, r *http.Request
 	delivery := de.GetNewDelivery().SetId(deliveryId).SetStatus(body.Status)
 
 	if err := dc.deliveryService.UpdateStatus(delivery); err != nil {
-		var valError *e.ValidationError
-		switch {
-		case errors.As(err, &valError):
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(valError.Decode())
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(delivery); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, delivery)
 }
 
 func (dc DeliveryController) Get(w http.ResponseWriter, r *http.Request) {
@@ -198,22 +155,11 @@ func (dc DeliveryController) Get(w http.ResponseWriter, r *http.Request) {
 	delivery := de.GetNewDelivery().SetId(deliveryId)
 
 	if err := dc.deliveryService.FindById(user.ToUser(), delivery); err != nil {
-		switch {
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(delivery); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, delivery)
 }
 
 func (dc DeliveryController) ListByCompany(w http.ResponseWriter, r *http.Request) {
@@ -227,22 +173,11 @@ func (dc DeliveryController) ListByCompany(w http.ResponseWriter, r *http.Reques
 
 	deliveries, err := dc.deliveryService.FindByCompanyId(company)
 	if err != nil {
-		switch {
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(deliveries); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, deliveries)
 }
 
 func (dc DeliveryController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -261,12 +196,7 @@ func (dc DeliveryController) Delete(w http.ResponseWriter, r *http.Request) {
 	delivery := de.GetNewDelivery().SetId(deliveryId)
 
 	if err := dc.deliveryService.Delete(user.ToUser(), delivery); err != nil {
-		switch {
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 }
@@ -281,22 +211,11 @@ func (dc DeliveryController) ListAllPendingsWithoutDriver(w http.ResponseWriter,
 
 	deliveries, err := dc.deliveryService.FindPendingWithoutDriver()
 	if err != nil {
-		switch {
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(deliveries); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, deliveries)
 }
 
 func (dc DeliveryController) ListAllForSender(w http.ResponseWriter, r *http.Request) {
@@ -308,20 +227,9 @@ func (dc DeliveryController) ListAllForSender(w http.ResponseWriter, r *http.Req
 
 	deliveries, err := dc.deliveryService.FindBySenderId(user.ToUser())
 	if err != nil {
-		switch {
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, e.NotFoundError):
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(deliveries); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, deliveries)
 }

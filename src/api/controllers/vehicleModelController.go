@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
+	h "ddgodeliv/api/http"
 	s "ddgodeliv/application/services"
 	e "ddgodeliv/common/errors"
 	v "ddgodeliv/domains/vehicle"
@@ -14,11 +14,15 @@ type VehicleModelController struct {
 	vehicleModelService *s.VehicleModelService
 }
 
-func GetNewVehicleModelController(vehicleModelService *s.VehicleModelService) *VehicleModelController {
+func GetNewVehicleModelController(
+	vehicleModelService *s.VehicleModelService,
+) *VehicleModelController {
 	return &VehicleModelController{vehicleModelService: vehicleModelService}
 }
 
-func (vmc VehicleModelController) CreateVehicleModel(w http.ResponseWriter, r *http.Request) {
+func (vmc VehicleModelController) CreateVehicleModel(
+	w http.ResponseWriter, r *http.Request,
+) {
 
 	vehicleModel := v.GetNewVehicleModel()
 
@@ -28,26 +32,11 @@ func (vmc VehicleModelController) CreateVehicleModel(w http.ResponseWriter, r *h
 	}
 
 	if err := vmc.vehicleModelService.Create(vehicleModel); err != nil {
-		var valError *e.ValidationError
-		switch {
-		case errors.As(err, &valError):
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(valError.Decode())
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(vehicleModel); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusCreated, vehicleModel)
 }
 
 func (vmc VehicleModelController) ListModels(w http.ResponseWriter, r *http.Request) {
@@ -57,9 +46,5 @@ func (vmc VehicleModelController) ListModels(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(models); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	h.JsonResponse(w, http.StatusOK, models)
 }

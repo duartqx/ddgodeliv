@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
+	h "ddgodeliv/api/http"
 	s "ddgodeliv/application/services"
 	as "ddgodeliv/application/services/auth"
 	e "ddgodeliv/common/errors"
@@ -43,25 +43,11 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {
 		SetPassword(body.Password)
 
 	if err := uc.userService.Create(user); err != nil {
-		var valError *e.ValidationError
-		switch {
-		case errors.As(err, &valError):
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(valError.Decode())
-		case errors.Is(err, e.BadRequestError):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		h.ErrorResponse(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(user); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	h.JsonResponse(w, http.StatusCreated, user)
 }
 
 func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
@@ -72,10 +58,7 @@ func (uc UserController) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(user); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	h.JsonResponse(w, http.StatusOK, user)
 }
 
 func (uc UserController) UpdatePassword(w http.ResponseWriter, r *http.Request) {
