@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
+import { Paths } from "../path";
 
 export default function PrivateRouter({ children }) {
   const { isLoggedIn } = useContext(AuthContext);
@@ -11,7 +12,7 @@ export default function PrivateRouter({ children }) {
   ) : (
     <Navigate
       replace
-      to="/login"
+      to={Paths.login}
       state={{ from: `${location.pathname}${location.search}` }}
     />
   );

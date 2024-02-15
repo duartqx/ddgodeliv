@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import CardForm from "./CardForm";
-import CreateNewButton from "./CreateNewButton";
-import { getVehicleModels } from "../services/vehicles/vehicleModels";
-import { createVehicle } from "../services/vehicles/vehicles";
+import CardForm from "../CardForm";
+import CardFormCreateButton from "../CardFormCreateButton";
+import { getVehicleModels } from "../../../services/vehicles/vehicleModels";
+import { createVehicle } from "../../../services/vehicles/vehicles";
 
 /** @param {{ appendVehicle: Function }} props */
 export default function VehicleCardForm({ appendVehicle }) {
@@ -12,7 +12,7 @@ export default function VehicleCardForm({ appendVehicle }) {
   const [error, setError] = useState("");
   const [createdAlert, setCreatedAlert] = useState("");
   const [vehicleModels, setVehicleModels] = useState(
-    /** @type {import("../services/vehicles/vehicleModels").VehicleModel[]} */ ([])
+    /** @type {import("../../../services/vehicles/vehicleModels").VehicleModel[]} */ ([])
   );
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function VehicleCardForm({ appendVehicle }) {
             {createdAlert}
           </div>
         )}
-        <CreateNewButton
+        <CardFormCreateButton
           label={!showForm ? "Create New Vehicle" : "Cancel"}
           height={!showForm ? "6rem" : "100vh"}
           onClickHandler={() => setShowForm(!showForm)}

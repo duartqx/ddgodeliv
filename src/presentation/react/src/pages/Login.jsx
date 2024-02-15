@@ -6,6 +6,7 @@ import SubmitAndLinkButton from "../components/SubmitAndLinkButton";
 import Error from "../components/Error";
 import { AuthContext } from "../middlewares/AuthContext";
 import * as Types from "../middlewares/authTypes";
+import { Paths } from "../path";
 
 /**
  * @typedef {{
@@ -18,7 +19,7 @@ import * as Types from "../middlewares/authTypes";
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { from } = location.state || { from: { pathname: "/dashboard" } };
+  const { from } = location.state || { from: { pathname: "/" } };
 
   const { login } = useContext(AuthContext);
   const [error, setError] = useState("");
@@ -57,7 +58,7 @@ export default function Login() {
               <PasswordInput password={password} setPassword={setPassword} />
               <SubmitAndLinkButton
                 submitLabel="Submit"
-                linkTo="/register"
+                linkTo={Paths.register}
                 linkLabel="Sign up Instead"
               />
             </form>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import CardForm from "./CardForm";
-import { createDriver } from "../services/driver/driver";
-import CreateNewButton from "./CreateNewButton";
+import CardForm from "../CardForm";
+import { createDriver } from "../../../services/driver/driver";
+import CardFormCreateButton from "../CardFormCreateButton";
 
 /** @param {{ appendDriver: Function }} props */
 export default function DriverCardForm({ appendDriver }) {
@@ -29,6 +29,11 @@ export default function DriverCardForm({ appendDriver }) {
       appendDriver(driver);
       setShowForm(false);
       setCreatedAlertTimeout(`${driver.user.email} created`);
+
+      // Reset Form
+      for (const setField of [setDriverName, setDriverEmail, setDriverLicense]) {
+        setField("")
+      }
     } else {
       setError(`Could not create driver ${driverEmail}`);
       setTimeout(() => setError(""), 5000);
@@ -57,7 +62,7 @@ export default function DriverCardForm({ appendDriver }) {
             {createdAlert}
           </div>
         )}
-        <CreateNewButton
+        <CardFormCreateButton
           label={!showForm ? "Create New Driver" : "Cancel"}
           height={!showForm ? "6rem" : "100vh"}
           onClickHandler={() => setShowForm(!showForm)}

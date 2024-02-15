@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function SideBarListings({
+export default function SideBarList({
   listing,
   createButton,
   filterValue,

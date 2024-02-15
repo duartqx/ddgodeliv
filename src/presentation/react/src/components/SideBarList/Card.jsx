@@ -1,4 +1,5 @@
 import React from "react";
+import RoundImage from "../RoundImage";
 
 /** @param {{ label: string, value: any, border: boolean }} props */
 function CardPart({ label, value, border }) {
@@ -26,19 +27,10 @@ export default function Card({ title, parts, onClickHandler, selected }) {
         onClick={onClickHandler}
         style={{
           cursor: "pointer",
-          backgroundColor: selected && "#f8f0fa",
+          backgroundColor: selected && "#deeafc"
         }}
       >
-        <img
-          src="https://images.assetsdelivery.com/compings_v2/tanyadanuta/tanyadanuta1910/tanyadanuta191000003.jpg"
-          className="rounded-circle img-thumbnail mx-2"
-          style={{
-            objectFit: "cover",
-            width: "2.2rem",
-            height: "2.2rem",
-            minWidth: "2.2rem",
-          }}
-        />
+        <RoundImage size="2.2rem" />
         <div className="pl-4 fw-semibold" style={{ width: "100%" }}>
           {title}
         </div>

@@ -7,11 +7,12 @@ import PasswordInput from "../components/PasswordInput";
 import SubmitAndLinkButton from "../components/SubmitAndLinkButton";
 import Error from "../components/Error";
 import { AuthContext } from "../middlewares/AuthContext";
+import { Paths } from "../path";
 
 export default function Register() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { from } = location.state || { from: { pathname: "/dashboard" } };
+  const { from } = location.state || { from: { pathname: "/" } };
   const { register } = useContext(AuthContext);
 
   const [error, setError] = useState("");
@@ -56,7 +57,7 @@ export default function Register() {
               <PasswordInput password={password} setPassword={setPassword} />
               <SubmitAndLinkButton
                 submitLabel="Create Account"
-                linkTo="/login"
+                linkTo={Paths.login}
                 linkLabel="Sign In Instead"
               />
             </form>

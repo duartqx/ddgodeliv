@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function CreateNewButton({ label, height, onClickHandler }) {
+export default function CardFormCreateButton({ label, height, onClickHandler }) {
   return (
     <>
       <div

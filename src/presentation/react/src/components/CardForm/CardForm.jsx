@@ -1,7 +1,7 @@
 import React from "react";
 import CardFormInput from "./CardFormInput";
 import CardFormSelect from "./CardFormSelect";
-import Error from "./Error";
+import Error from "../Error";
 
 /** @param {{
  *  title: string

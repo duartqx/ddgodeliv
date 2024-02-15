@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import VehicleCard from "./VehicleCard";
-import SideBarListings from "./SideBarListings";
-import * as vehicleService from "../services/vehicles/vehicles";
-import VehicleCardForm from "./VehicleCardForm";
+import SideBarList from "../SideBarList";
+import * as vehicleService from "../../../services/vehicles/vehicles";
+import VehicleCardForm from "../../CardForm/Vehicle/VehicleCardForm";
 
 export default function VehiclesList() {
   const [vehicles, setVehicles] = useState(
-    /** @type {import("../services/vehicles/vehicles").Vehicle[]} */ ([])
+    /** @type {import("../../../services/vehicles/vehicles").Vehicle[]} */ ([])
   );
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function VehiclesList() {
         <VehicleCardForm
           appendVehicle={(vehicle) => setVehicles(vehicles.concat(vehicle))}
         />
-        <SideBarListings listing={vehicleCards} />
+        <SideBarList listing={vehicleCards} />
       </div>
     </>
   );

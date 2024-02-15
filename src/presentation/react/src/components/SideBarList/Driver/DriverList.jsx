@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
+import SideBarList from "../SideBarList";
 import DriverCard from "./DriverCard";
-import SideBarListings from "./SideBarListings";
-import * as driverService from "../services/driver/driver";
-import DriverCardForm from "./DriverCardForm";
-import DriverMain from "./DriverMain";
+import DriverCardForm from "../../CardForm/Driver/DriverCardForm";
+import DriverMain from "../../DriverMain/DriverMain";
+import * as driverService from "../../../services/driver/driver";
 
-export default function DriversList() {
+export default function DriverList() {
   const [drivers, setDrivers] = useState(
-    /** @type {import("../services/driver/driver").Driver[]} */ ([])
+    /** @type {import("../../../services/driver/driver").Driver[]} */ ([])
   );
   const [filterDriver, setFilterDriver] = useState("");
   const [selectedDriver, setSelectedDriver] = useState(0);
@@ -19,11 +19,14 @@ export default function DriversList() {
   const deleteClickHandler = async (/** @type {number} */ id) => {
     if (await driverService.deleteDriver({ id })) {
       setDrivers(drivers.filter((d) => d.id !== id));
+      setSelectedDriver(0);
     }
   };
 
   const filteredDrivers = filterDriver
-    ? drivers.filter((d) => d.user.name.includes(filterDriver))
+    ? drivers.filter((d) =>
+        d.user.name.toLowerCase().includes(filterDriver.toLowerCase())
+      )
     : drivers;
 
   const driversCards = filteredDrivers.map((d, idx) => (
@@ -42,14 +45,17 @@ export default function DriversList() {
           <DriverCardForm
             appendDriver={(driver) => setDrivers(drivers.concat(driver))}
           />
-          <SideBarListings
+          <SideBarList
             listing={driversCards}
             filterValue={filterDriver}
             filterOnChangeHandler={(e) => setFilterDriver(e.target.value)}
           />
         </div>
         {filteredDrivers[selectedDriver] && (
-          <DriverMain driver={filteredDrivers[selectedDriver]} />
+          <DriverMain
+            driver={filteredDrivers[selectedDriver]}
+            deleteHandler={deleteClickHandler}
+          />
         )}
       </div>
     </>
