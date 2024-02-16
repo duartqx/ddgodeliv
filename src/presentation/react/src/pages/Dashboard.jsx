@@ -10,5 +10,5 @@ import VehiclesList from "../components/SideBarList/Vehicle/VehiclesList";
  */
 
 export default function Dashboard() {
-  return <main className="d-flex"> </main>;
+    return <main className="d-flex"> </main>;
 }

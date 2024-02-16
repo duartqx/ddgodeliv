@@ -7,20 +7,23 @@ import React from "react";
  * }} props
  **/
 export default function EmailInput({ email, setEmail }) {
-  return (
-    <div className="form-group">
-      <div className="input-group mb-3">
-        <label className="input-group-text" style={{ minWidth: "8rem" }}>
-          Email
-        </label>
-        <input
-          type="email"
-          className="form-control"
-          placeholder="example@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-    </div>
-  );
+    return (
+        <div className="form-group">
+            <div className="input-group mb-3">
+                <label
+                    className="input-group-text"
+                    style={{ minWidth: "8rem" }}
+                >
+                    Email
+                </label>
+                <input
+                    type="email"
+                    className="form-control"
+                    placeholder="example@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+            </div>
+        </div>
+    );
 }

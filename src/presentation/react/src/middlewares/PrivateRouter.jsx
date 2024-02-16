@@ -4,16 +4,16 @@ import { AuthContext } from "./AuthContext";
 import { Paths } from "../path";
 
 export default function PrivateRouter({ children }) {
-  const { isLoggedIn } = useContext(AuthContext);
-  const location = useLocation();
+    const { isLoggedIn } = useContext(AuthContext);
+    const location = useLocation();
 
-  return isLoggedIn() ? (
-    children
-  ) : (
-    <Navigate
-      replace
-      to={Paths.login}
-      state={{ from: `${location.pathname}${location.search}` }}
-    />
-  );
+    return isLoggedIn() ? (
+        children
+    ) : (
+        <Navigate
+            replace
+            to={Paths.login}
+            state={{ from: `${location.pathname}${location.search}` }}
+        />
+    );
 }

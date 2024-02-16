@@ -4,6 +4,6 @@ import { AuthContext } from "./AuthContext";
 import { Paths } from "../path";
 
 export default function NotSignedInRouter({ children }) {
-  const { isLoggedIn } = useContext(AuthContext);
-  return isLoggedIn() ? <Navigate replace to={Paths.root} /> : children;
+    const { isLoggedIn } = useContext(AuthContext);
+    return isLoggedIn() ? <Navigate replace to={Paths.root} /> : children;
 }

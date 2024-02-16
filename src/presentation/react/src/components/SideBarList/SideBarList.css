@@ -1,0 +1,9 @@
+.sidebarlisting__scrollbar {
+    overflow-y: hidden;
+    padding-bottom: 6rem;
+    scrollbar-width: thin;
+}
+
+.sidebarlisting__scrollbar:hover {
+    overflow-y: auto;
+}

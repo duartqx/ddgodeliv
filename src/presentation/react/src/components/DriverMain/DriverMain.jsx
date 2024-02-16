@@ -9,16 +9,19 @@ import DriverMainCard from "./DriverMainCard";
  * }}
  * props */
 export default function DriverMain({ driver, deleteHandler }) {
-  return (
-    driver && (
-      <>
-        <div className="d-flex flex-column flex-grow-1">
-          <div className="p-3">
-            <DriverMainHeader driver={driver} deleteHandler={deleteHandler} />
-            <DriverMainCard driver={driver} />
-          </div>
-        </div>
-      </>
-    )
-  );
+    return (
+        driver && (
+            <>
+                <div className="d-flex flex-column flex-grow-1">
+                    <div className="p-5">
+                        <DriverMainHeader
+                            driver={driver}
+                            deleteHandler={deleteHandler}
+                        />
+                        <DriverMainCard driver={driver} />
+                    </div>
+                </div>
+            </>
+        )
+    );
 }

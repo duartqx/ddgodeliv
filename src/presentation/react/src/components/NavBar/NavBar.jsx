@@ -5,22 +5,21 @@ import { Paths as P } from "../../path";
 
 function NavBarLi({ path, atPath, icon }) {
   return (
-    <li className="nav-link">
-      <Link to={path || "#"}>
-        <i className={`bi bi-${icon} ${atPath ? "" : "text-white"}`}></i>
-      </Link>
-    </li>
+    <Link to={path || "#"}>
+      <li className="nav-link py-3" style={{ backgroundColor: atPath && "#2388fd" }}>
+        <i className={`bi bi-${icon} text-white`}></i>
+      </li>
+    </Link>
   );
 }
 
 function NavBarLiGroup({ group }) {
   return (
     <>
-      {group.map((p, i) => (
-        <>
+      {group.map((p) => (
+        <div key={`${p.path?.replace("/", "")}__${P.icon?.replace(" ", "")}}`}>
           <NavBarLi path={p.path} atPath={p.atPath} icon={p.icon} />
-          {(i + 1) % 2 === 0 && <hr className="mx-2 text-white" />}
-        </>
+        </div>
       ))}
     </>
   );
@@ -35,16 +34,32 @@ export default function NavBar() {
     <>
       <nav
         className="d-flex flex-column flex-shrink-0"
-        style={{ width: "4.5rem", height: "100vh", backgroundColor: "#000" }}
+        style={{
+          width: "4.5rem",
+          height: "100vh",
+          backgroundColor: "#000",
+        }}
         data-bs-theme="dark"
       >
         <ul className="nav nav-pills nav-flush flex-column mb-auto text-center pt-2">
           <NavBarLiGroup
             group={[
-              { path: P.root, atPath: at(P.root), icon: "house" },
+              {
+                path: P.root,
+                atPath: at(P.root),
+                icon: "house",
+              },
               { path: "#", atPath: false, icon: "bell" },
-              { path: P.drivers, atPath: at(P.drivers), icon: "person" },
-              { path: P.vehicles, atPath: at(P.vehicles), icon: "truck" },
+              {
+                path: P.drivers,
+                atPath: at(P.drivers),
+                icon: "person",
+              },
+              {
+                path: P.vehicles,
+                atPath: at(P.vehicles),
+                icon: "truck",
+              },
               {
                 path: P.delivery.available,
                 atPath: at(P.delivery.available),
