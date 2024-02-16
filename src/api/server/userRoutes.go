@@ -11,8 +11,8 @@ func (s server) SetupUserRoutes() http.Handler {
 
 	userSubRouter := http.NewServeMux()
 
-	userService := services.GetNewUserService(s.userRepository)
-	userController := controllers.GetNewUserController(userService, s.sessionService)
+	userService := services.GetUserService(s.userRepository)
+	userController := controllers.GetUserController(userService, s.sessionService)
 
 	// POST: Create User
 	userSubRouter.Handle(

@@ -13,8 +13,13 @@ type UserRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewUserRepository(db *sqlx.DB) *UserRepository {
-	return &UserRepository{db: db}
+var userRepository *UserRepository
+
+func GetUserRepository(db *sqlx.DB) *UserRepository {
+	if userRepository == nil {
+		userRepository = &UserRepository{db: db}
+	}
+	return userRepository
 }
 
 func (ur UserRepository) FindById(id int) (u.IUser, error) {

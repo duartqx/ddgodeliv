@@ -15,17 +15,22 @@ type DriverService struct {
 	validator *v.Validator
 }
 
-func GetNewDriverService(
+var driverService *DriverService
+
+func GetDriverService(
 	driverRepository d.IDriverRepository,
 	userService *UserService,
 	// emailService *EmailService
 ) *DriverService {
-	return &DriverService{
-		driverRepository: driverRepository,
-		userService:      userService,
-		validator:        v.NewValidator(),
-		// emailService:     emailService,
+	if driverService == nil {
+		driverService = &DriverService{
+			driverRepository: driverRepository,
+			userService:      userService,
+			validator:        v.NewValidator(),
+			// emailService:     emailService,
+		}
 	}
+	return driverService
 }
 
 // Asks the new user to activate it's account and warns the company owner

@@ -49,17 +49,17 @@ func GetNewServer(cfg ServerConfig) *server {
 
 func (s *server) setupBase() *server {
 	// Repositories
-	s.userRepository = repository.GetNewUserRepository(s.db)
-	s.driverRepository = repository.GetNewDriverRepository(s.db)
+	s.userRepository = repository.GetUserRepository(s.db)
+	s.driverRepository = repository.GetDriverRepository(s.db)
 
-	sessionRepository := repository.GetNewSessionRepository()
+	sessionRepository := repository.GetSessionRepository()
 	// Services
-	s.sessionService = auth.GetNewSessionService(
+	s.sessionService = auth.GetSessionService(
 		s.driverRepository, sessionRepository,
 	)
 
-	s.jwtController = controllers.NewJwtController(
-		auth.GetNewJwtAuthService(
+	s.jwtController = controllers.GetJwtController(
+		auth.GetJwtAuthService(
 			s.userRepository, sessionRepository, s.secret,
 		),
 	)

@@ -10,9 +10,9 @@ import (
 
 func (s *server) SetupCompanyRoutes() http.Handler {
 
-	companyRepository := repository.GetNewCompanyRepository(s.db)
-	companyService := services.GetNewCompanyService(companyRepository)
-	companyController := controllers.GetNewCompanyController(
+	companyRepository := repository.GetCompanyRepository(s.db)
+	companyService := services.GetCompanyService(companyRepository)
+	companyController := controllers.GetCompanyController(
 		companyService, s.sessionService,
 	)
 

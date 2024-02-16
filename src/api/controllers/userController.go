@@ -16,12 +16,17 @@ type UserController struct {
 	sessionService *as.SessionService
 }
 
-func GetNewUserController(
+var userController *UserController
+
+func GetUserController(
 	userService *s.UserService, sessionService *as.SessionService,
 ) *UserController {
-	return &UserController{
-		userService: userService, sessionService: sessionService,
+	if userController == nil {
+		userController = &UserController{
+			userService: userService, sessionService: sessionService,
+		}
 	}
+	return userController
 }
 
 func (uc UserController) Create(w http.ResponseWriter, r *http.Request) {

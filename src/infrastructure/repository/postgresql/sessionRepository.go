@@ -29,13 +29,18 @@ type SessionRepository struct {
 	store *sessionStore
 }
 
-func GetNewSessionRepository() *SessionRepository {
-	return &SessionRepository{
-		store: &sessionStore{
-			sessions: &map[string]a.ISession{},
-			mutex:    &sync.Mutex{},
-		},
+var sessionRepository *SessionRepository
+
+func GetSessionRepository() *SessionRepository {
+	if sessionRepository == nil {
+		sessionRepository = &SessionRepository{
+			store: &sessionStore{
+				sessions: &map[string]a.ISession{},
+				mutex:    &sync.Mutex{},
+			},
+		}
 	}
+	return sessionRepository
 }
 
 func (sr SessionRepository) Get(user a.ISessionUser) (a.ISession, error) {

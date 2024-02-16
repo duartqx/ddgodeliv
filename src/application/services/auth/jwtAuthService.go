@@ -19,16 +19,21 @@ type JwtAuthService struct {
 	secret            *[]byte
 }
 
-func GetNewJwtAuthService(
+var jwtAuthService *JwtAuthService
+
+func GetJwtAuthService(
 	userRepository u.IUserRepository,
 	sessionRepository a.ISessionRepository,
 	secret *[]byte,
 ) *JwtAuthService {
-	return &JwtAuthService{
-		userRepository:    userRepository,
-		sessionRepository: sessionRepository,
-		secret:            secret,
+	if jwtAuthService == nil {
+		jwtAuthService = &JwtAuthService{
+			userRepository:    userRepository,
+			sessionRepository: sessionRepository,
+			secret:            secret,
+		}
 	}
+	return jwtAuthService
 }
 
 func (jas JwtAuthService) keyFunc(t *jwt.Token) (interface{}, error) {

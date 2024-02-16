@@ -17,7 +17,7 @@ type DeliveryRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewDeliveryRepository(db *sqlx.DB) *DeliveryRepository {
+func GetDeliveryRepository(db *sqlx.DB) *DeliveryRepository {
 	return &DeliveryRepository{db: db}
 }
 

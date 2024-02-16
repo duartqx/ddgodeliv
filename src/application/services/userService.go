@@ -15,11 +15,16 @@ type UserService struct {
 	validator      *v.Validator
 }
 
-func GetNewUserService(userRepository u.IUserRepository) *UserService {
-	return &UserService{
-		userRepository: userRepository,
-		validator:      v.NewValidator(),
+var userService *UserService
+
+func GetUserService(userRepository u.IUserRepository) *UserService {
+	if userService == nil {
+		userService = &UserService{
+			userRepository: userRepository,
+			validator:      v.NewValidator(),
+		}
 	}
+	return userService
 }
 
 func (us UserService) Create(user u.IUser) error {

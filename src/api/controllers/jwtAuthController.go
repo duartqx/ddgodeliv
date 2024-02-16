@@ -15,10 +15,15 @@ type JwtController struct {
 	jwtService *a.JwtAuthService
 }
 
-func NewJwtController(jwtService *a.JwtAuthService) *JwtController {
-	return &JwtController{
-		jwtService: jwtService,
+var jwtController *JwtController
+
+func GetJwtController(jwtService *a.JwtAuthService) *JwtController {
+	if jwtController == nil {
+		jwtController = &JwtController{
+			jwtService: jwtService,
+		}
 	}
+	return jwtController
 }
 
 func (jc JwtController) Login(w http.ResponseWriter, r *http.Request) {

@@ -17,14 +17,18 @@ import (
 
 type DeliveryController struct {
 	deliveryService *s.DeliveryService
+	driverService   *s.DriverService
 	sessionService  *a.SessionService
 }
 
-func GetNewDeliveryController(
-	deliveryService *s.DeliveryService, sessionService *a.SessionService,
+func GetDeliveryController(
+	deliveryService *s.DeliveryService,
+	driverService *s.DriverService,
+	sessionService *a.SessionService,
 ) *DeliveryController {
 	return &DeliveryController{
 		deliveryService: deliveryService,
+		driverService:   driverService,
 		sessionService:  sessionService,
 	}
 }
@@ -226,6 +230,35 @@ func (dc DeliveryController) ListAllForSender(w http.ResponseWriter, r *http.Req
 	}
 
 	deliveries, err := dc.deliveryService.FindBySenderId(user.ToUser())
+	if err != nil {
+		h.ErrorResponse(w, err)
+		return
+	}
+
+	h.JsonResponse(w, http.StatusOK, deliveries)
+}
+
+func (dc DeliveryController) ListAllForDriver(w http.ResponseWriter, r *http.Request) {
+	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
+	if user == nil {
+		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
+		return
+	}
+
+	driverId, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
+		return
+	}
+
+	driver := d.GetNewDriver().SetId(driverId)
+
+	if err := dc.driverService.FindById(driver); err != nil {
+		h.ErrorResponse(w, err)
+		return
+	}
+
+	deliveries, err := dc.deliveryService.FindByDriverId(user.ToUser(), driver)
 	if err != nil {
 		h.ErrorResponse(w, err)
 		return

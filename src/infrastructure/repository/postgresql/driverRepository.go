@@ -18,8 +18,13 @@ type DriverRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewDriverRepository(db *sqlx.DB) *DriverRepository {
-	return &DriverRepository{db: db}
+var driverRepository *DriverRepository
+
+func GetDriverRepository(db *sqlx.DB) *DriverRepository {
+	if driverRepository == nil {
+		driverRepository = &DriverRepository{db: db}
+	}
+	return driverRepository
 }
 
 func (dr DriverRepository) baseJoinedQuery(where string) string {

@@ -14,10 +14,17 @@ type VehicleModelController struct {
 	vehicleModelService *s.VehicleModelService
 }
 
-func GetNewVehicleModelController(
+var vehicleModelController *VehicleModelController
+
+func GetVehicleModelController(
 	vehicleModelService *s.VehicleModelService,
 ) *VehicleModelController {
-	return &VehicleModelController{vehicleModelService: vehicleModelService}
+	if vehicleModelController == nil {
+		vehicleModelController = &VehicleModelController{
+			vehicleModelService: vehicleModelService,
+		}
+	}
+	return vehicleModelController
 }
 
 func (vmc VehicleModelController) CreateVehicleModel(

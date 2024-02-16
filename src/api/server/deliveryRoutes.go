@@ -12,12 +12,16 @@ func (s server) SetupDeliveryRoutes() http.Handler {
 
 	deliverySubRouter := http.NewServeMux()
 
-	deliveryRepository := repository.GetNewDeliveryRepository(s.db)
-	deliveryService := services.GetNewDeliveryService(
+	deliveryRepository := repository.GetDeliveryRepository(s.db)
+	deliveryService := services.GetDeliveryService(
 		deliveryRepository, s.driverRepository,
 	)
-	deliveryController := controllers.GetNewDeliveryController(
-		deliveryService, s.sessionService,
+	deliveryController := controllers.GetDeliveryController(
+		deliveryService,
+		services.GetDriverService(
+			s.driverRepository, services.GetUserService(s.userRepository),
+		),
+		s.sessionService,
 	)
 
 	deliverySubRouter.HandleFunc(

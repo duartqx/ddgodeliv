@@ -15,14 +15,19 @@ type SessionService struct {
 	sessionRepository a.ISessionRepository
 }
 
-func GetNewSessionService(
+var sessionService *SessionService
+
+func GetSessionService(
 	driverRepository d.IDriverRepository,
 	sessionRepository a.ISessionRepository,
 ) *SessionService {
-	return &SessionService{
-		driverRepository:  driverRepository,
-		sessionRepository: sessionRepository,
+	if sessionService == nil {
+		sessionService = &SessionService{
+			driverRepository:  driverRepository,
+			sessionRepository: sessionRepository,
+		}
 	}
+	return sessionService
 }
 
 func (ss SessionService) GetSessionUser(ctx context.Context) a.ISessionUser {

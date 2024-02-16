@@ -16,13 +16,18 @@ type CompanyController struct {
 	sessionService *as.SessionService
 }
 
-func GetNewCompanyController(
+var companyController *CompanyController
+
+func GetCompanyController(
 	companyService *s.CompanyService, sessionService *as.SessionService,
 ) *CompanyController {
-	return &CompanyController{
-		companyService: companyService,
-		sessionService: sessionService,
+	if companyController == nil {
+		companyController = &CompanyController{
+			companyService: companyService,
+			sessionService: sessionService,
+		}
 	}
+	return companyController
 }
 
 func (cc CompanyController) Create(w http.ResponseWriter, r *http.Request) {

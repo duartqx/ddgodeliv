@@ -17,7 +17,7 @@ type DeliveryService struct {
 	validator          *v.Validator
 }
 
-func GetNewDeliveryService(
+func GetDeliveryService(
 	deliveryRepository de.IDeliveryRepository,
 	driverRepository d.IDriverRepository,
 ) *DeliveryService {
@@ -187,6 +187,24 @@ func (ds DeliveryService) FindPendingWithoutDriver() (*[]de.IDelivery, error) {
 
 func (ds DeliveryService) FindBySenderId(user u.IUser) (*[]de.IDelivery, error) {
 	deliveries, err := ds.deliveryRepository.FindBySenderId(user.GetId())
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", e.InternalError, err.Error())
+	}
+	return deliveries, nil
+}
+
+func (ds DeliveryService) FindByDriverId(user u.IUser, driver d.IDriver) (*[]de.IDelivery, error) {
+
+	if driver.HasInvalidId() || driver.GetCompany().HasInvalidId() {
+		return nil, fmt.Errorf("%w: Invalid Driver or Company", e.BadRequestError)
+	}
+
+	if user.GetId() != driver.GetUserId() ||
+		user.GetId() != driver.GetCompany().GetOwnerId() {
+		return nil, fmt.Errorf("%w: Can't access this", e.ForbiddenError)
+	}
+
+	deliveries, err := ds.deliveryRepository.FindByDriverId(driver.GetId())
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", e.InternalError, err.Error())
 	}

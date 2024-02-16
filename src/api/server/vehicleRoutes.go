@@ -10,13 +10,13 @@ import (
 
 func (s server) SetupVehicleRoutes() http.Handler {
 
-	vehicleRepository := repository.GetNewVehicleRepository(s.db)
-	vehicleService := services.GetNewVehicleService(vehicleRepository)
-	vehicleController := controllers.GetNewVehicleController(vehicleService, s.sessionService)
+	vehicleRepository := repository.GetVehicleRepository(s.db)
+	vehicleService := services.GetVehicleService(vehicleRepository)
+	vehicleController := controllers.GetVehicleController(vehicleService, s.sessionService)
 
-	vehicleModelRepository := repository.GetNewVehicleModelRepository(s.db)
-	vehicleModelService := services.GetNewVehicleModelService(vehicleModelRepository)
-	vehicleModelController := controllers.GetNewVehicleModelController(vehicleModelService)
+	vehicleModelRepository := repository.GetVehicleModelRepository(s.db)
+	vehicleModelService := services.GetVehicleModelService(vehicleModelRepository)
+	vehicleModelController := controllers.GetVehicleModelController(vehicleModelService)
 
 	// Mux
 	vehiclesSubRouter := http.NewServeMux()

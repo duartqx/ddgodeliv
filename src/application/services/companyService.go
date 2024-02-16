@@ -13,10 +13,15 @@ type CompanyService struct {
 	validator         *v.Validator
 }
 
-func GetNewCompanyService(companyRepository c.ICompanyRepository) *CompanyService {
-	return &CompanyService{
-		companyRepository: companyRepository, validator: v.NewValidator(),
+var companyService *CompanyService
+
+func GetCompanyService(companyRepository c.ICompanyRepository) *CompanyService {
+	if companyService == nil {
+		companyService = &CompanyService{
+			companyRepository: companyRepository, validator: v.NewValidator(),
+		}
 	}
+	return companyService
 }
 
 func (cs CompanyService) CreateCompany(company c.ICompany, licenseId string) error {

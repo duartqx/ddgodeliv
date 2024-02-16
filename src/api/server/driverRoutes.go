@@ -11,9 +11,9 @@ func (s server) SetupDriverRoutes() http.Handler {
 
 	driverSubRouter := http.NewServeMux()
 
-	userService := services.GetNewUserService(s.userRepository)
-	driverService := services.GetNewDriverService(s.driverRepository, userService)
-	driverController := controllers.GetNewDriverController(driverService, s.sessionService)
+	userService := services.GetUserService(s.userRepository)
+	driverService := services.GetDriverService(s.driverRepository, userService)
+	driverController := controllers.GetDriverController(driverService, s.sessionService)
 
 	driverSubRouter.HandleFunc("GET /{$}", driverController.ListCompanyDrivers)
 

@@ -13,8 +13,13 @@ type CompanyRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewCompanyRepository(db *sqlx.DB) *CompanyRepository {
-	return &CompanyRepository{db: db}
+var companyRepository *CompanyRepository
+
+func GetCompanyRepository(db *sqlx.DB) *CompanyRepository {
+	if companyRepository == nil {
+		companyRepository = &CompanyRepository{db: db}
+	}
+	return companyRepository
 }
 
 func (cr CompanyRepository) FindById(company c.ICompany) error {

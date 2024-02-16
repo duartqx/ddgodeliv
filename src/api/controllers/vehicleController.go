@@ -17,15 +17,19 @@ type VehicleController struct {
 	sessionService *as.SessionService
 }
 
-func GetNewVehicleController(
+var vehicleController *VehicleController
+
+func GetVehicleController(
 	vehicleService *s.VehicleService,
 	sessionService *as.SessionService,
 ) *VehicleController {
-
-	return &VehicleController{
-		vehicleService: vehicleService,
-		sessionService: sessionService,
+	if vehicleController == nil {
+		vehicleController = &VehicleController{
+			vehicleService: vehicleService,
+			sessionService: sessionService,
+		}
 	}
+	return vehicleController
 }
 
 func (vc VehicleController) CreateVehicle(w http.ResponseWriter, r *http.Request) {

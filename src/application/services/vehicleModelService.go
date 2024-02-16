@@ -12,13 +12,18 @@ type VehicleModelService struct {
 	validator              *v.Validator
 }
 
-func GetNewVehicleModelService(
+var vehicleModelService *VehicleModelService
+
+func GetVehicleModelService(
 	vehicleModelRepository ve.IVehicleModelRepository,
 ) *VehicleModelService {
-	return &VehicleModelService{
-		vehicleModelRepository: vehicleModelRepository,
-		validator:              v.NewValidator(),
+	if vehicleModelService == nil {
+		vehicleModelService = &VehicleModelService{
+			vehicleModelRepository: vehicleModelRepository,
+			validator:              v.NewValidator(),
+		}
 	}
+	return vehicleModelService
 }
 
 func (vms VehicleModelService) Create(vehicleModel ve.IVehicleModel) error {

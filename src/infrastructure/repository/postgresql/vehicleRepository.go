@@ -17,8 +17,13 @@ type VehicleRepository struct {
 	db *sqlx.DB
 }
 
-func GetNewVehicleRepository(db *sqlx.DB) *VehicleRepository {
-	return &VehicleRepository{db: db}
+var vehicleRepository *VehicleRepository
+
+func GetVehicleRepository(db *sqlx.DB) *VehicleRepository {
+	if vehicleRepository == nil {
+		vehicleRepository = &VehicleRepository{db: db}
+	}
+	return vehicleRepository
 }
 
 func (vr VehicleRepository) FindById(vehicle v.IVehicle) error {

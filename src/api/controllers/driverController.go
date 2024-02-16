@@ -18,13 +18,18 @@ type DriverController struct {
 	sessionService *as.SessionService
 }
 
-func GetNewDriverController(
+var driverController *DriverController
+
+func GetDriverController(
 	driverService *s.DriverService, sessionService *as.SessionService,
 ) *DriverController {
-	return &DriverController{
-		driverService:  driverService,
-		sessionService: sessionService,
+	if driverController == nil {
+		driverController = &DriverController{
+			driverService:  driverService,
+			sessionService: sessionService,
+		}
 	}
+	return driverController
 }
 
 func (dc DriverController) Create(w http.ResponseWriter, r *http.Request) {
