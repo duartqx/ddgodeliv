@@ -7,23 +7,20 @@ import React from "react";
  * }} props
  **/
 export default function NameInput({ name, setName }) {
-    return (
-        <div className="form-group">
-            <div className="input-group mb-3">
-                <label
-                    className="input-group-text"
-                    style={{ minWidth: "8rem" }}
-                >
-                    Name
-                </label>
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Maria Silva"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-            </div>
-        </div>
-    );
+  return (
+    <div className="form-group">
+      <div className="input-group mb-3">
+        <label className="input-group-text" style={{ minWidth: "8rem" }}>
+          Name
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Maria Silva"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+    </div>
+  );
 }

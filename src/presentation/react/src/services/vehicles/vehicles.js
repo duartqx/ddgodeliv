@@ -16,30 +16,30 @@ import * as cache from "../cache";
 
 /** @returns {string} */
 function getVehiclesCacheKey() {
-    const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-    return `cachedVehicles__${authData?.token}`;
+  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+  return `cachedVehicles__${authData?.token}`;
 }
 
 /** @returns {Promise<Vehicle[]>} */
 async function companyVehicles() {
-    const cacheKey = getVehiclesCacheKey();
-    try {
-        const cachedVehicles = await cache.getFromCache(cacheKey);
-        if (cachedVehicles?.length) {
-            return cachedVehicles;
-        }
-
-        const res = await httpClient().get("/vehicle");
-
-        if (res.data) {
-            cache.setToCache(cacheKey, res.data);
-        }
-
-        return res.data || [];
-    } catch (e) {
-        console.log(e);
-        return [];
+  const cacheKey = getVehiclesCacheKey();
+  try {
+    const cachedVehicles = await cache.getFromCache(cacheKey);
+    if (cachedVehicles?.length) {
+      return cachedVehicles;
     }
+
+    const res = await httpClient().get("/vehicle");
+
+    if (res.data) {
+      cache.setToCache(cacheKey, res.data);
+    }
+
+    return res.data || [];
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
 }
 
 /**
@@ -47,20 +47,20 @@ async function companyVehicles() {
  * @returns {Promise<Vehicle>}
  */
 async function createVehicle({ license, model }) {
-    try {
-        const res = await httpClient().post("/vehicle", {
-            license_id: license,
-            model_id: model,
-        });
+  try {
+    const res = await httpClient().post("/vehicle", {
+      license_id: license,
+      model_id: model,
+    });
 
-        if (res.data) {
-            cache.invalidateCache(getVehiclesCacheKey());
-            return res.data;
-        }
-    } catch (e) {
-        console.log(e);
-        return {};
+    if (res.data) {
+      cache.invalidateCache(getVehiclesCacheKey());
+      return res.data;
     }
+  } catch (e) {
+    console.log(e);
+    return {};
+  }
 }
 
 /**
@@ -68,14 +68,14 @@ async function createVehicle({ license, model }) {
  * @returns {Promise<boolean>}
  */
 async function deleteVehicle({ id }) {
-    try {
-        await httpClient().delete(`/vehicle/${id}`);
-        cache.invalidateCache(getVehiclesCacheKey());
-        return true;
-    } catch (e) {
-        console.log(e);
-        return false;
-    }
+  try {
+    await httpClient().delete(`/vehicle/${id}`);
+    cache.invalidateCache(getVehiclesCacheKey());
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
 }
 
 export { companyVehicles, createVehicle, deleteVehicle };

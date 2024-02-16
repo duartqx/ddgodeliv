@@ -21,50 +21,50 @@ import * as cache from "../cache";
 
 /** @returns {string} */
 function getDriverCacheKey() {
-    const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-    return `cachedDriver__${authData?.token}`;
+  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+  return `cachedDriver__${authData?.token}`;
 }
 
 /** @returns {Promise<Driver[]>} */
 async function companyDrivers() {
-    try {
-        const cachedDrivers = await cache.getFromCache(getDriverCacheKey());
-        if (cachedDrivers?.length) {
-            return cachedDrivers;
-        }
-
-        const res = await httpClient().get("/driver");
-
-        if (res.data) {
-            cache.setToCache(getDriverCacheKey(), res.data);
-        }
-
-        return res.data || [];
-    } catch (e) {
-        console.log(e);
-        return [];
+  try {
+    const cachedDrivers = await cache.getFromCache(getDriverCacheKey());
+    if (cachedDrivers?.length) {
+      return cachedDrivers;
     }
+
+    const res = await httpClient().get("/driver");
+
+    if (res.data) {
+      cache.setToCache(getDriverCacheKey(), res.data);
+    }
+
+    return res.data || [];
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
 }
 
 /** @returns {Promise<Driver>} */
 async function createDriver({ name, email, license }) {
-    try {
-        const res = await httpClient().post("/driver", {
-            license_id: license,
-            user: {
-                name: name,
-                email: email,
-            },
-        });
+  try {
+    const res = await httpClient().post("/driver", {
+      license_id: license,
+      user: {
+        name: name,
+        email: email,
+      },
+    });
 
-        if (res.data) {
-            cache.invalidateCache(getDriverCacheKey());
-            return res.data;
-        }
-    } catch (e) {
-        console.log(e);
-        return {};
+    if (res.data) {
+      cache.invalidateCache(getDriverCacheKey());
+      return res.data;
     }
+  } catch (e) {
+    console.log(e);
+    return {};
+  }
 }
 
 /**
@@ -72,14 +72,14 @@ async function createDriver({ name, email, license }) {
  * @returns {Promise<boolean>}
  */
 async function deleteDriver({ id }) {
-    try {
-        await httpClient().delete(`/driver/${id}`);
-        cache.invalidateCache(getDriverCacheKey());
-        return true;
-    } catch (e) {
-        console.log(e);
-        return false;
-    }
+  try {
+    await httpClient().delete(`/driver/${id}`);
+    cache.invalidateCache(getDriverCacheKey());
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
 }
 
 export { companyDrivers, createDriver, deleteDriver };

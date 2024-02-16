@@ -8,19 +8,19 @@ import { DeliveryStatus } from "../../../domains/deliveries/status";
  * selected: boolean
  * }} props */
 export default function DriverCard({ onClickHandler, driver, selected }) {
-    const parts = [
-        {
-            label: "Status:",
-            value: DeliveryStatus[driver.status],
-            border: false,
-        },
-    ];
-    return (
-        <Card
-            selected={selected}
-            onClickHandler={onClickHandler}
-            title={driver.user.name}
-            parts={parts}
-        />
-    );
+  const parts = [
+    {
+      label: "Status:",
+      value: DeliveryStatus[driver.status],
+      border: false,
+    },
+  ];
+  return (
+    <Card
+      selected={selected}
+      onClickHandler={onClickHandler}
+      title={driver.user.name}
+      parts={parts}
+    />
+  );
 }

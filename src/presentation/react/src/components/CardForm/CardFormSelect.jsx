@@ -11,29 +11,29 @@ import React from "react";
 
 /** @param {CardFormSelectObject} props */
 export default function CardFormSelect({
-    label,
-    onChangeHandler,
-    options,
-    required = true,
+  label,
+  onChangeHandler,
+  options,
+  required = true,
 }) {
-    return (
-        <div className="form-group mb-3">
-            <label className="text-body-tertiary fw-light">{label}</label>
-            <select
-                onChange={onChangeHandler}
-                required={required}
-                className="form-select"
-            >
-                <option value="">Select One</option>
-                {options.map((o) => (
-                    <option
-                        value={o.value}
-                        key={`select__option__${o.value}__${o.label.replace(" ", "")}`}
-                    >
-                        {o.label}
-                    </option>
-                ))}
-            </select>
-        </div>
-    );
+  return (
+    <div className="form-group mb-3">
+      <label className="text-body-tertiary fw-light">{label}</label>
+      <select
+        onChange={onChangeHandler}
+        required={required}
+        className="form-select"
+      >
+        <option value="">Select One</option>
+        {options.map((o) => (
+          <option
+            value={o.value}
+            key={`select__option__${o.value}__${o.label.replace(" ", "")}`}
+          >
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 }

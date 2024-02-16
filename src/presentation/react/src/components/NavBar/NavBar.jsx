@@ -6,7 +6,10 @@ import { Paths as P } from "../../path";
 function NavBarLi({ path, atPath, icon }) {
   return (
     <Link to={path || "#"}>
-      <li className="nav-link py-3" style={{ backgroundColor: atPath && "#2388fd" }}>
+      <li
+        className="nav-link py-3"
+        style={{ backgroundColor: atPath && "#2388fd" }}
+      >
         <i className={`bi bi-${icon} text-white`}></i>
       </li>
     </Link>
