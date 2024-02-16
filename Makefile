@@ -1,6 +1,9 @@
-.DEFAULT_GOAL := up
+.DEFAULT_GOAL := local
 
 all: build up
+
+local:
+	set -a && source ./.env && cd ./src && go run -mod=vendor . && cd ..
 
 build:
 	docker compose build backend --no-cache
