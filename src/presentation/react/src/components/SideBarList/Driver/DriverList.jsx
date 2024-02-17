@@ -40,7 +40,7 @@ export default function DriverList() {
 
   return (
     <>
-      <div className="d-flex col-11">
+      <div className="d-flex flex-grow-1">
         <DriverCardForm
         appendDriver={(driver) => setDrivers(drivers.concat(driver))}
         />

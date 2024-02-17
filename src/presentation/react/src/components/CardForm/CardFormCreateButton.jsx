@@ -1,19 +1,22 @@
 import React from "react";
+import useWidthHeight from "../../middlewares/useWidthHeight";
 
 export default function CardFormCreateButton({
   label,
   height,
   onClickHandler,
 }) {
+  const {windowHeight } = useWidthHeight()
+
   return (
       <div
         className="p-3 d-flex justify-content-center"
         style={{
           position: "absolute",
-          bottom: 0,
           background: "linear-gradient(transparent 0%, white 50%)",
           width: "22rem",
           height: `${height}`,
+          bottom: windowHeight > 800 ? 0 : "-1rem",
         }}
       >
         <button

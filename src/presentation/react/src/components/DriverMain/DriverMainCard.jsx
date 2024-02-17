@@ -1,14 +1,15 @@
 import React from "react";
 import RoundImage from "../RoundImage";
-import { Link } from "react-router-dom";
 import DottedLink from "../DottedLink";
 
 function DriverMainInnerCard({ label, value }) {
   return (
     <>
       <div className="col-6 d-flex flex-column justify-content-end">
-        <div className="fw-light">{label}</div>
-        <div className="fw-bold">{value}</div>
+        <div className="fw-light px-4">{label}</div>
+        <div className="flex-shrink-1">
+          <div className="fw-bold px-4">{value}</div>
+        </div>
       </div>
     </>
   );
@@ -22,7 +23,7 @@ function DriverMainInnerCardRow({ group }) {
         <DriverMainInnerCard
           label={ic.label}
           value={ic.value}
-          key={`drivermaininnercardrow__${i}__${
+          key={`drivermaininnercard__${i}__${
             ic.label?.replace(" ", "") || `obj__${i}`
           }`}
         />
@@ -49,18 +50,24 @@ export default function DriverMainCard({ driver }) {
   ];
 
   return (
-    <div className="card bg-body-tertiary">
-      <div className="card-body row">
-        <div className="col-lg-3 text-center">
-          <RoundImage size="13rem" />
+    <div className="card bg-body-tertiary flex-grow-1 p-2 my-4">
+      <div className="row">
+        <div className="col-xxl-3 col-xl-4 d-flex align-items-center justify-content-center p-4">
+          <RoundImage src="" size="13rem" />
         </div>
-        <div className="col-lg-9 p-2">
-          <div className="row">
-            <div className="col-12 rounded-2">
-              {cardGroups.map((g) => (
-                <DriverMainInnerCardRow group={g} />
-              ))}
-            </div>
+        <div
+          className="col-xxl-9 col-xl-8 p-2 d-flex flex-column justify-content-center"
+          style={{ height: "80%" }}
+        >
+          <div className="col-12">
+            {cardGroups.map((g, i) => (
+              <DriverMainInnerCardRow
+                group={g}
+                key={`drivermaininnercardrow__${i}__${
+                  g.label?.replace(" ", "") || `obj__${i}`
+                }`}
+              />
+            ))}
           </div>
         </div>
       </div>
