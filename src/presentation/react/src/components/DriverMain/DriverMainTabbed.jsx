@@ -1,58 +1,54 @@
-import React from "react";
-import DriverMainCard from "./DriverMainCard";
+import React, { useState } from "react";
+import DriverMainDriverInfo from "./DriverMainDriverInfo";
+import DriverMainDeliveries from "./DriverMainDeliveries";
+import DriverMainStatistics from "./DriverMainStatistics";
 
-export default function DriverMainTabbed({ activeTab, setActiveTab, driver }) {
+function DriverMainTab({ setActive, isActive, label }) {
   return (
-    <div className="col-12 d-flex flex-column flex-grow-1">
-      <ul className="nav nav-tabs">
-        <li
-          className="nav-item"
-          onClick={() => setActiveTab({ ...activeTab, tab: "inf" })}
-        >
-          <a
-            href="#"
-            className={`nav-link ${activeTab.isActive("inf") && "active"}`}
-          >
-            Driver
-          </a>
-        </li>
-        <li
-          className="nav-item"
-          onClick={() => setActiveTab({ ...activeTab, tab: "del" })}
-        >
-          <a
-            href="#"
-            className={`nav-link ${activeTab.isActive("del") && "active"}`}
-          >
-            Deliveries
-          </a>
-        </li>
-        <li
-          className="nav-item"
-          onClick={() => setActiveTab({ ...activeTab, tab: "sta" })}
-        >
-          <a
-            href="#"
-            className={`nav-link ${activeTab.isActive("sta") && "active"}`}
-          >
-            Statistics
-          </a>
-        </li>
+    <li className="nav-item" onClick={setActive}>
+      <a href="#" className={`nav-link ${isActive && "active"}`}>
+        {label}
+      </a>
+    </li>
+  );
+}
+
+export default function DriverMainTabbed({ driver }) {
+  const [activeTab, setActiveTab] = useState(
+    /** @type {{ tab: "inf"|"del"|"sta", isActive: (tab: string) => boolean }} */ ({
+      tab: "inf",
+      isActive: function (tab) {
+        return this.tab === tab;
+      },
+    })
+  );
+
+  return (
+    <div
+      className="d-flex flex-column flex-grow-1"
+      style={{ maxHeight: "100vh" }}
+    >
+      <ul className="nav nav-tabs flex-nowrap">
+        <DriverMainTab
+          setActive={() => setActiveTab({ ...activeTab, tab: "inf" })}
+          isActive={activeTab.isActive("inf")}
+          label="Driver"
+        />
+        <DriverMainTab
+          setActive={() => setActiveTab({ ...activeTab, tab: "del" })}
+          isActive={activeTab.isActive("del")}
+          label="Deliveries"
+        />
+        <DriverMainTab
+          setActive={() => setActiveTab({ ...activeTab, tab: "sta" })}
+          isActive={activeTab.isActive("sta")}
+          label="Statistics"
+        />
       </ul>
 
-      {activeTab.isActive("inf") && <DriverMainCard driver={driver} />}
-      {activeTab.isActive("del") && (
-        <div
-          className="mt-4 p-4"
-          style={{ backgroundColor: "black", height: "100%" }}
-        ></div>
-      )}
-      {activeTab.isActive("sta") && (
-        <div
-          className="mt-4 p-4"
-          style={{ backgroundColor: "pink", height: "100%" }}
-        ></div>
-      )}
+      {activeTab.isActive("inf") && <DriverMainDriverInfo driver={driver} />}
+      {activeTab.isActive("del") && <DriverMainDeliveries driver={driver} />}
+      {activeTab.isActive("sta") && <DriverMainStatistics driver={driver} />}
     </div>
   );
 }

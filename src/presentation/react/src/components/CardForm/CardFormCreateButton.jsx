@@ -6,7 +6,15 @@ export default function CardFormCreateButton({
   height,
   onClickHandler,
 }) {
-  const {windowHeight } = useWidthHeight()
+  const {windowHeight, windowWidth } = useWidthHeight()
+
+  const getBottom = () => {
+    console.log(windowHeight, windowWidth)
+    if (windowWidth > 800) {
+      return 0
+    }
+    return "-1rem"
+  }
 
   return (
       <div
@@ -16,7 +24,7 @@ export default function CardFormCreateButton({
           background: "linear-gradient(transparent 0%, white 50%)",
           width: "22rem",
           height: `${height}`,
-          bottom: windowHeight > 800 ? 0 : "-1rem",
+          bottom: getBottom()
         }}
       >
         <button

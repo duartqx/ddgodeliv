@@ -5,10 +5,10 @@ import DottedLink from "../DottedLink";
 function DriverMainInnerCard({ label, value }) {
   return (
     <>
-      <div className="col-6 d-flex flex-column justify-content-end">
-        <div className="fw-light px-4">{label}</div>
+      <div className="col-6 d-flex flex-column justify-content-end align-items-center">
+        <div className="fw-light">{label}</div>
         <div className="flex-shrink-1">
-          <div className="fw-bold px-4">{value}</div>
+          <div className="fw-bold">{value}</div>
         </div>
       </div>
     </>
@@ -18,7 +18,7 @@ function DriverMainInnerCard({ label, value }) {
 /** @param {{ group: { label: string, value: any }[]}} props */
 function DriverMainInnerCardRow({ group }) {
   return (
-    <div className="row p-2">
+    <div className="row p-2 flex">
       {group.map((ic, i) => (
         <DriverMainInnerCard
           label={ic.label}
@@ -33,7 +33,7 @@ function DriverMainInnerCardRow({ group }) {
 }
 
 /** @param {{ driver: import("../../services/driver/driver").Driver }} props */
-export default function DriverMainCard({ driver }) {
+export default function DriverMainDriverInfo({ driver }) {
   const cardGroups = [
     [
       { label: "Vehicle:", value: "Ford E250" },
@@ -50,15 +50,15 @@ export default function DriverMainCard({ driver }) {
   ];
 
   return (
-    <div className="card bg-body-tertiary flex-grow-1 p-2 my-4">
+    <div
+      className="card flex-grow-1 p-2 my-3 align-items-center justify-content-center"
+      style={{ backgroundColor: "#f0f2f7", minHeight: "40vh" }}
+    >
       <div className="row">
-        <div className="col-xxl-3 col-xl-4 d-flex align-items-center justify-content-center p-4">
+        <div className="col-xl-3 p-4 d-flex align-items-center justify-content-center">
           <RoundImage src="" size="13rem" />
         </div>
-        <div
-          className="col-xxl-9 col-xl-8 p-2 d-flex flex-column justify-content-center"
-          style={{ height: "80%" }}
-        >
+        <div className="col-xl-8 d-flex flex-column justify-content-center ms-auto">
           <div className="col-12">
             {cardGroups.map((g, i) => (
               <DriverMainInnerCardRow
