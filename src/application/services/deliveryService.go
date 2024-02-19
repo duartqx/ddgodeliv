@@ -143,7 +143,8 @@ func (ds DeliveryService) FindById(user u.IUser, delivery de.IDelivery) error {
 
 	// Allows all drivers to see the delivery if it's pending
 	// Otherwise only allows drivers from same company
-	if driver != nil && (delivery.IsPending() || delivery.GetDriver().GetCompanyId() == driver.GetCompanyId()) {
+	if driver != nil && (delivery.IsPending() ||
+		delivery.GetDriver().GetCompanyId() == driver.GetCompanyId()) {
 		return nil
 	}
 
@@ -193,20 +194,44 @@ func (ds DeliveryService) FindBySenderId(user u.IUser) (*[]de.IDelivery, error) 
 	return deliveries, nil
 }
 
-func (ds DeliveryService) FindByDriverId(user u.IUser, driver d.IDriver) (*[]de.IDelivery, error) {
-
+func (ds DeliveryService) canAccessDriverInfo(user u.IUser, driver d.IDriver) error {
 	if driver.HasInvalidId() || driver.GetCompany().HasInvalidId() {
-		return nil, fmt.Errorf("%w: Invalid Driver or Company", e.BadRequestError)
+		return fmt.Errorf("%w: Invalid Driver or Company", e.BadRequestError)
 	}
 
 	if user.GetId() != driver.GetUserId() &&
 		user.GetId() != driver.GetCompany().GetOwnerId() {
-		return nil, fmt.Errorf("%w: Can't access this", e.ForbiddenError)
+		return fmt.Errorf("%w: Can't access this", e.ForbiddenError)
+	}
+	return nil
+}
+
+func (ds DeliveryService) FindByDriverId(
+	user u.IUser, driver d.IDriver,
+) (*[]de.IDelivery, error) {
+
+	if err := ds.canAccessDriverInfo(user, driver); err != nil {
+		return nil, err
 	}
 
 	deliveries, err := ds.deliveryRepository.FindByDriverId(driver.GetId())
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", e.InternalError, err.Error())
+		return nil, err
 	}
 	return deliveries, nil
+}
+
+func (ds DeliveryService) FindCurrentByDriverId(
+	user u.IUser, driver d.IDriver,
+) (de.IDelivery, error) {
+
+	if err := ds.canAccessDriverInfo(user, driver); err != nil {
+		return nil, err
+	}
+
+	delivery, err := ds.deliveryRepository.FindCurrentByDriverId(driver.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return delivery, nil
 }

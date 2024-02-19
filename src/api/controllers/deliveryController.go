@@ -266,3 +266,32 @@ func (dc DeliveryController) ListAllForDriver(w http.ResponseWriter, r *http.Req
 
 	h.JsonResponse(w, http.StatusOK, deliveries)
 }
+
+func (dc DeliveryController) GetDriverCurrentDelivery(w http.ResponseWriter, r *http.Request) {
+	user := dc.sessionService.GetSessionUserWithCompany(r.Context())
+	if user == nil {
+		http.Error(w, e.ForbiddenError.Error(), http.StatusForbidden)
+		return
+	}
+
+	driverId, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
+		return
+	}
+
+	driver := d.GetNewDriver().SetId(driverId).SetCompanyId(user.GetCompanyId())
+
+	if err := dc.driverService.FindById(driver); err != nil {
+		h.ErrorResponse(w, err)
+		return
+	}
+
+	delivery, err := dc.deliveryService.FindCurrentByDriverId(user.ToUser(), driver)
+	if err != nil {
+		h.ErrorResponse(w, err)
+		return
+	}
+
+	h.JsonResponse(w, http.StatusOK, delivery)
+}

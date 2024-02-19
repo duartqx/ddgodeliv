@@ -22,6 +22,6 @@ func ErrorResponse(w http.ResponseWriter, err error) {
 	case errors.Is(err, e.ForbiddenError):
 		http.Error(w, err.Error(), http.StatusForbidden)
 	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		panic(err.Error())
 	}
 }

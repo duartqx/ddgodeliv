@@ -59,7 +59,7 @@ POST http://{{HOST}}/login/
 Content-Type: application/json
 
 {
-    "email": "user@test.com",
+    "email": "t@t.com",
     "password": "password"
 }
 
@@ -163,11 +163,11 @@ POST http://{{HOST}}/delivery/
 Authorization: Bearer {{JWT_commonuser}}
 
 {
-    "loadout": "Good stuff 2",
-    "weight": 77,
-    "origin": "A cool place",
-    "destination": "Far away",
-    "deadline": "2024-03-24T15:04:05Z"
+    "loadout": "Some loadout",
+    "weight": 33,
+    "origin": "Minas Gerais",
+    "destination": "João Pessoa",
+    "deadline": "2024-03-07T15:04:05Z"
 }
 
 ###

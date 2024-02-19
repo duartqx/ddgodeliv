@@ -10,6 +10,8 @@ type IDeliveryRepository interface {
 	FindByDriverId(id int) (*[]IDelivery, error)
 	ExistsByDriverId(id int) bool
 
+	FindCurrentByDriverId(id int) (IDelivery, error)
+
 	FindByStatusByDriverId(id int, status uint8) (*[]IDelivery, error)
 	ExistsByStatusByDriverId(id int, status uint8) bool
 

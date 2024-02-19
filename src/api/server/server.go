@@ -122,7 +122,7 @@ func (s *server) Build() http.Handler {
 		mux,
 		cm.CorsMiddleware,
 		tm.TrailingSlashMiddleware,
-		rm.RecoveryMiddleware,
 		lm.LoggerMiddleware,
+		rm.RecoveryMiddleware,
 	)
 }

@@ -104,6 +104,22 @@ func (dr DeliveryRepository) FindByDriverId(id int) (*[]d.IDelivery, error) {
 	return dr.findMany("de.driver_id = $1", id)
 }
 
+func (dr DeliveryRepository) FindCurrentByDriverId(id int) (d.IDelivery, error) {
+
+	var delivery d.Delivery
+
+	if err := dr.db.Get(
+		&delivery,
+		dr.baseJoinedQuery("de.driver_id = $1 AND de.status != 0"),
+		id,
+	); err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+	}
+	return &delivery, nil
+}
+
 func (dr DeliveryRepository) ExistsByDriverId(id int) (exists bool) {
 	dr.db.QueryRow(
 		"SELECT EXISTS (SELECT 1 FROM deliveries WHERE driver_id = $1)",

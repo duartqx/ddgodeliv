@@ -57,6 +57,11 @@ func (s server) SetupDeliveryRoutes() http.Handler {
 	)
 
 	deliverySubRouter.HandleFunc(
+		"GET /company/driver/{id}/current/{$}",
+		deliveryController.GetDriverCurrentDelivery,
+	)
+
+	deliverySubRouter.HandleFunc(
 		"GET /pending/{$}", deliveryController.ListAllPendingsWithoutDriver,
 	)
 
