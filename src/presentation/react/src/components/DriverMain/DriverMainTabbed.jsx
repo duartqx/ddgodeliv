@@ -26,7 +26,7 @@ export default function DriverMainTabbed({ driver }) {
   return (
     <div
       className="d-flex flex-column flex-grow-1"
-      style={{ maxHeight: "100vh" }}
+      style={{ maxHeight: "87vh" }}
     >
       <ul className="nav nav-tabs flex-nowrap">
         <DriverMainTab

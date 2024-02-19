@@ -52,7 +52,7 @@ export default function DriverMainDriverInfo({ driver }) {
   return (
     <div
       className="card flex-grow-1 p-2 my-3 align-items-center justify-content-center"
-      style={{ backgroundColor: "#f0f2f7", minHeight: "40vh" }}
+      style={{ backgroundColor: "#f0f2f7", minHeight: "25vh" }}
     >
       <div className="row">
         <div className="col-xl-3 p-4 d-flex align-items-center justify-content-center">

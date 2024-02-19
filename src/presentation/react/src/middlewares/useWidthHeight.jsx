@@ -4,6 +4,8 @@ export default function useWidthHeight() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
+  const isSmallWindow = () => windowWidth <= 1200;
+
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -15,5 +17,11 @@ export default function useWidthHeight() {
     };
   }, []);
 
-  return { windowWidth, setWindowWidth, windowHeight, setWindowHeight };
+  return {
+    windowWidth,
+    setWindowWidth,
+    windowHeight,
+    setWindowHeight,
+    isSmallWindow,
+  };
 }

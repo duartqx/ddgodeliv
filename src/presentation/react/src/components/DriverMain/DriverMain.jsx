@@ -11,17 +11,17 @@ import DriverMainCarded from "./DriverMainCarded";
  * }}
  * props */
 export default function DriverMain({ driver, deleteHandler }) {
-  const { windowWidth } = useWidthHeight();
+  const { isSmallWindow } = useWidthHeight();
 
   return (
     driver && (
       <>
         <div
           className="d-flex flex-column mx-4 flex-grow-1"
-          style={{ overflow: "hidden", maxHeight: "100vh" }}
+          style={{ maxHeight: "100vh" }}
         >
           <DriverMainHeader driver={driver} deleteHandler={deleteHandler} />
-          {windowWidth <= 1200 ? (
+          {isSmallWindow() ? (
             <DriverMainTabbed driver={driver} />
           ) : (
             <DriverMainCarded driver={driver} />
