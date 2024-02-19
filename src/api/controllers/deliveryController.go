@@ -251,7 +251,7 @@ func (dc DeliveryController) ListAllForDriver(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	driver := d.GetNewDriver().SetId(driverId)
+	driver := d.GetNewDriver().SetId(driverId).SetCompanyId(user.GetCompanyId())
 
 	if err := dc.driverService.FindById(driver); err != nil {
 		h.ErrorResponse(w, err)

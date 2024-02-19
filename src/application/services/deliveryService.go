@@ -199,7 +199,7 @@ func (ds DeliveryService) FindByDriverId(user u.IUser, driver d.IDriver) (*[]de.
 		return nil, fmt.Errorf("%w: Invalid Driver or Company", e.BadRequestError)
 	}
 
-	if user.GetId() != driver.GetUserId() ||
+	if user.GetId() != driver.GetUserId() &&
 		user.GetId() != driver.GetCompany().GetOwnerId() {
 		return nil, fmt.Errorf("%w: Can't access this", e.ForbiddenError)
 	}
