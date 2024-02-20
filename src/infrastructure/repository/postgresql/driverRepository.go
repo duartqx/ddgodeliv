@@ -50,7 +50,7 @@ func (dr DriverRepository) baseJoinedQuery(where string) string {
 			LEFT JOIN LATERAL (
 				SELECT status, driver_id
 				FROM deliveries
-				WHERE driver_id = d.id AND status != 0
+				WHERE driver_id = d.id AND status NOT IN (0, 4)
 				ORDER BY created_at DESC LIMIT 1
 			) de ON d.id = de.driver_id
 			WHERE %s
