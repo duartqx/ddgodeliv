@@ -4,6 +4,16 @@ import DottedLink from "../DottedLink";
 import { DeliveryStatus } from "../../domains/deliveries/status";
 import useWidthHeight from "../../middlewares/useWidthHeight";
 
+/** @param {{ margin: { marginLeft?: string, marginRight?: string } }} props */
+function MiddleLine({ margin = { marginLeft: "1rem" } }) {
+  return (
+    <div
+      className="flex-grow-1"
+      style={{ borderBottom: "1px solid #f0f2f7", ...margin }}
+    ></div>
+  );
+}
+
 /** @param {{ delivery: import("../../services/deliveries/deliveries").Delivery }} props */
 function DeliveryCard({ delivery }) {
   return (
@@ -30,16 +40,11 @@ function DeliveryCard({ delivery }) {
 
 /** @param {{ delivery: import("../../services/deliveries/deliveries").Delivery }} props */
 function CurrentDelivery({ delivery }) {
-  const { isSmallWindow } = useWidthHeight();
-
   return (
     <>
-      <div className="d-flex align-items-center mb-2">
+      <div className="d-flex align-items-center my-3">
         <div className="fw-medium">Current</div>
-        <div
-          className="flex-grow-1"
-          style={{ borderBottom: "1px solid #f0f2f7", marginLeft: "1rem" }}
-        ></div>
+        <MiddleLine />
       </div>
 
       <DeliveryCard delivery={delivery} />
@@ -47,7 +52,7 @@ function CurrentDelivery({ delivery }) {
         className="img-fluid img-thumbnail"
         style={{
           objectFit: "cover",
-          height: isSmallWindow() ? "24rem" : "16rem",
+          height: "16rem",
           width: "100%",
         }}
         src={
@@ -70,13 +75,16 @@ export default function DriverMainDeliveries({ driver }) {
     /** @type {import("../../services/deliveries/deliveries").Delivery} */
     (null)
   );
+  const { isSmallWindow } = useWidthHeight();
 
   useEffect(() => {
-    deliveryService
-      .getOtherDeliveriesByDriverId(driver.id)
-      .then((deliveries) => {
-        setDriverDeliveries(deliveries);
-      });
+    if (isSmallWindow()) {
+      deliveryService
+        .getOtherDeliveriesByDriverId(driver.id)
+        .then((deliveries) => {
+          setDriverDeliveries(deliveries);
+        });
+    }
 
     deliveryService
       .getCurrentByDriverId(driver.id)
@@ -85,20 +93,29 @@ export default function DriverMainDeliveries({ driver }) {
 
   return (
     <div className="flex-grow-1 p-2 d-flex flex-column">
-      <div className="d-flex justify-content-between my-4">
-        <div className="fw-bold">Deliveries</div>
-        <div className="fw-bold">
-          <DottedLink to="#" label="History" />
+      {!isSmallWindow() && (
+        <div className="d-flex align-items-center flex-grow-1 fw-bold my-3">
+          Deliveries
         </div>
-      </div>
+      )}
       <CurrentDelivery delivery={currentDelivery} />
       <div className="my-3 d-flex flex-column justify-content-center flex-grow-1">
+        {isSmallWindow() && (
+          <div className="d-flex align-items-center flex-grow-1 mb-auto">
+            <div>History</div>
+            <MiddleLine />
+          </div>
+        )}
         {driverDeliveries
           .filter((delivery) => delivery.id !== currentDelivery?.id)
           .splice(0, 3)
           .map((delivery) => (
             <DeliveryCard key={delivery.id} delivery={delivery} />
           ))}
+      </div>
+      <div className="d-flex align-items-center flex-grow-1 mb-auto">
+        <MiddleLine margin={{ marginRight: "1rem" }} />
+        <DottedLink to="#" label={isSmallWindow() ? "See more" : "History"} />
       </div>
     </div>
   );
