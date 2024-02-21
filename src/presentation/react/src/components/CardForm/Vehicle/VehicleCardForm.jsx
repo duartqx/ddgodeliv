@@ -46,7 +46,7 @@ export default function VehicleCardForm({ appendVehicle }) {
       <div
         style={{
           zIndex: 20,
-          position: "relative",
+          position: "absolute",
           bottom: 0,
         }}
       >

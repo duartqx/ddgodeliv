@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SideBarList from "../components/SideBarList/SideBarList";
 import DriverCard from "../components/DriverCard";
 import DriverCardForm from "../components/CardForm/Driver/DriverCardForm";
 import DriverMain from "../components/DriverMain/DriverMain";
 import * as driverService from "../services/driver/driver";
+import { TitleContext } from "../middlewares/TitleContext";
 
 export default function DriverList() {
   const [drivers, setDrivers] = useState(
@@ -11,8 +12,12 @@ export default function DriverList() {
   );
   const [filterDriver, setFilterDriver] = useState("");
   const [selectedDriver, setSelectedDriver] = useState(0);
+  const { setTitle } = useContext(TitleContext)
 
   useEffect(() => {
+
+    setTitle("Drivers")
+
     driverService.companyDrivers().then((drivers) => setDrivers(drivers));
   }, []);
 

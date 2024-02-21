@@ -11,8 +11,8 @@ export default function SideBarList({
       <div
         className="d-flex flex-column flex-shrink-0 border-right"
         style={{
-          maxHeight: "100vh",
-          height: "100vh",
+          maxHeight: "calc(100vh - 4rem)",
+          height: "calc(100vh - 4rem)",
           width: "22rem",
           position: "relative",
           borderRight: "solid 1px #f0f2f7",

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import VehicleCard from "../components/VehicleCard";
 import SideBarList from "../components/SideBarList/SideBarList";
 import * as vehicleService from "../services/vehicles/vehicles";
 import VehicleCardForm from "../components/CardForm/Vehicle/VehicleCardForm";
+import { TitleContext } from "../middlewares/TitleContext";
 
 export default function VehiclesList() {
   const [vehicles, setVehicles] = useState(
@@ -10,8 +11,12 @@ export default function VehiclesList() {
   );
   const [filterVehicle, setFilterVehicle] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState(0);
+  const { setTitle } = useContext(TitleContext)
 
   useEffect(() => {
+
+    setTitle("Vehicles")
+
     vehicleService.companyVehicles().then((vehicles) => setVehicles(vehicles));
   }, []);
 

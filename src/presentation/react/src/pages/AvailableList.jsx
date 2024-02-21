@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SideBarList from "../components/SideBarList/SideBarList";
 import * as deliveryService from "../services/deliveries/deliveries";
 import DeliveryCard from "../components/DeliveryCard";
+import { TitleContext } from "../middlewares/TitleContext";
 
 export default function AvailableList() {
   const [deliveries, setDeliveries] = useState(
@@ -9,8 +10,12 @@ export default function AvailableList() {
   );
   const [filterDeliveries, setFilterDeliveries] = useState("");
   const [selectedDelivery, setSelectedDelivery] = useState(0);
+  const { setTitle } = useContext(TitleContext)
 
   useEffect(() => {
+
+    setTitle("Available")
+
     deliveryService
       .getPendingDeliveries()
       .then((deliveries) => setDeliveries(deliveries));

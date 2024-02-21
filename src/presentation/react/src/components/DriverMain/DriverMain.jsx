@@ -18,7 +18,7 @@ export default function DriverMain({ driver, deleteHandler }) {
       <>
         <div
           className="d-flex flex-column mx-4 flex-grow-1"
-          style={{ maxHeight: "100vh" }}
+          style={{ maxHeight: "calc(100vh - 4rem)" }}
         >
           <DriverMainHeader driver={driver} deleteHandler={deleteHandler} />
           {isSmallWindow() ? (
