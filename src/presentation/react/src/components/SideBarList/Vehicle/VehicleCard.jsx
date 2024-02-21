@@ -1,11 +1,20 @@
 import React from "react";
 import Card from "../Card";
 
-/** @param {{
+/**
+ * @param {{
  *  deleteHandler: () => void,
+ *  onClickHandler: () => void,
+ *  selected: boolean
  *  vehicle: import("../../../services/vehicles/vehicles").Vehicle
- * }} props */
-export default function VehicleCard({ deleteHandler, vehicle }) {
+ * }} props
+ */
+export default function VehicleCard({
+  deleteHandler,
+  onClickHandler,
+  vehicle,
+  selected,
+}) {
   const parts = [
     { label: "Year:", value: vehicle.model.year, border: true },
     {
@@ -23,8 +32,10 @@ export default function VehicleCard({ deleteHandler, vehicle }) {
   ];
   return (
     <Card
+      selected={selected}
       title={vehicle.model.name}
       parts={parts}
+      onClickHandler={onClickHandler}
       deleteHandler={deleteHandler}
     />
   );

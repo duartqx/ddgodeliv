@@ -6,8 +6,10 @@ import VehicleCardForm from "../../CardForm/Vehicle/VehicleCardForm";
 
 export default function VehiclesList() {
   const [vehicles, setVehicles] = useState(
-    /** @type {import("../../../services/vehicles/vehicles").Vehicle[]} */ ([]),
+    /** @type {import("../../../services/vehicles/vehicles").Vehicle[]} */ ([])
   );
+  const [filterVehicle, setFilterVehicle] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState(0);
 
   useEffect(() => {
     vehicleService.companyVehicles().then((vehicles) => setVehicles(vehicles));
@@ -19,10 +21,18 @@ export default function VehiclesList() {
     }
   };
 
-  const vehicleCards = vehicles.map((v) => (
+  const filteredVehicles = filterVehicle
+    ? vehicles.filter((v) =>
+        v.model.name.toLowerCase().includes(filterVehicle.toLowerCase())
+      )
+    : vehicles;
+
+  const vehicleCards = filteredVehicles.map((v, idx) => (
     <VehicleCard
       vehicle={v}
+      selected={selectedVehicle === idx}
       key={`vehicle__${v.id}__${v.model.name}`}
+      onClickHandler={() => setSelectedVehicle(idx)}
       deleteHandler={() => deleteClickHandler(v.id)}
     />
   ));
@@ -32,7 +42,11 @@ export default function VehiclesList() {
       <VehicleCardForm
         appendVehicle={(vehicle) => setVehicles(vehicles.concat(vehicle))}
       />
-      <SideBarList listing={vehicleCards} />
+      <SideBarList
+        listing={vehicleCards}
+        filterValue={filterVehicle}
+        filterOnChangeHandler={(e) => setFilterVehicle(e.target.value)}
+      />
     </>
   );
 }
