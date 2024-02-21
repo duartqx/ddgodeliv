@@ -24,7 +24,7 @@ function DriverMainInnerCardRow({ group }) {
           label={ic.label}
           value={ic.value}
           key={`drivermaininnercard__${i}__${
-            ic.label?.replace(" ", "") || `obj__${i}`
+            ic.label?.replaceAll(" ", "") || `obj__${i}`
           }`}
         />
       ))}
@@ -64,7 +64,7 @@ export default function DriverMainDriverInfo({ driver }) {
               <DriverMainInnerCardRow
                 group={g}
                 key={`drivermaininnercardrow__${i}__${
-                  g.label?.replace(" ", "") || `obj__${i}`
+                  g.label?.replaceAll(" ", "") || `obj__${i}`
                 }`}
               />
             ))}

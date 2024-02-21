@@ -11,9 +11,10 @@ import Layout from "./pages/Layout";
 import NotSignedInRouter from "./middlewares/NotSignedInRouter";
 import PrivateRouter from "./middlewares/PrivateRouter";
 import AuthProvider from "./middlewares/AuthProvider";
-import DriverList from "./components/SideBarList/Driver/DriverList";
-import VehiclesList from "./components/SideBarList/Vehicle/VehiclesList";
+import DriverList from "./pages/DriverList";
+import VehiclesList from "./pages/VehiclesList";
 import { Paths } from "./path";
+import AvailableList from "./pages/AvailableList";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,7 +29,7 @@ function App() {
         { index: true, element: <Dashboard /> },
         { path: Paths.drivers, element: <DriverList /> },
         { path: Paths.vehicles, element: <VehiclesList /> },
-        { path: Paths.delivery.available, element: <></> },
+        { path: Paths.delivery.available, element: <AvailableList /> },
         { path: Paths.delivery.company, element: <></> },
       ],
     },

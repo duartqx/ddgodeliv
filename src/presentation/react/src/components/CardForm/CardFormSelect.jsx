@@ -28,7 +28,7 @@ export default function CardFormSelect({
         {options.map((o) => (
           <option
             value={o.value}
-            key={`select__option__${o.value}__${o.label.replace(" ", "")}`}
+            key={`select__option__${o.value}__${o.label.replaceAll(" ", "")}`}
           >
             {o.label}
           </option>

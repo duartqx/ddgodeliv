@@ -1,12 +1,12 @@
 import React from "react";
-import Card from "../Card";
+import Card from "./SideBarList/Card";
 
 /**
  * @param {{
  *  deleteHandler: () => void,
  *  onClickHandler: () => void,
  *  selected: boolean
- *  vehicle: import("../../../services/vehicles/vehicles").Vehicle
+ *  vehicle: import("../services/vehicles/vehicles").Vehicle
  * }} props
  */
 export default function VehicleCard({

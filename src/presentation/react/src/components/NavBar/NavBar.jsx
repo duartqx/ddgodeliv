@@ -20,7 +20,7 @@ function NavBarLiGroup({ group }) {
   return (
     <>
       {group.map((p) => (
-        <div key={`${p.path?.replace("/", "")}__${P.icon?.replace(" ", "")}}`}>
+        <div key={`${p.path?.replaceAll("/", "")}__${P.icon?.replaceAll(" ", "")}}`}>
           <NavBarLi path={p.path} atPath={p.atPath} icon={p.icon} />
         </div>
       ))}

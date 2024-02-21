@@ -38,14 +38,14 @@ export default function CardForm({ title, error, handleSubmit, inputs }) {
               return (
                 <CardFormSelect
                   {...props}
-                  key={`${props.label.replace(" ", "")}__${props.type}`}
+                  key={`${props.label.replaceAll(" ", "")}__${props.type}`}
                 />
               );
             }
             return (
               <CardFormInput
                 {...props}
-                key={`${props.label.replace(" ", "")}__${props.type}`}
+                key={`${props.label.replaceAll(" ", "")}__${props.type}`}
               />
             );
           })}

@@ -17,27 +17,16 @@ import * as cache from "../cache";
  */
 
 /**
+ * @param {string} prefix
  * @param {number} driverId
  * @returns {string}
  **/
-function getDriverDeliveriesCacheKey(driverId) {
+function getCacheKey(prefix, driverId) {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  return `cachedDriverDeliveries__${driverId}__${authData?.token}`;
-}
-
-/**
- * @param {number} driverId
- * @returns {string}
- **/
-function getDriverCurrentDeliveryCacheKey(driverId) {
-  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  return `cachedDriverCurrentDelivery__${driverId}__${authData?.token}`;
-}
-
-/** @returns {string} */
-function getCompanyDeliveriesCacheKey() {
-  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  return `cachedCompanyDeliveries__${authData?.token}`;
+  if (driverId) {
+    return `${prefix}__${driverId}__${authData?.token}`;
+  }
+  return `${prefix}__${authData?.token}`;
 }
 
 /**
@@ -47,7 +36,7 @@ function getCompanyDeliveriesCacheKey() {
 async function getOtherDeliveriesByDriverId(driverId) {
   try {
     const cachedDeliveries = await cache.getFromCache(
-      getDriverDeliveriesCacheKey(driverId)
+      getCacheKey("cachedDriverDeliveries", driverId)
     );
     if (cachedDeliveries) {
       // Can be an empty array
@@ -58,7 +47,10 @@ async function getOtherDeliveriesByDriverId(driverId) {
 
     const deliveries = res.data || [];
 
-    cache.setToCache(getDriverDeliveriesCacheKey(driverId), deliveries);
+    cache.setToCache(
+      getCacheKey("cachedDriverDeliveries", driverId),
+      deliveries
+    );
 
     return deliveries;
   } catch (e) {
@@ -73,7 +65,7 @@ async function getOtherDeliveriesByDriverId(driverId) {
 async function getCurrentByDriverId(driverId) {
   try {
     const cachedDelivery = await cache.getFromCache(
-      getDriverCurrentDeliveryCacheKey(driverId)
+      getCacheKey("cachedDriverCurrentDelivery", driverId)
     );
     if (cachedDelivery) {
       // Can be an empty array
@@ -86,7 +78,10 @@ async function getCurrentByDriverId(driverId) {
 
     const delivery = res.data || null;
 
-    cache.setToCache(getDriverCurrentDeliveryCacheKey(driverId), delivery);
+    cache.setToCache(
+      getCacheKey("cachedDriverCurrentDelivery", driverId),
+      delivery
+    );
 
     return delivery;
   } catch (e) {
@@ -98,7 +93,7 @@ async function getCurrentByDriverId(driverId) {
 async function getByCompanyId() {
   try {
     const cachedDeliveries = await cache.getFromCache(
-      getCompanyDeliveriesCacheKey()
+      getCacheKey("cachedCompanyDeliveries")
     );
     if (cachedDeliveries) {
       // Can be an empty array
@@ -108,11 +103,37 @@ async function getByCompanyId() {
     const res = await httpClient().get(`/delivery/company/`);
 
     const deliveries = res.data || [];
-    cache.setToCache(getCompanyDeliveriesCacheKey(), deliveries);
+    cache.setToCache(getCacheKey("cachedCompanyDeliveries"), deliveries);
     return deliveries;
   } catch (e) {
     return [];
   }
 }
 
-export { getOtherDeliveriesByDriverId, getCurrentByDriverId, getByCompanyId };
+/** @returns {Promise<Delivery[]>} */
+async function getPendingDeliveries() {
+  try {
+    const cachedDeliveries = await cache.getFromCache(
+      getCacheKey("cachedPendingDeliveries")
+    );
+    if (cachedDeliveries) {
+      // Can be an empty array
+      return cachedDeliveries;
+    }
+
+    const res = await httpClient().get(`/delivery/pending/`);
+
+    const deliveries = res.data || [];
+    cache.setToCache(getCacheKey("cachedPendingDeliveries"), deliveries);
+    return deliveries;
+  } catch (e) {
+    return [];
+  }
+}
+
+export {
+  getOtherDeliveriesByDriverId,
+  getCurrentByDriverId,
+  getByCompanyId,
+  getPendingDeliveries,
+};

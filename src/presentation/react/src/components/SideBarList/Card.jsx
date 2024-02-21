@@ -2,21 +2,21 @@ import React from "react";
 import RoundImage from "../RoundImage";
 import "./Card.css";
 
-/** @param {{ value: any, border: boolean }} props */
-function CardPart({ value, border }) {
+/** @typedef {{ value: any, label: any, border: boolean }} CardPartProps */
+
+/** @param {CardPartProps} props */
+function CardPart({ value, label, border }) {
   return (
     <div className={border ? "border-bottom" : ""}>
-      <span className="text-muted fw-medium">{value}</span>
+      <span className="text-muted fw-medium">{label}</span>{" "}
+      <span className="fw-light text-muted">{value}</span>
     </div>
   );
 }
 
 /** @param {{
- * title: string
- * parts: {
- *   value: any
- *   border: boolean
- *  }[]
+ *  title: string
+ *  parts: CardPartProps[]
  *  onClickHandler: () => void
  * }} props */
 export default function Card({ title, parts, onClickHandler, selected }) {
@@ -30,12 +30,13 @@ export default function Card({ title, parts, onClickHandler, selected }) {
         }}
       >
         <RoundImage size="3.0rem" />
-        <div className="d-flex flex-column">
-          <div className="fw-semibold text-center" style={{ width: "100%" }}>
+        <div className="d-flex flex-column flex-grow-1">
+          <div className="fw-semibold" style={{ width: "100%" }}>
             {title}
           </div>
           {parts.map(({ label, value, border }) => (
             <CardPart
+              label={label}
               value={value}
               border={border}
               key={`cardPart__${label}__${value}`}

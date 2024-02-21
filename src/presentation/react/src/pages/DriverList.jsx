@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import SideBarList from "../SideBarList";
-import DriverCard from "./DriverCard";
-import DriverCardForm from "../../CardForm/Driver/DriverCardForm";
-import DriverMain from "../../DriverMain/DriverMain";
-import * as driverService from "../../../services/driver/driver";
+import SideBarList from "../components/SideBarList/SideBarList";
+import DriverCard from "../components/DriverCard";
+import DriverCardForm from "../components/CardForm/Driver/DriverCardForm";
+import DriverMain from "../components/DriverMain/DriverMain";
+import * as driverService from "../services/driver/driver";
 
 export default function DriverList() {
   const [drivers, setDrivers] = useState(
-    /** @type {import("../../../services/driver/driver").Driver[]} */ ([]),
+    /** @type {import("../services/driver/driver").Driver[]} */ ([]),
   );
   const [filterDriver, setFilterDriver] = useState("");
   const [selectedDriver, setSelectedDriver] = useState(0);

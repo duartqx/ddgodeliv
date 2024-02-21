@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import VehicleCard from "./VehicleCard";
-import SideBarList from "../SideBarList";
-import * as vehicleService from "../../../services/vehicles/vehicles";
-import VehicleCardForm from "../../CardForm/Vehicle/VehicleCardForm";
+import VehicleCard from "../components/VehicleCard";
+import SideBarList from "../components/SideBarList/SideBarList";
+import * as vehicleService from "../services/vehicles/vehicles";
+import VehicleCardForm from "../components/CardForm/Vehicle/VehicleCardForm";
 
 export default function VehiclesList() {
   const [vehicles, setVehicles] = useState(
-    /** @type {import("../../../services/vehicles/vehicles").Vehicle[]} */ ([])
+    /** @type {import("../services/vehicles/vehicles").Vehicle[]} */ ([])
   );
   const [filterVehicle, setFilterVehicle] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState(0);
