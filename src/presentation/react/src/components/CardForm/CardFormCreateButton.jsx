@@ -1,5 +1,6 @@
 import React from "react";
 import useWidthHeight from "../../middlewares/useWidthHeight";
+import BlackButton from "./BlackButton";
 
 export default function CardFormCreateButton({
   label,
@@ -23,16 +24,7 @@ export default function CardFormCreateButton({
         bottom: getBottom(),
       }}
     >
-      <button
-        className="btn align-self-end text-white p-3 shadow"
-        style={{
-          backgroundColor: "#000",
-          width: "100%",
-        }}
-        onClick={onClickHandler}
-      >
-        {label}
-      </button>
+      <BlackButton onClickHandler={onClickHandler} label={label} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DriverMainHeaderButton from "./DriverMainHeaderButton";
+import MainHeaderButton from "../../MainHeaderButton";
 
 /**
  * @param {{
@@ -56,17 +56,17 @@ export default function DriverMainHeader({ driver, deleteHandler }) {
               )}
             </ul>
           </div>
-          <DriverMainHeaderButton
+          <MainHeaderButton
             icon="bi-chat-left-text-fill"
             onClickHandler={() => alert("button chat")}
           />
 
-          <DriverMainHeaderButton
+          <MainHeaderButton
             icon="bi-telephone-fill"
             onClickHandler={() => alert("button phone")}
           />
 
-          <DriverMainHeaderButton
+          <MainHeaderButton
             icon="bi-three-dots-vertical"
             onClickHandler={() => setShowConfig(!showConfig)}
           />

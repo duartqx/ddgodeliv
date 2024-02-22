@@ -13,17 +13,7 @@ export default function DeliveryCard({ onClickHandler, selected, delivery }) {
   const parts = [
     { label: "Weight:", value: delivery.weight, border: true },
     { label: "Origin:", value: delivery.origin, border: true },
-    { label: "Destination:", value: delivery.destination, border: true },
-    {
-      label: "Created At:",
-      value: delivery.created_at,
-      border: true,
-    },
-    {
-      label: "Deadline:",
-      value: delivery.deadline,
-      border: false,
-    },
+    { label: "Destination:", value: delivery.destination, border: false },
   ];
   return (
     <Card

@@ -3,14 +3,22 @@ import CardFormInput from "./CardFormInput";
 import CardFormSelect from "./CardFormSelect";
 import Error from "../Error";
 
-/** @param {{
+/**
+ * @param {{
  *  title: string
  *  error: string
- *  handleSubmit: Function
+ *  handleSubmit: () => void
  *  inputs: import("./CardFormInput").CardFormInputObject[]
+ *  handleDismiss: () => void
  * }} props
  */
-export default function CardForm({ title, error, handleSubmit, inputs }) {
+export default function CardForm({
+  title,
+  error,
+  handleSubmit,
+  inputs,
+  handleDismiss = () => {},
+}) {
   return (
     <div
       className="card mx-auto"

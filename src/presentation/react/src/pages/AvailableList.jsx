@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import SideBarList from "../components/SideBarList/SideBarList";
 import * as deliveryService from "../services/deliveries/deliveries";
 import DeliveryCard from "../components/DeliveryCard";
+import DeliveryMain from "../components/DeliveryMain/DeliveryMainPending";
 import { TitleContext } from "../middlewares/TitleContext";
 
 export default function AvailableList() {
@@ -10,11 +11,10 @@ export default function AvailableList() {
   );
   const [filterDeliveries, setFilterDeliveries] = useState("");
   const [selectedDelivery, setSelectedDelivery] = useState(0);
-  const { setTitle } = useContext(TitleContext)
+  const { setTitle } = useContext(TitleContext);
 
   useEffect(() => {
-
-    setTitle("Available")
+    setTitle("Available");
 
     deliveryService
       .getPendingDeliveries()
@@ -38,11 +38,16 @@ export default function AvailableList() {
 
   return (
     <>
-      <SideBarList
-        listing={deliveriesCards}
-        filterValue={filterDeliveries}
-        filterOnChangeHandler={(e) => setFilterDeliveries(e.target.value)}
-      />
+      <div className="d-flex flex-grow-1">
+        <SideBarList
+          listing={deliveriesCards}
+          filterValue={filterDeliveries}
+          filterOnChangeHandler={(e) => setFilterDeliveries(e.target.value)}
+        />
+        {filteredDeliveries[selectedDelivery] && (
+          <DeliveryMain delivery={filteredDeliveries[selectedDelivery]} />
+        )}
+      </div>
     </>
   );
 }
