@@ -15,6 +15,7 @@ import DriverList from "./pages/DriverList";
 import VehiclesList from "./pages/VehiclesList";
 import { Paths } from "./path";
 import AvailableList from "./pages/AvailableList";
+import CompanyDeliveryList from "./pages/CompanyDeliveryList";
 
 function App() {
   const router = createBrowserRouter([
@@ -30,7 +31,7 @@ function App() {
         { path: Paths.drivers, element: <DriverList /> },
         { path: Paths.vehicles, element: <VehiclesList /> },
         { path: Paths.delivery.available, element: <AvailableList /> },
-        { path: Paths.delivery.company, element: <></> },
+        { path: Paths.delivery.company, element: <CompanyDeliveryList /> },
       ],
     },
     {

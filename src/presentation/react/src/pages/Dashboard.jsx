@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
+import { TitleContext } from "../middlewares/TitleContext";
 
 /**
  * @typedef {{
@@ -8,5 +9,9 @@ import React from "react";
  */
 
 export default function Dashboard() {
+  const { setTitle } = useContext(TitleContext)
+
+  useEffect(() => setTitle("Home"), [])
+
   return <main className="d-flex"> </main>;
 }
