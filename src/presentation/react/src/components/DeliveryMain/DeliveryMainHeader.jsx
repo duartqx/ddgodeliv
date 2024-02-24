@@ -19,10 +19,16 @@ function AssignToDriverForm({ delivery }) {
     driverService.companyDrivers().then((drivers) => setDrivers(drivers));
   }, []);
 
+  const handleSubmit = (/** @type {React.FormEvent} */ e) => {
+    e.preventDefault();
+
+    alert(`assign ${delivery.id} ${driverId}`);
+  };
+
   return (
     <>
       <CardForm
-        handleSubmit={() => alert(`assign ${delivery.id} ${driverId}`)}
+        handleSubmit={handleSubmit}
         title="Assign to Driver"
         inputs={[
           {
@@ -37,6 +43,36 @@ function AssignToDriverForm({ delivery }) {
         ]}
       />
     </>
+  );
+}
+
+function AssignToDriverFormWithBackdrop({ delivery, handleBackdropClick }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "55vh",
+        right: "50vw",
+      }}
+    >
+      <AssignToDriverForm delivery={delivery} />
+      <div
+        onClick={handleBackdropClick}
+        style={{
+          top: 0,
+          left: 0,
+          position: "fixed",
+          background: `linear-gradient(
+                      rgba(255, 255, 255, 0.75) 0%,
+                      rgba(255, 255, 255, 0.98) 25%,
+                      rgba(255, 255, 255, 0.98) 75%,
+                      rgba(255, 255, 255, 0.75) 100%
+                    )`,
+          height: "100vh",
+          width: "100vw",
+        }}
+      ></div>
+    </div>
   );
 }
 
@@ -66,33 +102,12 @@ export default function DriverMainHeader({ delivery }) {
               onClickHandler={handleSetShowForm}
               label="Assign Driver"
             />
-            <div
-              className={`collapse ${showForm && "show"}`}
-              style={{
-                position: "absolute",
-                top: "55vh",
-                right: "50vw",
-              }}
-            >
-              <AssignToDriverForm delivery={delivery} />
-              <div
-                onClick={handleSetShowForm}
-                style={{
-                  top: 0,
-                  left: 0,
-                  position: "fixed",
-                  background:
-                    `linear-gradient(
-                      rgba(255, 255, 255, 0.75) 0%,
-                      rgba(255, 255, 255, 0.98) 25%,
-                      rgba(255, 255, 255, 0.98) 75%,
-                      rgba(255, 255, 255, 0.75) 100%
-                    )`,
-                  height: "100vh",
-                  width: "100vw",
-                }}
-              ></div>
-            </div>
+            {showForm && (
+              <AssignToDriverFormWithBackdrop
+                delivery={delivery}
+                handleBackdropClick={handleSetShowForm}
+              />
+            )}
           </div>
           <DriverMainHeaderButton
             icon="bi-chat-left-text-fill"
