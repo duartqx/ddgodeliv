@@ -6,13 +6,9 @@ import AssignToDriverFormWithBackdrop from "./AssignToDriverFormWithBackdrop";
 /**
  * @param {{
  *  delivery: import("../../services/deliveries/deliveries").Delivery
- *  handleFilterOutDelivery: (delivery: import("../../services/deliveries/deliveries").Delivery) => void
  * }} props
  * */
-export default function DeliveryMainHeader({
-  delivery,
-  handleFilterOutDelivery,
-}) {
+export default function DeliveryMainHeader({ delivery }) {
   const [showForm, setShowForm] = useState(false);
 
   const handleSetShowForm = () => setShowForm(!showForm);
@@ -37,7 +33,6 @@ export default function DeliveryMainHeader({
               <AssignToDriverFormWithBackdrop
                 delivery={delivery}
                 handleBackdropClick={handleSetShowForm}
-                handleFilterOutDelivery={handleFilterOutDelivery}
               />
             )}
           </div>

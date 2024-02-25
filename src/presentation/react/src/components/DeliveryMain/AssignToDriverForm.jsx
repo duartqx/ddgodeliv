@@ -1,25 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import CardForm from "../CardForm/CardForm";
 import * as driverService from "../../services/driver/driver";
 import * as deliveryService from "../../services/deliveries/deliveries";
 import * as deliveryStatus from "../../domains/deliveries/status";
+import { PendingDeliveriesContext } from "./PendingDeliveriesContext";
 
 /**
  * @param {{
  *  delivery: import("../../services/deliveries/deliveries").Delivery
- *  handleFilterOutDelivery: (delivery: import("../../services/deliveries/deliveries").Delivery) => void
  *  dissmissForm: () => void
  * }} props
  */
-export default function AssignToDriverForm({
-  delivery,
-  dissmissForm,
-  handleFilterOutDelivery,
-}) {
+export default function AssignToDriverForm({ delivery, dissmissForm }) {
   const [driverId, setDriverId] = useState(null);
   const [drivers, setDrivers] = useState(
-    /** @type {driverService.Driver[]} */ ([]),
+    /** @type {driverService.Driver[]} */ ([])
   );
+  const { removeDelivery } = useContext(PendingDeliveriesContext);
 
   useEffect(() => {
     driverService.companyDrivers().then((drivers) => setDrivers(drivers));
@@ -33,7 +30,7 @@ export default function AssignToDriverForm({
       driverId: driverId,
     });
 
-    handleFilterOutDelivery(delivery);
+    removeDelivery(delivery);
 
     if (dissmissForm) {
       dissmissForm();

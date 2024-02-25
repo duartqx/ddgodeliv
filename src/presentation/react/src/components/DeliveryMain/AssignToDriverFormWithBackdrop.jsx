@@ -5,13 +5,11 @@ import AssignToDriverForm from "./AssignToDriverForm";
  * @param {{
  *  delivery: import("../../services/deliveries/deliveries").Delivery
  *  handleBackdropClick: () => void
- *  handleFilterOutDelivery: (delivery: import("../../services/deliveries/deliveries").Delivery) => void
  * }}
  */
 export default function AssignToDriverFormWithBackdrop({
   delivery,
   handleBackdropClick,
-  handleFilterOutDelivery,
 }) {
   return (
     <div
@@ -24,7 +22,6 @@ export default function AssignToDriverFormWithBackdrop({
       <AssignToDriverForm
         delivery={delivery}
         dissmissForm={handleBackdropClick}
-        handleFilterOutDelivery={handleFilterOutDelivery}
       />
       <div
         onClick={handleBackdropClick}

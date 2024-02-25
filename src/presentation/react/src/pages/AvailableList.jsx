@@ -3,33 +3,21 @@ import SideBarList from "../components/SideBarList/SideBarList";
 import DeliveryCard from "../components/DeliveryCard";
 import DeliveryMainPending from "../components/DeliveryMain/DeliveryMainPending";
 import { TitleContext } from "../middlewares/TitleContext";
-import * as deliveryService from "../services/deliveries/deliveries";
+import PendingDeliveriesContextProvider, {
+  PendingDeliveriesContext,
+} from "../components/DeliveryMain/PendingDeliveriesContext";
 
-export default function AvailableList() {
-  const [pendingDeliveries, setPendingDeliveries] = useState(
-    /** @type {deliveryService.Delivery[]} */ ([]),
-  );
+function AvailableListWithContext() {
   const [filter, setFilter] = useState("");
   const [selectedDelivery, setSelectedDelivery] = useState(0);
   const { setTitle } = useContext(TitleContext);
+  const { getFiltered } = useContext(PendingDeliveriesContext);
 
   useEffect(() => {
     setTitle("Available");
-    deliveryService
-      .getPendingDeliveries()
-      .then((deliveries) => setPendingDeliveries(deliveries));
   }, []);
 
-  const filteredDeliveries = filter
-    ? pendingDeliveries.filter((d) =>
-        d.loadout.toLowerCase().includes(filter.toLowerCase()),
-      )
-    : pendingDeliveries;
-
-  const handleFilterOutDelivery = (delivery) =>
-    setPendingDeliveries(
-      pendingDeliveries.filter((d) => d.id !== delivery.id),
-    );
+  const filteredDeliveries = getFiltered(filter);
 
   const deliveriesCards = filteredDeliveries.map((d, idx) => (
     <DeliveryCard
@@ -51,10 +39,17 @@ export default function AvailableList() {
         {filteredDeliveries[selectedDelivery] && (
           <DeliveryMainPending
             delivery={filteredDeliveries[selectedDelivery]}
-            handleFilterOutDelivery={handleFilterOutDelivery}
           />
         )}
       </div>
     </>
+  );
+}
+
+export default function AvailableList() {
+  return (
+    <PendingDeliveriesContextProvider>
+      <AvailableListWithContext />
+    </PendingDeliveriesContextProvider>
   );
 }
