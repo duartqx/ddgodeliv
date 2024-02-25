@@ -36,20 +36,22 @@ function getCacheKey(prefix, driverId) {
 async function getOtherDeliveriesByDriverId(driverId) {
   try {
     const cachedDeliveries = await cache.getFromCache(
-      getCacheKey("cachedDriverDeliveries", driverId)
+      getCacheKey("cachedDriverDeliveries", driverId),
     );
     if (cachedDeliveries) {
       // Can be an empty array
       return cachedDeliveries;
     }
 
-    const res = await httpClient().get(`/delivery/company/driver/${driverId}/`);
+    const res = await httpClient().get(
+      `/delivery/company/driver/${driverId}/`,
+    );
 
     const deliveries = res.data || [];
 
     cache.setToCache(
       getCacheKey("cachedDriverDeliveries", driverId),
-      deliveries
+      deliveries,
     );
 
     return deliveries;
@@ -65,7 +67,7 @@ async function getOtherDeliveriesByDriverId(driverId) {
 async function getCurrentByDriverId(driverId) {
   try {
     const cachedDelivery = await cache.getFromCache(
-      getCacheKey("cachedDriverCurrentDelivery", driverId)
+      getCacheKey("cachedDriverCurrentDelivery", driverId),
     );
     if (cachedDelivery) {
       // Can be an empty array
@@ -73,14 +75,14 @@ async function getCurrentByDriverId(driverId) {
     }
 
     const res = await httpClient().get(
-      `/delivery/company/driver/${driverId}/current/`
+      `/delivery/company/driver/${driverId}/current/`,
     );
 
     const delivery = res.data || null;
 
     cache.setToCache(
       getCacheKey("cachedDriverCurrentDelivery", driverId),
-      delivery
+      delivery,
     );
 
     return delivery;
@@ -93,7 +95,7 @@ async function getCurrentByDriverId(driverId) {
 async function getByCompanyId() {
   try {
     const cachedDeliveries = await cache.getFromCache(
-      getCacheKey("cachedCompanyDeliveries")
+      getCacheKey("cachedCompanyDeliveries"),
     );
     if (cachedDeliveries) {
       // Can be an empty array
@@ -114,7 +116,7 @@ async function getByCompanyId() {
 async function getPendingDeliveries() {
   try {
     const cachedDeliveries = await cache.getFromCache(
-      getCacheKey("cachedPendingDeliveries")
+      getCacheKey("cachedPendingDeliveries"),
     );
     if (cachedDeliveries) {
       // Can be an empty array
@@ -131,7 +133,27 @@ async function getPendingDeliveries() {
   }
 }
 
+/** @returns {Promise<boolean>} */
+async function assignDriver({ deliveryId, driverId }) {
+  try {
+    const res = await httpClient().patch(`/delivery/${deliveryId}/assign/`, {
+      driver_id: Number(driverId),
+    });
+
+    cache.invalidateCache(
+      getCacheKey("cachedPendingDeliveries"),
+      getCacheKey("cachedCompanyDeliveries"),
+      getCacheKey("cachedDriver"),
+    );
+    return res.status === 200;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+}
+
 export {
+  assignDriver,
   getOtherDeliveriesByDriverId,
   getCurrentByDriverId,
   getByCompanyId,

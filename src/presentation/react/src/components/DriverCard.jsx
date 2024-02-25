@@ -1,6 +1,6 @@
 import React from "react";
 import Card from "./SideBarList/Card";
-import { DeliveryStatus } from "../domains/deliveries/status";
+import * as deliveryStatus from "../domains/deliveries/status";
 
 /** @param {{
  * onClickHandler: () => void
@@ -12,7 +12,7 @@ export default function DriverCard({ onClickHandler, driver, selected }) {
     {
       //label: "Status:",
       label: "",
-      value: DeliveryStatus[driver.status],
+      value: deliveryStatus.getStatusDisplay(driver.status),
       border: false,
     },
   ];

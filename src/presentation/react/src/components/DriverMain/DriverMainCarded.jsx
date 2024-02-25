@@ -5,9 +5,9 @@ import DriverMainStatistics from "./DriverMainStatistics";
 
 export default function DriverMainCarded({ driver }) {
   return (
-    <div className="d-flex flex-column" style={{ maxHeight: "87vh"}}>
+    <div className="d-flex flex-column" style={{ maxHeight: "87vh" }}>
       <DriverMainDriverInfo driver={driver} />
-      <div className="row" style={{ height: "60vh"}}>
+      <div className="row" style={{ height: "60vh" }}>
         <div className="col-sm-6">
           <DriverMainDeliveries driver={driver} />
         </div>

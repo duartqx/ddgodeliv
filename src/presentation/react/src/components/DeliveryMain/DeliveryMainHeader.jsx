@@ -1,87 +1,18 @@
 import React, { useEffect, useState } from "react";
 import DriverMainHeaderButton from "../MainHeaderButton";
 import BlackButton from "../CardForm/BlackButton";
-import * as driverService from "../../services/driver/driver";
-import CardForm from "../CardForm/CardForm";
+import AssignToDriverFormWithBackdrop from "./AssignToDriverFormWithBackdrop";
 
 /**
  * @param {{
  *  delivery: import("../../services/deliveries/deliveries").Delivery
- * }} props
- */
-function AssignToDriverForm({ delivery }) {
-  const [driverId, setDriverId] = useState(null);
-  const [drivers, setDrivers] = useState(
-    /** @type {driverService.Driver[]} */ ([])
-  );
-
-  useEffect(() => {
-    driverService.companyDrivers().then((drivers) => setDrivers(drivers));
-  }, []);
-
-  const handleSubmit = (/** @type {React.FormEvent} */ e) => {
-    e.preventDefault();
-
-    alert(`assign ${delivery.id} ${driverId}`);
-  };
-
-  return (
-    <>
-      <CardForm
-        handleSubmit={handleSubmit}
-        title="Assign to Driver"
-        inputs={[
-          {
-            label: "Driver",
-            type: "select",
-            options: drivers.map((d) => ({
-              value: d.id,
-              label: `${d.user.email} ${d.user.name}`,
-            })),
-            onChangeHandler: (e) => setDriverId(e.target.value),
-          },
-        ]}
-      />
-    </>
-  );
-}
-
-function AssignToDriverFormWithBackdrop({ delivery, handleBackdropClick }) {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: "55vh",
-        right: "50vw",
-      }}
-    >
-      <AssignToDriverForm delivery={delivery} />
-      <div
-        onClick={handleBackdropClick}
-        style={{
-          top: 0,
-          left: 0,
-          position: "fixed",
-          background: `linear-gradient(
-                      rgba(255, 255, 255, 0.75) 0%,
-                      rgba(255, 255, 255, 0.98) 25%,
-                      rgba(255, 255, 255, 0.98) 75%,
-                      rgba(255, 255, 255, 0.75) 100%
-                    )`,
-          height: "100vh",
-          width: "100vw",
-        }}
-      ></div>
-    </div>
-  );
-}
-
-/**
- * @param {{
- *  delivery: import("../../services/deliveries/deliveries").Delivery
+ *  handleFilterOutDelivery: (delivery: import("../../services/deliveries/deliveries").Delivery) => void
  * }} props
  * */
-export default function DriverMainHeader({ delivery }) {
+export default function DeliveryMainHeader({
+  delivery,
+  handleFilterOutDelivery,
+}) {
   const [showForm, setShowForm] = useState(false);
 
   const handleSetShowForm = () => setShowForm(!showForm);
@@ -106,6 +37,7 @@ export default function DriverMainHeader({ delivery }) {
               <AssignToDriverFormWithBackdrop
                 delivery={delivery}
                 handleBackdropClick={handleSetShowForm}
+                handleFilterOutDelivery={handleFilterOutDelivery}
               />
             )}
           </div>

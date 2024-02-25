@@ -7,15 +7,14 @@ import { TitleContext } from "../middlewares/TitleContext";
 
 export default function VehiclesList() {
   const [vehicles, setVehicles] = useState(
-    /** @type {import("../services/vehicles/vehicles").Vehicle[]} */ ([])
+    /** @type {import("../services/vehicles/vehicles").Vehicle[]} */ ([]),
   );
   const [filterVehicle, setFilterVehicle] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState(0);
-  const { setTitle } = useContext(TitleContext)
+  const { setTitle } = useContext(TitleContext);
 
   useEffect(() => {
-
-    setTitle("Vehicles")
+    setTitle("Vehicles");
 
     vehicleService.companyVehicles().then((vehicles) => setVehicles(vehicles));
   }, []);
@@ -28,7 +27,7 @@ export default function VehiclesList() {
 
   const filteredVehicles = filterVehicle
     ? vehicles.filter((v) =>
-        v.model.name.toLowerCase().includes(filterVehicle.toLowerCase())
+        v.model.name.toLowerCase().includes(filterVehicle.toLowerCase()),
       )
     : vehicles;
 

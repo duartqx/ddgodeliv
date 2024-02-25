@@ -12,11 +12,10 @@ export default function DriverList() {
   );
   const [filterDriver, setFilterDriver] = useState("");
   const [selectedDriver, setSelectedDriver] = useState(0);
-  const { setTitle } = useContext(TitleContext)
+  const { setTitle } = useContext(TitleContext);
 
   useEffect(() => {
-
-    setTitle("Drivers")
+    setTitle("Drivers");
 
     driverService.companyDrivers().then((drivers) => setDrivers(drivers));
   }, []);
@@ -47,12 +46,12 @@ export default function DriverList() {
     <>
       <div className="d-flex flex-grow-1">
         <DriverCardForm
-        appendDriver={(driver) => setDrivers(drivers.concat(driver))}
+          appendDriver={(driver) => setDrivers(drivers.concat(driver))}
         />
         <SideBarList
-        listing={driversCards}
-        filterValue={filterDriver}
-        filterOnChangeHandler={(e) => setFilterDriver(e.target.value)}
+          listing={driversCards}
+          filterValue={filterDriver}
+          filterOnChangeHandler={(e) => setFilterDriver(e.target.value)}
         />
         {filteredDrivers[selectedDriver] && (
           <DriverMain

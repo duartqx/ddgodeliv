@@ -1,5 +1,7 @@
-async function invalidateCache(/** @type {string} */ key) {
-  localStorage.removeItem(key);
+async function invalidateCache(/** @type {string[]} */ ...keys) {
+  for (const key of keys) {
+    localStorage.removeItem(key);
+  }
 }
 
 /** @returns {Promise<Array<any> | null>} */

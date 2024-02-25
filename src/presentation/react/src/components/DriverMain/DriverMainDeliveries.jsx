@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as deliveryService from "../../services/deliveries/deliveries";
 import DottedLink from "../DottedLink";
-import { DeliveryStatus } from "../../domains/deliveries/status";
+import * as deliveryStatus from "../../domains/deliveries/status";
 import useWidthHeight from "../../middlewares/useWidthHeight";
 
 /** @param {{ margin: { marginLeft?: string, marginRight?: string } }} props */
@@ -16,6 +16,7 @@ function MiddleLine({ margin = { marginLeft: "1rem" } }) {
 
 /** @param {{ delivery: import("../../services/deliveries/deliveries").Delivery }} props */
 function DeliveryCard({ delivery }) {
+  const status = deliveryStatus.getStatusDisplay(delivery?.status);
   return (
     delivery && (
       <div className="py-3">
@@ -25,13 +26,15 @@ function DeliveryCard({ delivery }) {
             {delivery.sender.name}
           </div>
           <div className="col-5 fw-light text-end">
-            {delivery.weight}kg | {DeliveryStatus[delivery.status]}
+            {delivery.weight}kg | {status}
           </div>
         </div>
         <div className="row">
           <div className="col-5 fw-medium">{delivery.origin}</div>
           <i className="col-2 bi bi-arrow-right text-center"></i>
-          <div className="col-5 fw-medium text-end">{delivery.destination}</div>
+          <div className="col-5 fw-medium text-end">
+            {delivery.destination}
+          </div>
         </div>
       </div>
     )
@@ -69,11 +72,11 @@ function CurrentDelivery({ delivery }) {
 /** @param {{ driver: import("../../services/driver/driver").Driver }} props */
 export default function DriverMainDeliveries({ driver }) {
   const [driverDeliveries, setDriverDeliveries] = useState(
-    /** @type {import("../../services/deliveries/deliveries").Delivery[]} */ ([])
+    /** @type {import("../../services/deliveries/deliveries").Delivery[]} */ ([]),
   );
   const [currentDelivery, setCurrentDelivery] = useState(
     /** @type {import("../../services/deliveries/deliveries").Delivery} */
-    (null)
+    (null),
   );
   const { isSmallWindow } = useWidthHeight();
 

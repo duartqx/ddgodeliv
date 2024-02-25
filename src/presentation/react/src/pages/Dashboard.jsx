@@ -9,9 +9,9 @@ import { TitleContext } from "../middlewares/TitleContext";
  */
 
 export default function Dashboard() {
-  const { setTitle } = useContext(TitleContext)
+  const { setTitle } = useContext(TitleContext);
 
-  useEffect(() => setTitle("Home"), [])
+  useEffect(() => setTitle("Home"), []);
 
   return <main className="d-flex"> </main>;
 }

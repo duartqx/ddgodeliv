@@ -6,15 +6,14 @@ import { TitleContext } from "../middlewares/TitleContext";
 
 export default function CompanyDeliveryList() {
   const [deliveries, setDeliveries] = useState(
-    /** @type {import("../services/deliveries/deliveries").Delivery[]} */ ([])
+    /** @type {import("../services/deliveries/deliveries").Delivery[]} */ ([]),
   );
   const [filterDeliveries, setFilterDeliveries] = useState("");
   const [selectedDelivery, setSelectedDelivery] = useState(0);
-  const { setTitle } = useContext(TitleContext)
+  const { setTitle } = useContext(TitleContext);
 
   useEffect(() => {
-
-    setTitle("Company Deliveries")
+    setTitle("Company Deliveries");
 
     deliveryService
       .getByCompanyId()
@@ -23,7 +22,7 @@ export default function CompanyDeliveryList() {
 
   const filteredDeliveries = filterDeliveries
     ? deliveries.filter((d) =>
-        d.loadout.toLowerCase().includes(filterDeliveries.toLowerCase())
+        d.loadout.toLowerCase().includes(filterDeliveries.toLowerCase()),
       )
     : deliveries;
 

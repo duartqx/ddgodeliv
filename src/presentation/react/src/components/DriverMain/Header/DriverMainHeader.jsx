@@ -20,7 +20,7 @@ export default function DriverMainHeader({ driver, deleteHandler }) {
 
   return (
     <>
-      <div className="my-4 d-flex" style={{ height: "8vh"}}>
+      <div className="my-4 d-flex" style={{ height: "8vh" }}>
         <div className="d-flex flex-column justify-content-center">
           <div className="fw-bold">{driver.user.name}</div>
           <div className="fw-light">{driver.user.email}</div>

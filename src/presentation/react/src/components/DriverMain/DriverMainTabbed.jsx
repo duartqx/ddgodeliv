@@ -20,7 +20,7 @@ export default function DriverMainTabbed({ driver }) {
       isActive: function (tab) {
         return this.tab === tab;
       },
-    })
+    }),
   );
 
   return (

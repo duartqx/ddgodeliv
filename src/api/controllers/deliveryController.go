@@ -93,7 +93,7 @@ func (dc DeliveryController) AssignDriver(w http.ResponseWriter, r *http.Request
 	}{}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, e.BadRequestError.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid Driver Id: Must be integer", http.StatusBadRequest)
 		return
 	}
 
