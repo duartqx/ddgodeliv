@@ -22,6 +22,8 @@ var s *server
 type server struct {
 	db     *sqlx.DB
 	secret *[]byte
+	index  *[]byte
+	assets *string
 
 	// Base Repos
 	userRepository   user.IUserRepository
@@ -37,12 +39,16 @@ type server struct {
 type ServerConfig struct {
 	Db     *sqlx.DB
 	Secret []byte
+	Index  []byte
+	Assets string
 }
 
 func GetNewServer(cfg ServerConfig) *server {
 	s := &server{
 		db:     cfg.Db,
 		secret: &cfg.Secret,
+		index:  &cfg.Index,
+		assets: &cfg.Assets,
 	}
 	return s.setupBase()
 }
@@ -102,21 +108,30 @@ func (s *server) Use(
 func (s *server) Build() http.Handler {
 
 	mux := s.BuildBaseServer()
-
 	// User Routes
-	mux.Handle("/user/", http.StripPrefix("/user", s.SetupUserRoutes()))
+	mux.Handle("/api/user/", http.StripPrefix("/api/user", s.SetupUserRoutes()))
 
 	// Vehicle Routes
-	mux.Handle("/vehicle/", http.StripPrefix("/vehicle", s.SetupVehicleRoutes()))
+	mux.Handle("/api/vehicle/", http.StripPrefix("/api/vehicle", s.SetupVehicleRoutes()))
 
 	// Company Routes
-	mux.Handle("/company/", http.StripPrefix("/company", s.SetupCompanyRoutes()))
+	mux.Handle("/api/company/", http.StripPrefix("/api/company", s.SetupCompanyRoutes()))
 
 	// Driver Routes
-	mux.Handle("/driver/", http.StripPrefix("/driver", s.SetupDriverRoutes()))
+	mux.Handle("/api/driver/", http.StripPrefix("/api/driver", s.SetupDriverRoutes()))
 
 	// Delivery Routes
-	mux.Handle("/delivery/", http.StripPrefix("/delivery", s.SetupDeliveryRoutes()))
+	mux.Handle("/api/delivery/", http.StripPrefix("/api/delivery", s.SetupDeliveryRoutes()))
+
+	mux.Handle(
+		"/assets/",
+		http.StripPrefix("/assets/", http.FileServer(http.Dir(*s.assets))),
+	)
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		w.Write(*s.index)
+	})
 
 	return s.Use(
 		mux,

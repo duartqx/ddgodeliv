@@ -4,7 +4,7 @@ async function invalidateCache(/** @type {string[]} */ ...keys) {
   }
 }
 
-/** @returns {Promise<Array<any> | null>} */
+/** @returns {Promise<any | null>} */
 async function getFromCache(/** @type {string} */ key) {
   const cached = JSON.parse(localStorage.getItem(key) || "{}");
 

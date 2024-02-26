@@ -27,9 +27,17 @@ func main() {
 	}
 	defer db.Close()
 
+	index, err := os.ReadFile("presentation/react/dist/index.html")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	mux := server.GetNewServer(
 		server.ServerConfig{
-			Db: db, Secret: []byte(os.Getenv("SECRET_KEY")),
+			Db:     db,
+			Secret: []byte(os.Getenv("SECRET_KEY")),
+			Assets: "presentation/react/dist/assets",
+			Index:  index,
 		},
 	).Build()
 

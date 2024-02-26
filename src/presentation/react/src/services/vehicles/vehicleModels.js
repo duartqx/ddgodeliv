@@ -27,7 +27,7 @@ async function getVehicleModels() {
       return cachedVehicleModels;
     }
 
-    const res = await httpClient().get("/vehicle/model");
+    const res = await httpClient().get("/api/vehicle/model");
 
     if (res.data) {
       cache.setToCache(cacheKey, res.data);

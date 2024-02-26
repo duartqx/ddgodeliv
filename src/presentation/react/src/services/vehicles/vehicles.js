@@ -29,7 +29,7 @@ async function companyVehicles() {
       return cachedVehicles;
     }
 
-    const res = await httpClient().get("/vehicle");
+    const res = await httpClient().get("/api/vehicle");
 
     if (res.data) {
       cache.setToCache(cacheKey, res.data);
@@ -48,7 +48,7 @@ async function companyVehicles() {
  */
 async function createVehicle({ license, model }) {
   try {
-    const res = await httpClient().post("/vehicle", {
+    const res = await httpClient().post("/api/vehicle", {
       license_id: license,
       model_id: model,
     });
@@ -69,7 +69,7 @@ async function createVehicle({ license, model }) {
  */
 async function deleteVehicle({ id }) {
   try {
-    await httpClient().delete(`/vehicle/${id}`);
+    await httpClient().delete(`/api/vehicle/${id}`);
     cache.invalidateCache(getVehiclesCacheKey());
     return true;
   } catch (e) {

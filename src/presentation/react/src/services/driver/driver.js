@@ -33,7 +33,7 @@ async function companyDrivers() {
       return cachedDrivers;
     }
 
-    const res = await httpClient().get("/driver");
+    const res = await httpClient().get("/api/driver");
 
     if (res.data) {
       cache.setToCache(getDriverCacheKey(), res.data);
@@ -49,7 +49,7 @@ async function companyDrivers() {
 /** @returns {Promise<Driver>} */
 async function createDriver({ name, email, license }) {
   try {
-    const res = await httpClient().post("/driver", {
+    const res = await httpClient().post("/api/driver", {
       license_id: license,
       user: {
         name: name,
@@ -63,17 +63,17 @@ async function createDriver({ name, email, license }) {
     }
   } catch (e) {
     console.log(e);
-    return {};
   }
+  return /** @type {Driver} */ ({});
 }
 
 /**
- * @param {number} id
+ * @param {{id: number}} params
  * @returns {Promise<boolean>}
  */
 async function deleteDriver({ id }) {
   try {
-    await httpClient().delete(`/driver/${id}`);
+    await httpClient().delete(`/api/driver/${id}`);
     cache.invalidateCache(getDriverCacheKey());
     return true;
   } catch (e) {

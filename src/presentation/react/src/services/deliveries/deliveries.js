@@ -18,7 +18,7 @@ import * as cache from "../cache";
 
 /**
  * @param {string} prefix
- * @param {number} driverId
+ * @param {number} driverId?
  * @returns {string}
  **/
 function getCacheKey(prefix, driverId) {
@@ -44,7 +44,7 @@ async function getOtherDeliveriesByDriverId(driverId) {
     }
 
     const res = await httpClient().get(
-      `/delivery/company/driver/${driverId}/`,
+      `/api/delivery/company/driver/${driverId}/`,
     );
 
     const deliveries = res.data || [];
@@ -75,7 +75,7 @@ async function getCurrentByDriverId(driverId) {
     }
 
     const res = await httpClient().get(
-      `/delivery/company/driver/${driverId}/current/`,
+      `/api/delivery/company/driver/${driverId}/current/`,
     );
 
     const delivery = res.data || null;
@@ -102,7 +102,7 @@ async function getByCompanyId() {
       return cachedDeliveries;
     }
 
-    const res = await httpClient().get(`/delivery/company/`);
+    const res = await httpClient().get(`/api/delivery/company/`);
 
     const deliveries = res.data || [];
     cache.setToCache(getCacheKey("cachedCompanyDeliveries"), deliveries);
@@ -123,7 +123,7 @@ async function getPendingDeliveries() {
       return cachedDeliveries;
     }
 
-    const res = await httpClient().get(`/delivery/pending/`);
+    const res = await httpClient().get(`/api/delivery/pending/`);
 
     const deliveries = res.data || [];
     cache.setToCache(getCacheKey("cachedPendingDeliveries"), deliveries);
@@ -136,9 +136,12 @@ async function getPendingDeliveries() {
 /** @returns {Promise<boolean>} */
 async function assignDriver({ deliveryId, driverId }) {
   try {
-    const res = await httpClient().patch(`/delivery/${deliveryId}/assign/`, {
-      driver_id: Number(driverId),
-    });
+    const res = await httpClient().patch(
+      `/api/delivery/${deliveryId}/assign/`,
+      {
+        driver_id: Number(driverId),
+      },
+    );
 
     cache.invalidateCache(
       getCacheKey("cachedPendingDeliveries"),

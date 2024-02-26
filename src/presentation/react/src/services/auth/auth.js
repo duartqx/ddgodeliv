@@ -65,7 +65,7 @@ async function logout() {
 /** @returns {Promise<SignUpUser>} */
 async function register({ name, email, password }) {
   try {
-    const res = await httpClient().post("/user", {
+    const res = await httpClient().post("/api/user", {
       name,
       email,
       password,
@@ -88,7 +88,7 @@ async function getUser() {
 
   if (!user?.id) {
     try {
-      const res = await httpClient().get("/user");
+      const res = await httpClient().get("/api/user");
       if (res.data?.id) {
         user = res.data;
         localStorage.setItem("user", JSON.stringify(user));
